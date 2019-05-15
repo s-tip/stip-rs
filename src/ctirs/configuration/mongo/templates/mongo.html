@@ -1,0 +1,59 @@
+{% include 'header.html' %}
+<head>
+<!--  for system_configurations -->
+<link href="/static/ctirs/css/profile_configuration_common.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/mongo_configuration.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<form name="modify_mongo" id="modify-mongo-form" action="/configuration/mongo/modify" method="POST">{% csrf_token %}
+<div class="container">
+    <br/>
+    <h1>Mongo</h1>
+    <br/>
+    <hr/>
+    <h2>Settings</h2>
+    <div class="form-group">
+    <p id="error-msg">{{ error_msg |default:'' }}</p>
+    <p id="info-msg">{{ info_msg |default:'' }}</p>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Host
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-mongo-host" type="text" name="host" class="form-control" value="{{ mongo.host }}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Port
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-mongo-port" type="text" name="port" class="form-control" value="{{ mongo.port }}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                DB Name
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-mongo-db" type="text" name="db" class="form-control" value="{{ mongo.db }}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="modify-mongo-submit" class="btn btn-default">Modify</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</form>
+</body>
+</html>

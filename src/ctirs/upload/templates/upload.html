@@ -1,0 +1,74 @@
+{% include 'header.html' %}
+<head>
+<!--  for upload -->
+<link href="/static/ctirs/css/upload.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/upload.js"></script>
+</head>
+<body>
+<form name="upload" id="upload-form" action="/upload/post/" method="post" enctype="multipart/form-data">{% csrf_token %}
+{% include 'nav_header.html' %}
+<br/>
+<br/>
+<div class="container">
+    <div class="col-lg-12">
+        <h1>Upload</h1>
+    </div> <!--<div class="col-lg-12"> -->
+    <br/>
+    <div class="row">
+        <div class="col-lg-2">
+                Community :
+        </div>
+        <div class="col-lg-6">
+            <div class="dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                    Choose
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" id="dropdown-menu-community-name">
+                	{% if communities %}
+                	{% for community in communities %}
+                    <li><a href="#" data-value="{{community.id}}">{{community.name}}</a></li>
+                	{% endfor %}
+                	{% endif %}
+                </ul>
+                <input type="hidden" id="community-id" name="community_id" value="">
+            </div>
+        </div>
+    </div> <!-- <div class="row"> -->
+    <br/>
+    <br/>
+    <div class="row">
+        <div class="col-lg-2">
+            Upload STIX File :
+        </div>
+        <div class="col-lg-6">
+            <input id="stix-file-file" type="file" name="stix" style="display:none"/>
+            <div class="input-group">
+                <input type="text" id="stix-file-text" class="form-control" placeholder="Choose Stix File..."/>
+                <span class="input-group-btn">
+                    <button type="button" id="stix-file-button" class="btn">Browse</button>
+                </span>
+            </div>
+        </div>
+    </div> <!-- <div class="row"> -->
+    <br/>
+    <br/>
+    <div class="row">
+        <div class="col-lg-2">
+            Package Name :
+        </div>
+        <div class="col-lg-6">
+            <input type="text" id="stix-package-name-text" name="package_name" class="form-control" placeholder="(Optional) Enter Package Name..."/>
+        </div><!--  <div class="col-lg-10"> -->
+    </div> <!-- <div class="row"> -->
+    <br/>
+    <br/>
+    <div class="row">
+    <div class="col-lg-12">
+        <button type="button" id="upload-button" class="btn btn-lg">Upload</button>
+    </div>
+    </div> <!-- <div class="row"> -->
+</div> <!-- <div class="container"> -->
+</form>
+</body>
+</html>

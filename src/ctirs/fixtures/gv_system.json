@@ -1,0 +1,27 @@
+[
+  {
+    "model": "ctirs.taxii",
+    "pk": "dummy",
+    "fields": {
+      "address": "localhost",
+      "port": 80,
+      "ssl": false,
+      "path": "/taxii-data",
+      "collection": "Default",
+      "login_id": "login_id",
+      "login_password": "login_password"
+    }
+  },
+  {
+    "model": "ctirs.config",
+    "pk": 1,
+    "fields": {
+      "path_upload_stix_dir": "/opt/s-tip/gv/stix", 
+      "path_sharing_policy_specifications": "/opt/s-tip/gv/conf/SharingPolicySpecifications.txt", 
+      "path_bootstrap_css_dir": "/opt/s-tip/gv/src/static/bootstrap/css",
+      "default_taxii": "dummy",
+      "ctirs_host": "https://localhost:10001/"
+    }
+  }
+]
+                                  

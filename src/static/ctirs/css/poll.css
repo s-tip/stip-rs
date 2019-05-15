@@ -1,0 +1,23 @@
+h1,h2{
+    font-family: 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1{
+    text-align: center;
+}
+
+#error-msg,#info-msg{
+    font-family: 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: large;
+    color: #ff0000;
+}
+
+#error-msg{
+    color: #ff0000;
+}
+
+#info-msg{
+    color: #0000ff;
+}

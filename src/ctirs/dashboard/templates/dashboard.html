@@ -1,0 +1,30 @@
+{% include 'header.html' %}
+<head>
+<!--  for charts -->
+<script type="text/javascript" src="/static/charts/charts.js"></script>
+<!--  for dashboard -->
+<link href="/static/ctirs/css/dashboard.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/dashboard.js"></script>
+</head>
+<body>
+{% include 'nav_header.html' %}
+<br/>
+<br/>
+<div class="container">
+    <div class="row chart-js-div">
+        <div class="col-lg-12">
+         <div class="col-lg-6">
+            <h1>By Community</h1>
+            <!--描画箇所 -->
+        	<canvas id="canvas-last-cti-pie"></canvas>
+         </div>
+         <div class="col-lg-6">
+            <h1>By Community</h1>
+            <!--描画箇所 -->
+        	<canvas id="canvas-last-cti-pie-2"></canvas>
+         </div>
+    </div>
+</div> <!-- <div class="container"> -->
+</body>
+</html>
+    

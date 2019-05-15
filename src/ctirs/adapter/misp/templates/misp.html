@@ -1,0 +1,168 @@
+{% include 'header.html' %}
+<head>
+<!--  for system_configurations -->
+<link href="/static/ctirs/css/adapter_misp.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/adapter_misp.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<form name="modify_misp" id="modify-misp-form" action="/adapter/misp/modify" method="POST">{% csrf_token %}
+<div class="container">
+    <br/>
+    <h1>MISP Adapter</h1>
+    <br/>
+    <hr/>
+    <h2>Settings</h2>
+    <div class="form-group">
+    <p id="error-msg">{{ error_msg_modify |default:'' }}</p>
+    <p id="info-msg">{{ info_msg_modify |default:'' }}</p>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                URL 
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-misp-url" type="text" name="url" class="form-control" value="{%if misp.url %}{{ misp.url }}{% endif %}" replaceholder='Ex: https://domain.com'/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                API Key
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-misp-apikey" type="text" name="apikey" class="form-control" value="{%if misp.apikey %}{{ misp.apikey }}{% endif %}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Identity
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-misp-identity" type="text" name="identity" class="form-control" value="{%if misp.identity %}{{ misp.identity }}{% endif %}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Community
+            </div>
+            <div class="col-xs-4">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" id="modify-community-dropdown-button" type="button" data-toggle="dropdown">
+                        {% if misp.community.name %}
+                        {{ misp.community.name }}
+                        {% else %}
+                        Choose Communtiy
+                        {% endif %}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="dropdown-menu-community-name">
+            	        {% if communities %}
+                    	{% for community in communities %}
+                        <li><a href="#" data-value="{{community.id}}">{{community.name}}</a></li>
+            	        {% endfor %}
+                    	{% endif %}
+                    </ul>
+                    <input type="hidden" id="modify-community-id" name="community_id" value="{{misp.community.id}}">
+                </div>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Uploader
+            </div>
+            <div class="col-xs-4">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" id="modify-uploader-dropdown-button" type="button" data-toggle="dropdown">
+                        {% if misp.uploader %}
+                        {{ misp.uploader_name }}
+                        {% else %}
+                        Choose Uploader
+                        {% endif %}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="dropdown-menu-uploader-name">
+            	        {% if users %}
+                    	{% for user in users %}
+                        <li><a href="#" data-value="{{user.id}}">{{user.username}}</a></li>
+            	        {% endfor %}
+                    	{% endif %}
+                    </ul>
+                    <input type="hidden" id="modify-uploader-id" name="uploader_id" {%if misp.uploader %}value="{{misp.uploader}}"{%endif%}>
+                </div>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Published Only
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-misp-published-only" type="checkbox" name="published_only" class="checkbox" value="published_only" {%if misp.published_only %}checked{% endif %}/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="modify-misp-submit" class="btn btn-default">Modify</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</form>
+
+<form name="get_misp" id="get-misp-form" action="/adapter/misp/get" method="GET">
+<div class="container">
+    <br/>
+    <hr/>
+    <h2>Get</h2>
+    <p id="error-msg">{{ error_msg_get |default:'' }}</p>
+    <p id="info-msg">{{ info_msg_get |default:'' }}</p>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Start this date .
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-misp-start-date" type="text" name="start_date" class="form-control" value="{%if misp.last_requested %}{{ misp.last_requested|date:'Y/m/d '}}{% endif %}" placeholder="Ex: 2017/01/01"'/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                End this date.
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-misp-end-time" type="text" name="end_date" class="form-control" placeholder="Ex: 2017/01/01"'/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="get-misp-submit" class="btn btn-default">Start</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</form>
+<div class="container">
+<form name="misp_detail" id="misp-detail" action="/adapter/misp/detail/" method="GET"></form>
+    <br/>
+    <hr/>
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="misp-detail-button" class="btn btn-default">Detail</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</body>
+</html>

@@ -1,0 +1,74 @@
+{% include 'header.html' %}
+<head>
+<!--  for poll -->
+<link href="/static/ctirs/css/poll.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/poll.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<form name="poll_detail" id="poll-detail" action="/poll/" method="GET"></form>
+<div class="container">
+    <br/>
+    <h1>Poll</h1>
+    <br/>
+    <hr/>
+    <h2>TAXII Client Configuration</h2>
+    {% if taxii_clients %}
+    <table class="table table-striped table-hover" style="table-layout: fixed;">
+    <thead>
+    <tr>
+    <td>
+        Poll
+    </td>
+    <td>
+        Display Name
+    </td>
+    <td>
+        Address
+    </td>
+    <td>
+        Community
+    </td>
+    <td>
+        Last Request
+    </td>
+    </tr>
+    </thead>
+    <tbody>
+    {% for taxii_client in taxii_clients %}
+    <tr class="configure-tr">
+    <td>
+        <div class="form-group">
+		    {% if taxii_client.is_exist_community %}
+            <button class="btn btn-default poll-detail-button btn-sm" type="button" display_name="{{ taxii_client.name }}" taxii_client_id="{{ taxii_client.id }}">Poll</button>
+		    {% else %}
+            <button class="btn btn-default poll-detail-button btn-sm" type="button" display_name="{{ taxii_client.name }}" taxii_client_id="{{ taxii_client.id }}" disabled>Poll</button>
+		    {% endif %}
+        </div><!-- <div class="form-group"> -->
+    </td>
+    <td>
+        <p class="display-name">{{ taxii_client.name }}</p>
+    </td>
+    <td>
+        <p class="address">{{ taxii_client.address }}</p>
+    </td>
+    <td>
+	    {% if taxii_client.is_exist_community %}
+        <p class="community">{{ taxii_client.community.name }}</p>
+        {% else %}
+        <p class="community" style="color:red;">Community has been deleted.</p>
+        {% endif %}
+    </td>
+    <td>
+        <p class="last-request">{{ taxii_client.last_requested |date:"Y/m/d H:i:s (O)" |default:'Not yet' }}</p>
+    </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    {% endif %}
+    </table>
+    <hr/>
+</div> <!--  <div class="container"> -->
+</body>
+</html>

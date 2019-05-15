@@ -1,0 +1,98 @@
+{% include 'header.html' %}
+<head>
+<link href="/static/ctirs/css/profile_configuration_common.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/profile.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<br/>
+<h1>Profile</h1>
+<br/>
+<div class="container">
+    <form name="change-password" id="change-password" action="/profile/change_password" method="POST">{% csrf_token %}</form>
+    <br/>
+    <h2>Change Password</h2>
+    <div class="form-group">
+        <p id="error-change-password-msg">{{ error_change_password_msg |default:'' }}</p>
+        <p id="info-change-password-msg">{{ info_change_password_msg |default:'' }}</p>
+    </div>
+    <hr/>
+    <br/>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Old Password
+            </div>
+            <div class="col-xs-4">
+                <input id="old-password" type="password" name="old-password" class="form-control"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                New Password
+            </div>
+            <div class="col-xs-4">
+                <input id="new-password-1" type="password" class="form-control"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                New Password (Again)
+            </div>
+            <div class="col-xs-4">
+                <input id="new-password-2" type="password" class="form-control"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+        <div class="row">
+            <button type="button" id="change-password-submit" class="btn btn-default">Change Password</button>
+        </div> <!-- <div class="row">-->
+    <form name="change-screen-name" id="change-screen-name" action="/profile/change_screen_name" method="POST">{% csrf_token %}</form>
+    <br/><br/>
+    <h2>Change Screen Name</h2>
+    <div class="form-group">
+        <p id="error-change-screen-name-msg">{{ error_change_screen_msg |default:'' }}</p>
+        <p id="info-change-screen-name-msg">{{ info_change_screen_msg |default:'' }}</p>
+    </div>
+    <hr/>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Screen Name
+            </div>
+            <div class="col-xs-4">
+                <input id="screen-name" type="text" name="screen-name" class="form-control" value="{{user.stip_user.screen_name}}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+        <div class="row">
+            <button type="button" id="change-screen-name-submit" class="btn btn-default">Change Screen Name</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <br/><br/>
+    <h2>APIKEY</h2>
+    <div class="form-group">
+        <p id="error-change-screen-msg">{{ error_change_api_key_msg |default:'' }}</p>
+        <p id="info-change-screen-msg">{{ info_change_api_key_msg |default:'' }}</p>
+    </div>
+    <hr/>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                API KEY
+            </div>
+            <div class="col-xs-6">
+                <input id="api-key" type="text" name="api_key" class="form-control" value="{{user.api_key}}" readonly="readonly"/>
+            </div>
+        </div> <!-- <div class="row">-->
+        <div class="row">
+            <button type="button" id="change-api-key-submit" class="btn btn-default">Change API KEY</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</body>
+</html>

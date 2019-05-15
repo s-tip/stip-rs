@@ -1,0 +1,60 @@
+{% include 'header.html' %}
+<head>
+<!--  for configuration taxii client detail -->
+<link href="/static/ctirs/css/configuration_taxii_cilent_detail.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/configuration_taxii_server_detail.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<form name="modify" id="configuration-taxii-server-modify" action="/configuration/taxii_server/detail/{{taxii_server.id}}/modify" method="GET">
+<div class="container">
+    <br/>
+    <h1>TAXII Server Detail Configuration</h1>
+    <br/>
+    <hr/>
+    <h2>Modify TAXII Collection Name</h2>
+    <div class="form-group">
+    <p id="error-msg" class="info-msg">{{ error_msg |default:'' }}</p>
+    <p id="info-msg" class="error-msg">{{ info_msg |default:'' }}</p>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                TAXII Collection Name
+            </div>
+            <div class="col-xs-4">
+                <input id="taxii-server-collection-name" type="text" name="collection_name" class="form-control" value="{{taxii_server.collection_name}}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <br/>
+
+    <h2>Choose Information Sources</h2>
+    <a id="all_check_information_sources">Check All</a> / <a id="all_uncheck_information_sources">Uncheck All</a>
+    <br/>
+    <br/>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-4">
+            	{% for information_source in information_sources %}
+            	<div class="chackbox">
+            		<label>
+            			<input type="checkbox" id="{{information_source.id}}" class="taxii_server_information_source" value="{{information_source.name}}" {% if information_source in taxii_server.information_sources %}checked=true{% endif %}/>
+            			{{information_source.name}}
+            		</label>
+            	</div>
+            	{% endfor %}
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <br/>
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="modify-taxii-server-submit" class="btn btn-default">Modify & Restart</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</form>
+</body>
+</html>

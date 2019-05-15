@@ -1,0 +1,71 @@
+{% include 'header.html' %}
+<head>
+<!--  for poll_detail -->
+<link href="/static/ctirs/css/poll.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/poll_detail.js"></script>
+</head>
+<body>
+{% include 'nav_header.html' %}
+<form name="poll_start" id="poll-start-form" action="/poll/{{taxii.id}}/start" method="GET">
+<div class="container">
+    <br/>
+    <h1>Poll Detail</h1>
+    <br/>
+    <hr/>
+    <h2>Poll Information</h2>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Configuration Name
+            </div>
+            <div class="col-xs-4">
+            	<p>{{ taxii.name }}</p>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Address
+            </div>
+            <div class="col-xs-4">
+            	<p>{{ taxii.address }}</p>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <br/>
+    <hr/>
+    <h2>Poll Configuration</h2>
+    <div class="form-group">
+    <p id="error-msg">{{ error_msg |default:'' }}</p>
+    <p id="info-msg">{{ info_msg |default:'' }}</p>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Start (UTC)
+            </div>
+            <div class="col-xs-4">
+                <input id="poll-start" type="text" name="poll_start" class="form-control" {% if taxii.last_requested %}value="{{taxii.last_requested|date:'Y/m/d H:i:s'}}" {% endif %}/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                End (UTC)
+            </div>
+            <div class="col-xs-4">
+                <input id="poll-End" type="text" name="poll_end" class="form-control"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="poll-start-submit" class="btn btn-default">Poll Start</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</form>
+</body>
+</html>

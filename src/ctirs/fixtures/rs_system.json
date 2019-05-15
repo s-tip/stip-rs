@@ -1,0 +1,10 @@
+[
+  {
+    "model": "ctirs.system",
+    "fields": {
+      "community_root_dir": "/opt/s-tip/rs/community",
+      "public_suffix_list_file_path": "/opt/s-tip/rs/data/public_suffix_list.dat"
+    }
+  }
+]
+                                  

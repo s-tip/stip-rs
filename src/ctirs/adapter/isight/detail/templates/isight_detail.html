@@ -1,0 +1,119 @@
+{% include 'header.html' %}
+<head>
+<!--  for adapter isight detail -->
+<link href="/static/ctirs/css/adapter_isight_detail.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/adapter_isight_detail.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<form name="delete" id="adapter-isight-job-delete" action="/adapter/isight/detail/remove/" method="GET"></form>
+<form name="start" id="adapter-isight-job-start" action="/adapter/isight/detail/resume/" method="GET"></form>
+<form name="stop" id="adapter-isight-job-stop" action="/adapter/isight/detail/pause/" method="GET"></form>
+<form name="interval" id="adapter-isight-job-interval" action="/adapter/isight/detail/interval" method="GET"></form>
+<form name="create" id="adapter-isight-detail-create" action="/adapter/isight/detail/create" method="POST">{% csrf_token %}
+<div class="container">
+    <br/>
+    <h1>iSIGHT Partners Adapter</h1>
+    <br/>
+    <hr/>
+    <h2>Interval Configuration</h2>
+    <div class="form-group">
+    <p id="interval-error-msg">{{ interval_error_msg |default:'' }}</p>
+    <p id="interval-info-msg">{{ interval_info_msg |default:'' }}</p>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Interval
+            </div>
+            <div class="col-xs-4">
+                <input id="interval" type="text" name="interval" class="form-control" placeholder="sec (Keep blank if you do not need to poll)" value="{{isight.interval_schedule_job.interval_job.seconds}}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <br/>
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="set-interval-submit" class="btn btn-default">Set Interval</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <hr/>
+    <h2>Create or Modify iSight Adapter Shedule Configuration</h2>
+    <div class="form-group">
+    <p id="error-msg">{{ error_msg |default:'' }}</p>
+    <p id="info-msg">{{ info_msg |default:'' }}</p>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Time
+            </div>
+            <div class="col-xs-4">
+                <input id="create-time" type="text" name="schedule_time" class="form-control" placeholder="HH:MM:SS"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <br/>
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="create-isight-schedule-submit" class="btn btn-default">Create Or Modify</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <hr/>
+    <h2>iSIGHT Partners Adapter Schedule Configuration</h2>
+    {% if isight.jobs %}
+    <table class="table table-striped table-hover" style="table-layout: fixed;">
+    <thead>
+    <tr>
+    <td>
+        Delete
+    </td>
+    <td>
+        Start Job at
+    </td>
+    <td>
+        Status
+    </td>
+    <td>
+        Start
+    </td>
+    <td>
+        Stop
+    </td>
+    </tr>
+    </thead>
+    <tbody>
+    {% for job in isight.jobs %}
+    <tr class="configure-tr">
+    <td>
+        <div class="form-group">
+            <button class="btn btn-default adapter-isight-delete-button btn-sm" type="button" job_id="{{job.id}}" >Delete</button>
+        </div><!-- <div class="form-group"> -->
+    </td>
+    <td>
+        {{job.cron_job.hour}}:{{job.cron_job.minute}}:{{job.cron_job.second}}
+    </td>
+    <td>
+        {{job.get_status_display}}
+    </td>
+    <td>
+        <div class="form-group">
+            <button {% ifequal job.status 'stop' %}{% else %}disabled{% endifequal %} class="btn btn-default adapter-isight-start-button btn-sm" type="button" job_id="{{job.id}}">Start</button>
+        </div><!-- <div class="form-group"> -->
+    </td>
+    <td>
+        <div class="form-group">
+            <button {% ifequal job.status 'stop' %}disabled{% else %}{% endifequal %} class="btn btn-default adapter-isight-stop-button btn-sm" type="button" job_id="{{job.id}}">Stop</button>
+        </div><!-- <div class="form-group"> -->
+    </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    {% endif %}
+    </table>
+    <hr/>
+</div> <!--  <div class="container"> -->
+</form>
+</body>
+</html>

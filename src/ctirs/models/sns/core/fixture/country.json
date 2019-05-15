@@ -1,0 +1,3737 @@
+[
+    {
+        "pk": 1, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 34, 
+            "region_code": 142, 
+            "alpha_2": "AF", 
+            "name": "Afghanistan", 
+            "country_code": 4, 
+            "sub_region": "Southern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:AF", 
+            "alpha_3": "AFG"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "AX", 
+            "name": "\u00c5land Islands", 
+            "country_code": 248, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:AX", 
+            "alpha_3": "ALA"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "AL", 
+            "name": "Albania", 
+            "country_code": 8, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:AL", 
+            "alpha_3": "ALB"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 15, 
+            "region_code": 2, 
+            "alpha_2": "DZ", 
+            "name": "Algeria", 
+            "country_code": 12, 
+            "sub_region": "Northern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:DZ", 
+            "alpha_3": "DZA"
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 61, 
+            "region_code": 9, 
+            "alpha_2": "AS", 
+            "name": "American Samoa", 
+            "country_code": 16, 
+            "sub_region": "Polynesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:AS", 
+            "alpha_3": "ASM"
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "AD", 
+            "name": "Andorra", 
+            "country_code": 20, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:AD", 
+            "alpha_3": "AND"
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 17, 
+            "region_code": 2, 
+            "alpha_2": "AO", 
+            "name": "Angola", 
+            "country_code": 24, 
+            "sub_region": "Middle Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:AO", 
+            "alpha_3": "AGO"
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "AI", 
+            "name": "Anguilla", 
+            "country_code": 660, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:AI", 
+            "alpha_3": "AIA"
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": -1, 
+            "region_code": -1, 
+            "alpha_2": "AQ", 
+            "name": "Antarctica", 
+            "country_code": 10, 
+            "sub_region": "", 
+            "region": "", 
+            "iso_3166_2": "ISO 3166-2:AQ", 
+            "alpha_3": "ATA"
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "AG", 
+            "name": "Antigua and Barbuda", 
+            "country_code": 28, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:AG", 
+            "alpha_3": "ATG"
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "AR", 
+            "name": "Argentina", 
+            "country_code": 32, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:AR", 
+            "alpha_3": "ARG"
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "AM", 
+            "name": "Armenia", 
+            "country_code": 51, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:AM", 
+            "alpha_3": "ARM"
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "AW", 
+            "name": "Aruba", 
+            "country_code": 533, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:AW", 
+            "alpha_3": "ABW"
+        }
+    }, 
+    {
+        "pk": 14, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 53, 
+            "region_code": 9, 
+            "alpha_2": "AU", 
+            "name": "Australia", 
+            "country_code": 36, 
+            "sub_region": "Australia and New Zealand", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:AU", 
+            "alpha_3": "AUS"
+        }
+    }, 
+    {
+        "pk": 15, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 155, 
+            "region_code": 150, 
+            "alpha_2": "AT", 
+            "name": "Austria", 
+            "country_code": 40, 
+            "sub_region": "Western Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:AT", 
+            "alpha_3": "AUT"
+        }
+    }, 
+    {
+        "pk": 16, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "AZ", 
+            "name": "Azerbaijan", 
+            "country_code": 31, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:AZ", 
+            "alpha_3": "AZE"
+        }
+    }, 
+    {
+        "pk": 17, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "BS", 
+            "name": "Bahamas", 
+            "country_code": 44, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:BS", 
+            "alpha_3": "BHS"
+        }
+    }, 
+    {
+        "pk": 18, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "BH", 
+            "name": "Bahrain", 
+            "country_code": 48, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:BH", 
+            "alpha_3": "BHR"
+        }
+    }, 
+    {
+        "pk": 19, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 34, 
+            "region_code": 142, 
+            "alpha_2": "BD", 
+            "name": "Bangladesh", 
+            "country_code": 50, 
+            "sub_region": "Southern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:BD", 
+            "alpha_3": "BGD"
+        }
+    }, 
+    {
+        "pk": 20, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "BB", 
+            "name": "Barbados", 
+            "country_code": 52, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:BB", 
+            "alpha_3": "BRB"
+        }
+    }, 
+    {
+        "pk": 21, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 151, 
+            "region_code": 150, 
+            "alpha_2": "BY", 
+            "name": "Belarus", 
+            "country_code": 112, 
+            "sub_region": "Eastern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:BY", 
+            "alpha_3": "BLR"
+        }
+    }, 
+    {
+        "pk": 22, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 155, 
+            "region_code": 150, 
+            "alpha_2": "BE", 
+            "name": "Belgium", 
+            "country_code": 56, 
+            "sub_region": "Western Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:BE", 
+            "alpha_3": "BEL"
+        }
+    }, 
+    {
+        "pk": 23, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 13, 
+            "region_code": 19, 
+            "alpha_2": "BZ", 
+            "name": "Belize", 
+            "country_code": 84, 
+            "sub_region": "Central America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:BZ", 
+            "alpha_3": "BLZ"
+        }
+    }, 
+    {
+        "pk": 24, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "BJ", 
+            "name": "Benin", 
+            "country_code": 204, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:BJ", 
+            "alpha_3": "BEN"
+        }
+    }, 
+    {
+        "pk": 25, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 21, 
+            "region_code": 19, 
+            "alpha_2": "BM", 
+            "name": "Bermuda", 
+            "country_code": 60, 
+            "sub_region": "Northern America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:BM", 
+            "alpha_3": "BMU"
+        }
+    }, 
+    {
+        "pk": 26, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 34, 
+            "region_code": 142, 
+            "alpha_2": "BT", 
+            "name": "Bhutan", 
+            "country_code": 64, 
+            "sub_region": "Southern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:BT", 
+            "alpha_3": "BTN"
+        }
+    }, 
+    {
+        "pk": 27, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "BO", 
+            "name": "Bolivia (Plurinational State of)", 
+            "country_code": 68, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:BO", 
+            "alpha_3": "BOL"
+        }
+    }, 
+    {
+        "pk": 28, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "BQ", 
+            "name": "Bonaire, Sint Eustatius and Saba", 
+            "country_code": 535, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:BQ", 
+            "alpha_3": "BES"
+        }
+    }, 
+    {
+        "pk": 29, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "BA", 
+            "name": "Bosnia and Herzegovina", 
+            "country_code": 70, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:BA", 
+            "alpha_3": "BIH"
+        }
+    }, 
+    {
+        "pk": 30, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 18, 
+            "region_code": 2, 
+            "alpha_2": "BW", 
+            "name": "Botswana", 
+            "country_code": 72, 
+            "sub_region": "Southern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:BW", 
+            "alpha_3": "BWA"
+        }
+    }, 
+    {
+        "pk": 31, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": -1, 
+            "region_code": -1, 
+            "alpha_2": "BV", 
+            "name": "Bouvet Island", 
+            "country_code": 74, 
+            "sub_region": "", 
+            "region": "", 
+            "iso_3166_2": "ISO 3166-2:BV", 
+            "alpha_3": "BVT"
+        }
+    }, 
+    {
+        "pk": 32, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "BR", 
+            "name": "Brazil", 
+            "country_code": 76, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:BR", 
+            "alpha_3": "BRA"
+        }
+    }, 
+    {
+        "pk": 33, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": -1, 
+            "region_code": -1, 
+            "alpha_2": "IO", 
+            "name": "British Indian Ocean Territory", 
+            "country_code": 86, 
+            "sub_region": "", 
+            "region": "", 
+            "iso_3166_2": "ISO 3166-2:IO", 
+            "alpha_3": "IOT"
+        }
+    }, 
+    {
+        "pk": 34, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 35, 
+            "region_code": 142, 
+            "alpha_2": "BN", 
+            "name": "Brunei Darussalam", 
+            "country_code": 96, 
+            "sub_region": "South-Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:BN", 
+            "alpha_3": "BRN"
+        }
+    }, 
+    {
+        "pk": 35, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 151, 
+            "region_code": 150, 
+            "alpha_2": "BG", 
+            "name": "Bulgaria", 
+            "country_code": 100, 
+            "sub_region": "Eastern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:BG", 
+            "alpha_3": "BGR"
+        }
+    }, 
+    {
+        "pk": 36, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "BF", 
+            "name": "Burkina Faso", 
+            "country_code": 854, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:BF", 
+            "alpha_3": "BFA"
+        }
+    }, 
+    {
+        "pk": 37, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "BI", 
+            "name": "Burundi", 
+            "country_code": 108, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:BI", 
+            "alpha_3": "BDI"
+        }
+    }, 
+    {
+        "pk": 38, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 35, 
+            "region_code": 142, 
+            "alpha_2": "KH", 
+            "name": "Cambodia", 
+            "country_code": 116, 
+            "sub_region": "South-Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:KH", 
+            "alpha_3": "KHM"
+        }
+    }, 
+    {
+        "pk": 39, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 17, 
+            "region_code": 2, 
+            "alpha_2": "CM", 
+            "name": "Cameroon", 
+            "country_code": 120, 
+            "sub_region": "Middle Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:CM", 
+            "alpha_3": "CMR"
+        }
+    }, 
+    {
+        "pk": 40, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 21, 
+            "region_code": 19, 
+            "alpha_2": "CA", 
+            "name": "Canada", 
+            "country_code": 124, 
+            "sub_region": "Northern America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:CA", 
+            "alpha_3": "CAN"
+        }
+    }, 
+    {
+        "pk": 41, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "CV", 
+            "name": "Cabo Verde", 
+            "country_code": 132, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:CV", 
+            "alpha_3": "CPV"
+        }
+    }, 
+    {
+        "pk": 42, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "KY", 
+            "name": "Cayman Islands", 
+            "country_code": 136, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:KY", 
+            "alpha_3": "CYM"
+        }
+    }, 
+    {
+        "pk": 43, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 17, 
+            "region_code": 2, 
+            "alpha_2": "CF", 
+            "name": "Central African Republic", 
+            "country_code": 140, 
+            "sub_region": "Middle Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:CF", 
+            "alpha_3": "CAF"
+        }
+    }, 
+    {
+        "pk": 44, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 17, 
+            "region_code": 2, 
+            "alpha_2": "TD", 
+            "name": "Chad", 
+            "country_code": 148, 
+            "sub_region": "Middle Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:TD", 
+            "alpha_3": "TCD"
+        }
+    }, 
+    {
+        "pk": 45, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "CL", 
+            "name": "Chile", 
+            "country_code": 152, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:CL", 
+            "alpha_3": "CHL"
+        }
+    }, 
+    {
+        "pk": 46, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 30, 
+            "region_code": 142, 
+            "alpha_2": "CN", 
+            "name": "China", 
+            "country_code": 156, 
+            "sub_region": "Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:CN", 
+            "alpha_3": "CHN"
+        }
+    }, 
+    {
+        "pk": 47, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": -1, 
+            "region_code": -1, 
+            "alpha_2": "CX", 
+            "name": "Christmas Island", 
+            "country_code": 162, 
+            "sub_region": "", 
+            "region": "", 
+            "iso_3166_2": "ISO 3166-2:CX", 
+            "alpha_3": "CXR"
+        }
+    }, 
+    {
+        "pk": 48, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": -1, 
+            "region_code": -1, 
+            "alpha_2": "CC", 
+            "name": "Cocos (Keeling) Islands", 
+            "country_code": 166, 
+            "sub_region": "", 
+            "region": "", 
+            "iso_3166_2": "ISO 3166-2:CC", 
+            "alpha_3": "CCK"
+        }
+    }, 
+    {
+        "pk": 49, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "CO", 
+            "name": "Colombia", 
+            "country_code": 170, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:CO", 
+            "alpha_3": "COL"
+        }
+    }, 
+    {
+        "pk": 50, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "KM", 
+            "name": "Comoros", 
+            "country_code": 174, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:KM", 
+            "alpha_3": "COM"
+        }
+    }, 
+    {
+        "pk": 51, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 17, 
+            "region_code": 2, 
+            "alpha_2": "CG", 
+            "name": "Congo", 
+            "country_code": 178, 
+            "sub_region": "Middle Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:CG", 
+            "alpha_3": "COG"
+        }
+    }, 
+    {
+        "pk": 52, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 17, 
+            "region_code": 2, 
+            "alpha_2": "CD", 
+            "name": "Congo (Democratic Republic of the)", 
+            "country_code": 180, 
+            "sub_region": "Middle Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:CD", 
+            "alpha_3": "COD"
+        }
+    }, 
+    {
+        "pk": 53, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 61, 
+            "region_code": 9, 
+            "alpha_2": "CK", 
+            "name": "Cook Islands", 
+            "country_code": 184, 
+            "sub_region": "Polynesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:CK", 
+            "alpha_3": "COK"
+        }
+    }, 
+    {
+        "pk": 54, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 13, 
+            "region_code": 19, 
+            "alpha_2": "CR", 
+            "name": "Costa Rica", 
+            "country_code": 188, 
+            "sub_region": "Central America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:CR", 
+            "alpha_3": "CRI"
+        }
+    }, 
+    {
+        "pk": 55, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "CI", 
+            "name": "C\u00f4te d'Ivoire", 
+            "country_code": 384, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:CI", 
+            "alpha_3": "CIV"
+        }
+    }, 
+    {
+        "pk": 56, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "HR", 
+            "name": "Croatia", 
+            "country_code": 191, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:HR", 
+            "alpha_3": "HRV"
+        }
+    }, 
+    {
+        "pk": 57, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "CU", 
+            "name": "Cuba", 
+            "country_code": 192, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:CU", 
+            "alpha_3": "CUB"
+        }
+    }, 
+    {
+        "pk": 58, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "CW", 
+            "name": "Cura\u00e7ao", 
+            "country_code": 531, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:CW", 
+            "alpha_3": "CUW"
+        }
+    }, 
+    {
+        "pk": 59, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "CY", 
+            "name": "Cyprus", 
+            "country_code": 196, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:CY", 
+            "alpha_3": "CYP"
+        }
+    }, 
+    {
+        "pk": 60, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 151, 
+            "region_code": 150, 
+            "alpha_2": "CZ", 
+            "name": "Czech Republic", 
+            "country_code": 203, 
+            "sub_region": "Eastern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:CZ", 
+            "alpha_3": "CZE"
+        }
+    }, 
+    {
+        "pk": 61, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "DK", 
+            "name": "Denmark", 
+            "country_code": 208, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:DK", 
+            "alpha_3": "DNK"
+        }
+    }, 
+    {
+        "pk": 62, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "DJ", 
+            "name": "Djibouti", 
+            "country_code": 262, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:DJ", 
+            "alpha_3": "DJI"
+        }
+    }, 
+    {
+        "pk": 63, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "DM", 
+            "name": "Dominica", 
+            "country_code": 212, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:DM", 
+            "alpha_3": "DMA"
+        }
+    }, 
+    {
+        "pk": 64, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "DO", 
+            "name": "Dominican Republic", 
+            "country_code": 214, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:DO", 
+            "alpha_3": "DOM"
+        }
+    }, 
+    {
+        "pk": 65, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "EC", 
+            "name": "Ecuador", 
+            "country_code": 218, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:EC", 
+            "alpha_3": "ECU"
+        }
+    }, 
+    {
+        "pk": 66, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 15, 
+            "region_code": 2, 
+            "alpha_2": "EG", 
+            "name": "Egypt", 
+            "country_code": 818, 
+            "sub_region": "Northern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:EG", 
+            "alpha_3": "EGY"
+        }
+    }, 
+    {
+        "pk": 67, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 13, 
+            "region_code": 19, 
+            "alpha_2": "SV", 
+            "name": "El Salvador", 
+            "country_code": 222, 
+            "sub_region": "Central America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:SV", 
+            "alpha_3": "SLV"
+        }
+    }, 
+    {
+        "pk": 68, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 17, 
+            "region_code": 2, 
+            "alpha_2": "GQ", 
+            "name": "Equatorial Guinea", 
+            "country_code": 226, 
+            "sub_region": "Middle Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:GQ", 
+            "alpha_3": "GNQ"
+        }
+    }, 
+    {
+        "pk": 69, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "ER", 
+            "name": "Eritrea", 
+            "country_code": 232, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:ER", 
+            "alpha_3": "ERI"
+        }
+    }, 
+    {
+        "pk": 70, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "EE", 
+            "name": "Estonia", 
+            "country_code": 233, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:EE", 
+            "alpha_3": "EST"
+        }
+    }, 
+    {
+        "pk": 71, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "ET", 
+            "name": "Ethiopia", 
+            "country_code": 231, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:ET", 
+            "alpha_3": "ETH"
+        }
+    }, 
+    {
+        "pk": 72, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "FK", 
+            "name": "Falkland Islands (Malvinas)", 
+            "country_code": 238, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:FK", 
+            "alpha_3": "FLK"
+        }
+    }, 
+    {
+        "pk": 73, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "FO", 
+            "name": "Faroe Islands", 
+            "country_code": 234, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:FO", 
+            "alpha_3": "FRO"
+        }
+    }, 
+    {
+        "pk": 74, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 54, 
+            "region_code": 9, 
+            "alpha_2": "FJ", 
+            "name": "Fiji", 
+            "country_code": 242, 
+            "sub_region": "Melanesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:FJ", 
+            "alpha_3": "FJI"
+        }
+    }, 
+    {
+        "pk": 75, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "FI", 
+            "name": "Finland", 
+            "country_code": 246, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:FI", 
+            "alpha_3": "FIN"
+        }
+    }, 
+    {
+        "pk": 76, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 155, 
+            "region_code": 150, 
+            "alpha_2": "FR", 
+            "name": "France", 
+            "country_code": 250, 
+            "sub_region": "Western Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:FR", 
+            "alpha_3": "FRA"
+        }
+    }, 
+    {
+        "pk": 77, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "GF", 
+            "name": "French Guiana", 
+            "country_code": 254, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:GF", 
+            "alpha_3": "GUF"
+        }
+    }, 
+    {
+        "pk": 78, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 61, 
+            "region_code": 9, 
+            "alpha_2": "PF", 
+            "name": "French Polynesia", 
+            "country_code": 258, 
+            "sub_region": "Polynesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:PF", 
+            "alpha_3": "PYF"
+        }
+    }, 
+    {
+        "pk": 79, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": -1, 
+            "region_code": -1, 
+            "alpha_2": "TF", 
+            "name": "French Southern Territories", 
+            "country_code": 260, 
+            "sub_region": "", 
+            "region": "", 
+            "iso_3166_2": "ISO 3166-2:TF", 
+            "alpha_3": "ATF"
+        }
+    }, 
+    {
+        "pk": 80, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 17, 
+            "region_code": 2, 
+            "alpha_2": "GA", 
+            "name": "Gabon", 
+            "country_code": 266, 
+            "sub_region": "Middle Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:GA", 
+            "alpha_3": "GAB"
+        }
+    }, 
+    {
+        "pk": 81, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "GM", 
+            "name": "Gambia", 
+            "country_code": 270, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:GM", 
+            "alpha_3": "GMB"
+        }
+    }, 
+    {
+        "pk": 82, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "GE", 
+            "name": "Georgia", 
+            "country_code": 268, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:GE", 
+            "alpha_3": "GEO"
+        }
+    }, 
+    {
+        "pk": 83, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 155, 
+            "region_code": 150, 
+            "alpha_2": "DE", 
+            "name": "Germany", 
+            "country_code": 276, 
+            "sub_region": "Western Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:DE", 
+            "alpha_3": "DEU"
+        }
+    }, 
+    {
+        "pk": 84, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "GH", 
+            "name": "Ghana", 
+            "country_code": 288, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:GH", 
+            "alpha_3": "GHA"
+        }
+    }, 
+    {
+        "pk": 85, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "GI", 
+            "name": "Gibraltar", 
+            "country_code": 292, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:GI", 
+            "alpha_3": "GIB"
+        }
+    }, 
+    {
+        "pk": 86, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "GR", 
+            "name": "Greece", 
+            "country_code": 300, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:GR", 
+            "alpha_3": "GRC"
+        }
+    }, 
+    {
+        "pk": 87, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 21, 
+            "region_code": 19, 
+            "alpha_2": "GL", 
+            "name": "Greenland", 
+            "country_code": 304, 
+            "sub_region": "Northern America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:GL", 
+            "alpha_3": "GRL"
+        }
+    }, 
+    {
+        "pk": 88, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "GD", 
+            "name": "Grenada", 
+            "country_code": 308, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:GD", 
+            "alpha_3": "GRD"
+        }
+    }, 
+    {
+        "pk": 89, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "GP", 
+            "name": "Guadeloupe", 
+            "country_code": 312, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:GP", 
+            "alpha_3": "GLP"
+        }
+    }, 
+    {
+        "pk": 90, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 57, 
+            "region_code": 9, 
+            "alpha_2": "GU", 
+            "name": "Guam", 
+            "country_code": 316, 
+            "sub_region": "Micronesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:GU", 
+            "alpha_3": "GUM"
+        }
+    }, 
+    {
+        "pk": 91, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 13, 
+            "region_code": 19, 
+            "alpha_2": "GT", 
+            "name": "Guatemala", 
+            "country_code": 320, 
+            "sub_region": "Central America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:GT", 
+            "alpha_3": "GTM"
+        }
+    }, 
+    {
+        "pk": 92, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "GG", 
+            "name": "Guernsey", 
+            "country_code": 831, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:GG", 
+            "alpha_3": "GGY"
+        }
+    }, 
+    {
+        "pk": 93, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "GN", 
+            "name": "Guinea", 
+            "country_code": 324, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:GN", 
+            "alpha_3": "GIN"
+        }
+    }, 
+    {
+        "pk": 94, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "GW", 
+            "name": "Guinea-Bissau", 
+            "country_code": 624, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:GW", 
+            "alpha_3": "GNB"
+        }
+    }, 
+    {
+        "pk": 95, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "GY", 
+            "name": "Guyana", 
+            "country_code": 328, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:GY", 
+            "alpha_3": "GUY"
+        }
+    }, 
+    {
+        "pk": 96, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "HT", 
+            "name": "Haiti", 
+            "country_code": 332, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:HT", 
+            "alpha_3": "HTI"
+        }
+    }, 
+    {
+        "pk": 97, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": -1, 
+            "region_code": -1, 
+            "alpha_2": "HM", 
+            "name": "Heard Island and McDonald Islands", 
+            "country_code": 334, 
+            "sub_region": "", 
+            "region": "", 
+            "iso_3166_2": "ISO 3166-2:HM", 
+            "alpha_3": "HMD"
+        }
+    }, 
+    {
+        "pk": 98, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "VA", 
+            "name": "Holy See", 
+            "country_code": 336, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:VA", 
+            "alpha_3": "VAT"
+        }
+    }, 
+    {
+        "pk": 99, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 13, 
+            "region_code": 19, 
+            "alpha_2": "HN", 
+            "name": "Honduras", 
+            "country_code": 340, 
+            "sub_region": "Central America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:HN", 
+            "alpha_3": "HND"
+        }
+    }, 
+    {
+        "pk": 100, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 30, 
+            "region_code": 142, 
+            "alpha_2": "HK", 
+            "name": "Hong Kong", 
+            "country_code": 344, 
+            "sub_region": "Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:HK", 
+            "alpha_3": "HKG"
+        }
+    }, 
+    {
+        "pk": 101, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 151, 
+            "region_code": 150, 
+            "alpha_2": "HU", 
+            "name": "Hungary", 
+            "country_code": 348, 
+            "sub_region": "Eastern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:HU", 
+            "alpha_3": "HUN"
+        }
+    }, 
+    {
+        "pk": 102, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "IS", 
+            "name": "Iceland", 
+            "country_code": 352, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:IS", 
+            "alpha_3": "ISL"
+        }
+    }, 
+    {
+        "pk": 103, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 34, 
+            "region_code": 142, 
+            "alpha_2": "IN", 
+            "name": "India", 
+            "country_code": 356, 
+            "sub_region": "Southern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:IN", 
+            "alpha_3": "IND"
+        }
+    }, 
+    {
+        "pk": 104, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 35, 
+            "region_code": 142, 
+            "alpha_2": "ID", 
+            "name": "Indonesia", 
+            "country_code": 360, 
+            "sub_region": "South-Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:ID", 
+            "alpha_3": "IDN"
+        }
+    }, 
+    {
+        "pk": 105, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 34, 
+            "region_code": 142, 
+            "alpha_2": "IR", 
+            "name": "Iran (Islamic Republic of)", 
+            "country_code": 364, 
+            "sub_region": "Southern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:IR", 
+            "alpha_3": "IRN"
+        }
+    }, 
+    {
+        "pk": 106, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "IQ", 
+            "name": "Iraq", 
+            "country_code": 368, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:IQ", 
+            "alpha_3": "IRQ"
+        }
+    }, 
+    {
+        "pk": 107, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "IE", 
+            "name": "Ireland", 
+            "country_code": 372, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:IE", 
+            "alpha_3": "IRL"
+        }
+    }, 
+    {
+        "pk": 108, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "IM", 
+            "name": "Isle of Man", 
+            "country_code": 833, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:IM", 
+            "alpha_3": "IMN"
+        }
+    }, 
+    {
+        "pk": 109, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "IL", 
+            "name": "Israel", 
+            "country_code": 376, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:IL", 
+            "alpha_3": "ISR"
+        }
+    }, 
+    {
+        "pk": 110, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "IT", 
+            "name": "Italy", 
+            "country_code": 380, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:IT", 
+            "alpha_3": "ITA"
+        }
+    }, 
+    {
+        "pk": 111, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "JM", 
+            "name": "Jamaica", 
+            "country_code": 388, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:JM", 
+            "alpha_3": "JAM"
+        }
+    }, 
+    {
+        "pk": 112, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 30, 
+            "region_code": 142, 
+            "alpha_2": "JP", 
+            "name": "Japan", 
+            "country_code": 392, 
+            "sub_region": "Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:JP", 
+            "alpha_3": "JPN"
+        }
+    }, 
+    {
+        "pk": 113, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "JE", 
+            "name": "Jersey", 
+            "country_code": 832, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:JE", 
+            "alpha_3": "JEY"
+        }
+    }, 
+    {
+        "pk": 114, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "JO", 
+            "name": "Jordan", 
+            "country_code": 400, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:JO", 
+            "alpha_3": "JOR"
+        }
+    }, 
+    {
+        "pk": 115, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 143, 
+            "region_code": 142, 
+            "alpha_2": "KZ", 
+            "name": "Kazakhstan", 
+            "country_code": 398, 
+            "sub_region": "Central Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:KZ", 
+            "alpha_3": "KAZ"
+        }
+    }, 
+    {
+        "pk": 116, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "KE", 
+            "name": "Kenya", 
+            "country_code": 404, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:KE", 
+            "alpha_3": "KEN"
+        }
+    }, 
+    {
+        "pk": 117, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 57, 
+            "region_code": 9, 
+            "alpha_2": "KI", 
+            "name": "Kiribati", 
+            "country_code": 296, 
+            "sub_region": "Micronesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:KI", 
+            "alpha_3": "KIR"
+        }
+    }, 
+    {
+        "pk": 118, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 30, 
+            "region_code": 142, 
+            "alpha_2": "KP", 
+            "name": "Korea (Democratic People's Republic of)", 
+            "country_code": 408, 
+            "sub_region": "Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:KP", 
+            "alpha_3": "PRK"
+        }
+    }, 
+    {
+        "pk": 119, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 30, 
+            "region_code": 142, 
+            "alpha_2": "KR", 
+            "name": "Korea (Republic of)", 
+            "country_code": 410, 
+            "sub_region": "Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:KR", 
+            "alpha_3": "KOR"
+        }
+    }, 
+    {
+        "pk": 120, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "KW", 
+            "name": "Kuwait", 
+            "country_code": 414, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:KW", 
+            "alpha_3": "KWT"
+        }
+    }, 
+    {
+        "pk": 121, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 143, 
+            "region_code": 142, 
+            "alpha_2": "KG", 
+            "name": "Kyrgyzstan", 
+            "country_code": 417, 
+            "sub_region": "Central Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:KG", 
+            "alpha_3": "KGZ"
+        }
+    }, 
+    {
+        "pk": 122, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 35, 
+            "region_code": 142, 
+            "alpha_2": "LA", 
+            "name": "Lao People's Democratic Republic", 
+            "country_code": 418, 
+            "sub_region": "South-Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:LA", 
+            "alpha_3": "LAO"
+        }
+    }, 
+    {
+        "pk": 123, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "LV", 
+            "name": "Latvia", 
+            "country_code": 428, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:LV", 
+            "alpha_3": "LVA"
+        }
+    }, 
+    {
+        "pk": 124, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "LB", 
+            "name": "Lebanon", 
+            "country_code": 422, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:LB", 
+            "alpha_3": "LBN"
+        }
+    }, 
+    {
+        "pk": 125, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 18, 
+            "region_code": 2, 
+            "alpha_2": "LS", 
+            "name": "Lesotho", 
+            "country_code": 426, 
+            "sub_region": "Southern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:LS", 
+            "alpha_3": "LSO"
+        }
+    }, 
+    {
+        "pk": 126, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "LR", 
+            "name": "Liberia", 
+            "country_code": 430, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:LR", 
+            "alpha_3": "LBR"
+        }
+    }, 
+    {
+        "pk": 127, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 15, 
+            "region_code": 2, 
+            "alpha_2": "LY", 
+            "name": "Libya", 
+            "country_code": 434, 
+            "sub_region": "Northern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:LY", 
+            "alpha_3": "LBY"
+        }
+    }, 
+    {
+        "pk": 128, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 155, 
+            "region_code": 150, 
+            "alpha_2": "LI", 
+            "name": "Liechtenstein", 
+            "country_code": 438, 
+            "sub_region": "Western Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:LI", 
+            "alpha_3": "LIE"
+        }
+    }, 
+    {
+        "pk": 129, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "LT", 
+            "name": "Lithuania", 
+            "country_code": 440, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:LT", 
+            "alpha_3": "LTU"
+        }
+    }, 
+    {
+        "pk": 130, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 155, 
+            "region_code": 150, 
+            "alpha_2": "LU", 
+            "name": "Luxembourg", 
+            "country_code": 442, 
+            "sub_region": "Western Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:LU", 
+            "alpha_3": "LUX"
+        }
+    }, 
+    {
+        "pk": 131, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 30, 
+            "region_code": 142, 
+            "alpha_2": "MO", 
+            "name": "Macao", 
+            "country_code": 446, 
+            "sub_region": "Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:MO", 
+            "alpha_3": "MAC"
+        }
+    }, 
+    {
+        "pk": 132, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "MK", 
+            "name": "Macedonia (the former Yugoslav Republic of)", 
+            "country_code": 807, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:MK", 
+            "alpha_3": "MKD"
+        }
+    }, 
+    {
+        "pk": 133, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "MG", 
+            "name": "Madagascar", 
+            "country_code": 450, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:MG", 
+            "alpha_3": "MDG"
+        }
+    }, 
+    {
+        "pk": 134, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "MW", 
+            "name": "Malawi", 
+            "country_code": 454, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:MW", 
+            "alpha_3": "MWI"
+        }
+    }, 
+    {
+        "pk": 135, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 35, 
+            "region_code": 142, 
+            "alpha_2": "MY", 
+            "name": "Malaysia", 
+            "country_code": 458, 
+            "sub_region": "South-Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:MY", 
+            "alpha_3": "MYS"
+        }
+    }, 
+    {
+        "pk": 136, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 34, 
+            "region_code": 142, 
+            "alpha_2": "MV", 
+            "name": "Maldives", 
+            "country_code": 462, 
+            "sub_region": "Southern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:MV", 
+            "alpha_3": "MDV"
+        }
+    }, 
+    {
+        "pk": 137, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "ML", 
+            "name": "Mali", 
+            "country_code": 466, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:ML", 
+            "alpha_3": "MLI"
+        }
+    }, 
+    {
+        "pk": 138, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "MT", 
+            "name": "Malta", 
+            "country_code": 470, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:MT", 
+            "alpha_3": "MLT"
+        }
+    }, 
+    {
+        "pk": 139, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 57, 
+            "region_code": 9, 
+            "alpha_2": "MH", 
+            "name": "Marshall Islands", 
+            "country_code": 584, 
+            "sub_region": "Micronesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:MH", 
+            "alpha_3": "MHL"
+        }
+    }, 
+    {
+        "pk": 140, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "MQ", 
+            "name": "Martinique", 
+            "country_code": 474, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:MQ", 
+            "alpha_3": "MTQ"
+        }
+    }, 
+    {
+        "pk": 141, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "MR", 
+            "name": "Mauritania", 
+            "country_code": 478, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:MR", 
+            "alpha_3": "MRT"
+        }
+    }, 
+    {
+        "pk": 142, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "MU", 
+            "name": "Mauritius", 
+            "country_code": 480, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:MU", 
+            "alpha_3": "MUS"
+        }
+    }, 
+    {
+        "pk": 143, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "YT", 
+            "name": "Mayotte", 
+            "country_code": 175, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:YT", 
+            "alpha_3": "MYT"
+        }
+    }, 
+    {
+        "pk": 144, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 13, 
+            "region_code": 19, 
+            "alpha_2": "MX", 
+            "name": "Mexico", 
+            "country_code": 484, 
+            "sub_region": "Central America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:MX", 
+            "alpha_3": "MEX"
+        }
+    }, 
+    {
+        "pk": 145, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 57, 
+            "region_code": 9, 
+            "alpha_2": "FM", 
+            "name": "Micronesia (Federated States of)", 
+            "country_code": 583, 
+            "sub_region": "Micronesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:FM", 
+            "alpha_3": "FSM"
+        }
+    }, 
+    {
+        "pk": 146, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 151, 
+            "region_code": 150, 
+            "alpha_2": "MD", 
+            "name": "Moldova (Republic of)", 
+            "country_code": 498, 
+            "sub_region": "Eastern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:MD", 
+            "alpha_3": "MDA"
+        }
+    }, 
+    {
+        "pk": 147, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 155, 
+            "region_code": 150, 
+            "alpha_2": "MC", 
+            "name": "Monaco", 
+            "country_code": 492, 
+            "sub_region": "Western Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:MC", 
+            "alpha_3": "MCO"
+        }
+    }, 
+    {
+        "pk": 148, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 30, 
+            "region_code": 142, 
+            "alpha_2": "MN", 
+            "name": "Mongolia", 
+            "country_code": 496, 
+            "sub_region": "Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:MN", 
+            "alpha_3": "MNG"
+        }
+    }, 
+    {
+        "pk": 149, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "ME", 
+            "name": "Montenegro", 
+            "country_code": 499, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:ME", 
+            "alpha_3": "MNE"
+        }
+    }, 
+    {
+        "pk": 150, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "MS", 
+            "name": "Montserrat", 
+            "country_code": 500, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:MS", 
+            "alpha_3": "MSR"
+        }
+    }, 
+    {
+        "pk": 151, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 15, 
+            "region_code": 2, 
+            "alpha_2": "MA", 
+            "name": "Morocco", 
+            "country_code": 504, 
+            "sub_region": "Northern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:MA", 
+            "alpha_3": "MAR"
+        }
+    }, 
+    {
+        "pk": 152, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "MZ", 
+            "name": "Mozambique", 
+            "country_code": 508, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:MZ", 
+            "alpha_3": "MOZ"
+        }
+    }, 
+    {
+        "pk": 153, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 35, 
+            "region_code": 142, 
+            "alpha_2": "MM", 
+            "name": "Myanmar", 
+            "country_code": 104, 
+            "sub_region": "South-Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:MM", 
+            "alpha_3": "MMR"
+        }
+    }, 
+    {
+        "pk": 154, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 18, 
+            "region_code": 2, 
+            "alpha_2": "NA", 
+            "name": "Namibia", 
+            "country_code": 516, 
+            "sub_region": "Southern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:NA", 
+            "alpha_3": "NAM"
+        }
+    }, 
+    {
+        "pk": 155, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 57, 
+            "region_code": 9, 
+            "alpha_2": "NR", 
+            "name": "Nauru", 
+            "country_code": 520, 
+            "sub_region": "Micronesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:NR", 
+            "alpha_3": "NRU"
+        }
+    }, 
+    {
+        "pk": 156, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 34, 
+            "region_code": 142, 
+            "alpha_2": "NP", 
+            "name": "Nepal", 
+            "country_code": 524, 
+            "sub_region": "Southern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:NP", 
+            "alpha_3": "NPL"
+        }
+    }, 
+    {
+        "pk": 157, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 155, 
+            "region_code": 150, 
+            "alpha_2": "NL", 
+            "name": "Netherlands", 
+            "country_code": 528, 
+            "sub_region": "Western Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:NL", 
+            "alpha_3": "NLD"
+        }
+    }, 
+    {
+        "pk": 158, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 54, 
+            "region_code": 9, 
+            "alpha_2": "NC", 
+            "name": "New Caledonia", 
+            "country_code": 540, 
+            "sub_region": "Melanesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:NC", 
+            "alpha_3": "NCL"
+        }
+    }, 
+    {
+        "pk": 159, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 53, 
+            "region_code": 9, 
+            "alpha_2": "NZ", 
+            "name": "New Zealand", 
+            "country_code": 554, 
+            "sub_region": "Australia and New Zealand", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:NZ", 
+            "alpha_3": "NZL"
+        }
+    }, 
+    {
+        "pk": 160, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 13, 
+            "region_code": 19, 
+            "alpha_2": "NI", 
+            "name": "Nicaragua", 
+            "country_code": 558, 
+            "sub_region": "Central America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:NI", 
+            "alpha_3": "NIC"
+        }
+    }, 
+    {
+        "pk": 161, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "NE", 
+            "name": "Niger", 
+            "country_code": 562, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:NE", 
+            "alpha_3": "NER"
+        }
+    }, 
+    {
+        "pk": 162, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "NG", 
+            "name": "Nigeria", 
+            "country_code": 566, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:NG", 
+            "alpha_3": "NGA"
+        }
+    }, 
+    {
+        "pk": 163, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 61, 
+            "region_code": 9, 
+            "alpha_2": "NU", 
+            "name": "Niue", 
+            "country_code": 570, 
+            "sub_region": "Polynesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:NU", 
+            "alpha_3": "NIU"
+        }
+    }, 
+    {
+        "pk": 164, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 53, 
+            "region_code": 9, 
+            "alpha_2": "NF", 
+            "name": "Norfolk Island", 
+            "country_code": 574, 
+            "sub_region": "Australia and New Zealand", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:NF", 
+            "alpha_3": "NFK"
+        }
+    }, 
+    {
+        "pk": 165, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 57, 
+            "region_code": 9, 
+            "alpha_2": "MP", 
+            "name": "Northern Mariana Islands", 
+            "country_code": 580, 
+            "sub_region": "Micronesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:MP", 
+            "alpha_3": "MNP"
+        }
+    }, 
+    {
+        "pk": 166, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "NO", 
+            "name": "Norway", 
+            "country_code": 578, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:NO", 
+            "alpha_3": "NOR"
+        }
+    }, 
+    {
+        "pk": 167, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "OM", 
+            "name": "Oman", 
+            "country_code": 512, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:OM", 
+            "alpha_3": "OMN"
+        }
+    }, 
+    {
+        "pk": 168, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 34, 
+            "region_code": 142, 
+            "alpha_2": "PK", 
+            "name": "Pakistan", 
+            "country_code": 586, 
+            "sub_region": "Southern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:PK", 
+            "alpha_3": "PAK"
+        }
+    }, 
+    {
+        "pk": 169, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 57, 
+            "region_code": 9, 
+            "alpha_2": "PW", 
+            "name": "Palau", 
+            "country_code": 585, 
+            "sub_region": "Micronesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:PW", 
+            "alpha_3": "PLW"
+        }
+    }, 
+    {
+        "pk": 170, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "PS", 
+            "name": "Palestine, State of", 
+            "country_code": 275, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:PS", 
+            "alpha_3": "PSE"
+        }
+    }, 
+    {
+        "pk": 171, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 13, 
+            "region_code": 19, 
+            "alpha_2": "PA", 
+            "name": "Panama", 
+            "country_code": 591, 
+            "sub_region": "Central America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:PA", 
+            "alpha_3": "PAN"
+        }
+    }, 
+    {
+        "pk": 172, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 54, 
+            "region_code": 9, 
+            "alpha_2": "PG", 
+            "name": "Papua New Guinea", 
+            "country_code": 598, 
+            "sub_region": "Melanesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:PG", 
+            "alpha_3": "PNG"
+        }
+    }, 
+    {
+        "pk": 173, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "PY", 
+            "name": "Paraguay", 
+            "country_code": 600, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:PY", 
+            "alpha_3": "PRY"
+        }
+    }, 
+    {
+        "pk": 174, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "PE", 
+            "name": "Peru", 
+            "country_code": 604, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:PE", 
+            "alpha_3": "PER"
+        }
+    }, 
+    {
+        "pk": 175, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 35, 
+            "region_code": 142, 
+            "alpha_2": "PH", 
+            "name": "Philippines", 
+            "country_code": 608, 
+            "sub_region": "South-Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:PH", 
+            "alpha_3": "PHL"
+        }
+    }, 
+    {
+        "pk": 176, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 61, 
+            "region_code": 9, 
+            "alpha_2": "PN", 
+            "name": "Pitcairn", 
+            "country_code": 612, 
+            "sub_region": "Polynesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:PN", 
+            "alpha_3": "PCN"
+        }
+    }, 
+    {
+        "pk": 177, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 151, 
+            "region_code": 150, 
+            "alpha_2": "PL", 
+            "name": "Poland", 
+            "country_code": 616, 
+            "sub_region": "Eastern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:PL", 
+            "alpha_3": "POL"
+        }
+    }, 
+    {
+        "pk": 178, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "PT", 
+            "name": "Portugal", 
+            "country_code": 620, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:PT", 
+            "alpha_3": "PRT"
+        }
+    }, 
+    {
+        "pk": 179, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "PR", 
+            "name": "Puerto Rico", 
+            "country_code": 630, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:PR", 
+            "alpha_3": "PRI"
+        }
+    }, 
+    {
+        "pk": 180, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "QA", 
+            "name": "Qatar", 
+            "country_code": 634, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:QA", 
+            "alpha_3": "QAT"
+        }
+    }, 
+    {
+        "pk": 181, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "RE", 
+            "name": "R\u00e9union", 
+            "country_code": 638, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:RE", 
+            "alpha_3": "REU"
+        }
+    }, 
+    {
+        "pk": 182, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 151, 
+            "region_code": 150, 
+            "alpha_2": "RO", 
+            "name": "Romania", 
+            "country_code": 642, 
+            "sub_region": "Eastern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:RO", 
+            "alpha_3": "ROU"
+        }
+    }, 
+    {
+        "pk": 183, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 151, 
+            "region_code": 150, 
+            "alpha_2": "RU", 
+            "name": "Russian Federation", 
+            "country_code": 643, 
+            "sub_region": "Eastern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:RU", 
+            "alpha_3": "RUS"
+        }
+    }, 
+    {
+        "pk": 184, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "RW", 
+            "name": "Rwanda", 
+            "country_code": 646, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:RW", 
+            "alpha_3": "RWA"
+        }
+    }, 
+    {
+        "pk": 185, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "BL", 
+            "name": "Saint Barth\u00e9lemy", 
+            "country_code": 652, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:BL", 
+            "alpha_3": "BLM"
+        }
+    }, 
+    {
+        "pk": 186, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "SH", 
+            "name": "Saint Helena, Ascension and Tristan da Cunha", 
+            "country_code": 654, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:SH", 
+            "alpha_3": "SHN"
+        }
+    }, 
+    {
+        "pk": 187, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "KN", 
+            "name": "Saint Kitts and Nevis", 
+            "country_code": 659, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:KN", 
+            "alpha_3": "KNA"
+        }
+    }, 
+    {
+        "pk": 188, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "LC", 
+            "name": "Saint Lucia", 
+            "country_code": 662, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:LC", 
+            "alpha_3": "LCA"
+        }
+    }, 
+    {
+        "pk": 189, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "MF", 
+            "name": "Saint Martin (French part)", 
+            "country_code": 663, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:MF", 
+            "alpha_3": "MAF"
+        }
+    }, 
+    {
+        "pk": 190, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 21, 
+            "region_code": 19, 
+            "alpha_2": "PM", 
+            "name": "Saint Pierre and Miquelon", 
+            "country_code": 666, 
+            "sub_region": "Northern America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:PM", 
+            "alpha_3": "SPM"
+        }
+    }, 
+    {
+        "pk": 191, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "VC", 
+            "name": "Saint Vincent and the Grenadines", 
+            "country_code": 670, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:VC", 
+            "alpha_3": "VCT"
+        }
+    }, 
+    {
+        "pk": 192, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 61, 
+            "region_code": 9, 
+            "alpha_2": "WS", 
+            "name": "Samoa", 
+            "country_code": 882, 
+            "sub_region": "Polynesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:WS", 
+            "alpha_3": "WSM"
+        }
+    }, 
+    {
+        "pk": 193, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "SM", 
+            "name": "San Marino", 
+            "country_code": 674, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:SM", 
+            "alpha_3": "SMR"
+        }
+    }, 
+    {
+        "pk": 194, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 17, 
+            "region_code": 2, 
+            "alpha_2": "ST", 
+            "name": "Sao Tome and Principe", 
+            "country_code": 678, 
+            "sub_region": "Middle Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:ST", 
+            "alpha_3": "STP"
+        }
+    }, 
+    {
+        "pk": 195, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "SA", 
+            "name": "Saudi Arabia", 
+            "country_code": 682, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:SA", 
+            "alpha_3": "SAU"
+        }
+    }, 
+    {
+        "pk": 196, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "SN", 
+            "name": "Senegal", 
+            "country_code": 686, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:SN", 
+            "alpha_3": "SEN"
+        }
+    }, 
+    {
+        "pk": 197, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "RS", 
+            "name": "Serbia", 
+            "country_code": 688, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:RS", 
+            "alpha_3": "SRB"
+        }
+    }, 
+    {
+        "pk": 198, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "SC", 
+            "name": "Seychelles", 
+            "country_code": 690, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:SC", 
+            "alpha_3": "SYC"
+        }
+    }, 
+    {
+        "pk": 199, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "SL", 
+            "name": "Sierra Leone", 
+            "country_code": 694, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:SL", 
+            "alpha_3": "SLE"
+        }
+    }, 
+    {
+        "pk": 200, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 35, 
+            "region_code": 142, 
+            "alpha_2": "SG", 
+            "name": "Singapore", 
+            "country_code": 702, 
+            "sub_region": "South-Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:SG", 
+            "alpha_3": "SGP"
+        }
+    }, 
+    {
+        "pk": 201, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "SX", 
+            "name": "Sint Maarten (Dutch part)", 
+            "country_code": 534, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:SX", 
+            "alpha_3": "SXM"
+        }
+    }, 
+    {
+        "pk": 202, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 151, 
+            "region_code": 150, 
+            "alpha_2": "SK", 
+            "name": "Slovakia", 
+            "country_code": 703, 
+            "sub_region": "Eastern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:SK", 
+            "alpha_3": "SVK"
+        }
+    }, 
+    {
+        "pk": 203, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "SI", 
+            "name": "Slovenia", 
+            "country_code": 705, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:SI", 
+            "alpha_3": "SVN"
+        }
+    }, 
+    {
+        "pk": 204, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 54, 
+            "region_code": 9, 
+            "alpha_2": "SB", 
+            "name": "Solomon Islands", 
+            "country_code": 90, 
+            "sub_region": "Melanesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:SB", 
+            "alpha_3": "SLB"
+        }
+    }, 
+    {
+        "pk": 205, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "SO", 
+            "name": "Somalia", 
+            "country_code": 706, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:SO", 
+            "alpha_3": "SOM"
+        }
+    }, 
+    {
+        "pk": 206, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 18, 
+            "region_code": 2, 
+            "alpha_2": "ZA", 
+            "name": "South Africa", 
+            "country_code": 710, 
+            "sub_region": "Southern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:ZA", 
+            "alpha_3": "ZAF"
+        }
+    }, 
+    {
+        "pk": 207, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": -1, 
+            "region_code": -1, 
+            "alpha_2": "GS", 
+            "name": "South Georgia and the South Sandwich Islands", 
+            "country_code": 239, 
+            "sub_region": "", 
+            "region": "", 
+            "iso_3166_2": "ISO 3166-2:GS", 
+            "alpha_3": "SGS"
+        }
+    }, 
+    {
+        "pk": 208, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "SS", 
+            "name": "South Sudan", 
+            "country_code": 728, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:SS", 
+            "alpha_3": "SSD"
+        }
+    }, 
+    {
+        "pk": 209, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 39, 
+            "region_code": 150, 
+            "alpha_2": "ES", 
+            "name": "Spain", 
+            "country_code": 724, 
+            "sub_region": "Southern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:ES", 
+            "alpha_3": "ESP"
+        }
+    }, 
+    {
+        "pk": 210, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 34, 
+            "region_code": 142, 
+            "alpha_2": "LK", 
+            "name": "Sri Lanka", 
+            "country_code": 144, 
+            "sub_region": "Southern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:LK", 
+            "alpha_3": "LKA"
+        }
+    }, 
+    {
+        "pk": 211, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 15, 
+            "region_code": 2, 
+            "alpha_2": "SD", 
+            "name": "Sudan", 
+            "country_code": 729, 
+            "sub_region": "Northern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:SD", 
+            "alpha_3": "SDN"
+        }
+    }, 
+    {
+        "pk": 212, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "SR", 
+            "name": "Suriname", 
+            "country_code": 740, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:SR", 
+            "alpha_3": "SUR"
+        }
+    }, 
+    {
+        "pk": 213, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "SJ", 
+            "name": "Svalbard and Jan Mayen", 
+            "country_code": 744, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:SJ", 
+            "alpha_3": "SJM"
+        }
+    }, 
+    {
+        "pk": 214, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 18, 
+            "region_code": 2, 
+            "alpha_2": "SZ", 
+            "name": "Swaziland", 
+            "country_code": 748, 
+            "sub_region": "Southern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:SZ", 
+            "alpha_3": "SWZ"
+        }
+    }, 
+    {
+        "pk": 215, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "SE", 
+            "name": "Sweden", 
+            "country_code": 752, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:SE", 
+            "alpha_3": "SWE"
+        }
+    }, 
+    {
+        "pk": 216, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 155, 
+            "region_code": 150, 
+            "alpha_2": "CH", 
+            "name": "Switzerland", 
+            "country_code": 756, 
+            "sub_region": "Western Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:CH", 
+            "alpha_3": "CHE"
+        }
+    }, 
+    {
+        "pk": 217, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "SY", 
+            "name": "Syrian Arab Republic", 
+            "country_code": 760, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:SY", 
+            "alpha_3": "SYR"
+        }
+    }, 
+    {
+        "pk": 218, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 30, 
+            "region_code": 142, 
+            "alpha_2": "TW", 
+            "name": "Taiwan, Province of China", 
+            "country_code": 158, 
+            "sub_region": "Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:TW", 
+            "alpha_3": "TWN"
+        }
+    }, 
+    {
+        "pk": 219, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 143, 
+            "region_code": 142, 
+            "alpha_2": "TJ", 
+            "name": "Tajikistan", 
+            "country_code": 762, 
+            "sub_region": "Central Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:TJ", 
+            "alpha_3": "TJK"
+        }
+    }, 
+    {
+        "pk": 220, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "TZ", 
+            "name": "Tanzania, United Republic of", 
+            "country_code": 834, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:TZ", 
+            "alpha_3": "TZA"
+        }
+    }, 
+    {
+        "pk": 221, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 35, 
+            "region_code": 142, 
+            "alpha_2": "TH", 
+            "name": "Thailand", 
+            "country_code": 764, 
+            "sub_region": "South-Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:TH", 
+            "alpha_3": "THA"
+        }
+    }, 
+    {
+        "pk": 222, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 35, 
+            "region_code": 142, 
+            "alpha_2": "TL", 
+            "name": "Timor-Leste", 
+            "country_code": 626, 
+            "sub_region": "South-Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:TL", 
+            "alpha_3": "TLS"
+        }
+    }, 
+    {
+        "pk": 223, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 11, 
+            "region_code": 2, 
+            "alpha_2": "TG", 
+            "name": "Togo", 
+            "country_code": 768, 
+            "sub_region": "Western Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:TG", 
+            "alpha_3": "TGO"
+        }
+    }, 
+    {
+        "pk": 224, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 61, 
+            "region_code": 9, 
+            "alpha_2": "TK", 
+            "name": "Tokelau", 
+            "country_code": 772, 
+            "sub_region": "Polynesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:TK", 
+            "alpha_3": "TKL"
+        }
+    }, 
+    {
+        "pk": 225, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 61, 
+            "region_code": 9, 
+            "alpha_2": "TO", 
+            "name": "Tonga", 
+            "country_code": 776, 
+            "sub_region": "Polynesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:TO", 
+            "alpha_3": "TON"
+        }
+    }, 
+    {
+        "pk": 226, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "TT", 
+            "name": "Trinidad and Tobago", 
+            "country_code": 780, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:TT", 
+            "alpha_3": "TTO"
+        }
+    }, 
+    {
+        "pk": 227, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 15, 
+            "region_code": 2, 
+            "alpha_2": "TN", 
+            "name": "Tunisia", 
+            "country_code": 788, 
+            "sub_region": "Northern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:TN", 
+            "alpha_3": "TUN"
+        }
+    }, 
+    {
+        "pk": 228, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "TR", 
+            "name": "Turkey", 
+            "country_code": 792, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:TR", 
+            "alpha_3": "TUR"
+        }
+    }, 
+    {
+        "pk": 229, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 143, 
+            "region_code": 142, 
+            "alpha_2": "TM", 
+            "name": "Turkmenistan", 
+            "country_code": 795, 
+            "sub_region": "Central Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:TM", 
+            "alpha_3": "TKM"
+        }
+    }, 
+    {
+        "pk": 230, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "TC", 
+            "name": "Turks and Caicos Islands", 
+            "country_code": 796, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:TC", 
+            "alpha_3": "TCA"
+        }
+    }, 
+    {
+        "pk": 231, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 61, 
+            "region_code": 9, 
+            "alpha_2": "TV", 
+            "name": "Tuvalu", 
+            "country_code": 798, 
+            "sub_region": "Polynesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:TV", 
+            "alpha_3": "TUV"
+        }
+    }, 
+    {
+        "pk": 232, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "UG", 
+            "name": "Uganda", 
+            "country_code": 800, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:UG", 
+            "alpha_3": "UGA"
+        }
+    }, 
+    {
+        "pk": 233, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 151, 
+            "region_code": 150, 
+            "alpha_2": "UA", 
+            "name": "Ukraine", 
+            "country_code": 804, 
+            "sub_region": "Eastern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:UA", 
+            "alpha_3": "UKR"
+        }
+    }, 
+    {
+        "pk": 234, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "AE", 
+            "name": "United Arab Emirates", 
+            "country_code": 784, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:AE", 
+            "alpha_3": "ARE"
+        }
+    }, 
+    {
+        "pk": 235, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 154, 
+            "region_code": 150, 
+            "alpha_2": "GB", 
+            "name": "United Kingdom of Great Britain and Northern Ireland", 
+            "country_code": 826, 
+            "sub_region": "Northern Europe", 
+            "region": "Europe", 
+            "iso_3166_2": "ISO 3166-2:GB", 
+            "alpha_3": "GBR"
+        }
+    }, 
+    {
+        "pk": 236, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 21, 
+            "region_code": 19, 
+            "alpha_2": "US", 
+            "name": "United States of America", 
+            "country_code": 840, 
+            "sub_region": "Northern America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:US", 
+            "alpha_3": "USA"
+        }
+    }, 
+    {
+        "pk": 237, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": -1, 
+            "region_code": -1, 
+            "alpha_2": "UM", 
+            "name": "United States Minor Outlying Islands", 
+            "country_code": 581, 
+            "sub_region": "", 
+            "region": "", 
+            "iso_3166_2": "ISO 3166-2:UM", 
+            "alpha_3": "UMI"
+        }
+    }, 
+    {
+        "pk": 238, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "UY", 
+            "name": "Uruguay", 
+            "country_code": 858, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:UY", 
+            "alpha_3": "URY"
+        }
+    }, 
+    {
+        "pk": 239, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 143, 
+            "region_code": 142, 
+            "alpha_2": "UZ", 
+            "name": "Uzbekistan", 
+            "country_code": 860, 
+            "sub_region": "Central Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:UZ", 
+            "alpha_3": "UZB"
+        }
+    }, 
+    {
+        "pk": 240, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 54, 
+            "region_code": 9, 
+            "alpha_2": "VU", 
+            "name": "Vanuatu", 
+            "country_code": 548, 
+            "sub_region": "Melanesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:VU", 
+            "alpha_3": "VUT"
+        }
+    }, 
+    {
+        "pk": 241, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 5, 
+            "region_code": 19, 
+            "alpha_2": "VE", 
+            "name": "Venezuela (Bolivarian Republic of)", 
+            "country_code": 862, 
+            "sub_region": "South America", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:VE", 
+            "alpha_3": "VEN"
+        }
+    }, 
+    {
+        "pk": 242, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 35, 
+            "region_code": 142, 
+            "alpha_2": "VN", 
+            "name": "Viet Nam", 
+            "country_code": 704, 
+            "sub_region": "South-Eastern Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:VN", 
+            "alpha_3": "VNM"
+        }
+    }, 
+    {
+        "pk": 243, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "VG", 
+            "name": "Virgin Islands (British)", 
+            "country_code": 92, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:VG", 
+            "alpha_3": "VGB"
+        }
+    }, 
+    {
+        "pk": 244, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 29, 
+            "region_code": 19, 
+            "alpha_2": "VI", 
+            "name": "Virgin Islands (U.S.)", 
+            "country_code": 850, 
+            "sub_region": "Caribbean", 
+            "region": "Americas", 
+            "iso_3166_2": "ISO 3166-2:VI", 
+            "alpha_3": "VIR"
+        }
+    }, 
+    {
+        "pk": 245, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 61, 
+            "region_code": 9, 
+            "alpha_2": "WF", 
+            "name": "Wallis and Futuna", 
+            "country_code": 876, 
+            "sub_region": "Polynesia", 
+            "region": "Oceania", 
+            "iso_3166_2": "ISO 3166-2:WF", 
+            "alpha_3": "WLF"
+        }
+    }, 
+    {
+        "pk": 246, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 15, 
+            "region_code": 2, 
+            "alpha_2": "EH", 
+            "name": "Western Sahara", 
+            "country_code": 732, 
+            "sub_region": "Northern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:EH", 
+            "alpha_3": "ESH"
+        }
+    }, 
+    {
+        "pk": 247, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 145, 
+            "region_code": 142, 
+            "alpha_2": "YE", 
+            "name": "Yemen", 
+            "country_code": 887, 
+            "sub_region": "Western Asia", 
+            "region": "Asia", 
+            "iso_3166_2": "ISO 3166-2:YE", 
+            "alpha_3": "YEM"
+        }
+    }, 
+    {
+        "pk": 248, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "ZM", 
+            "name": "Zambia", 
+            "country_code": 894, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:ZM", 
+            "alpha_3": "ZMB"
+        }
+    }, 
+    {
+        "pk": 249, 
+        "model": "ctirs.Country", 
+        "fields": {
+            "sub_region_code": 14, 
+            "region_code": 2, 
+            "alpha_2": "ZW", 
+            "name": "Zimbabwe", 
+            "country_code": 716, 
+            "sub_region": "Eastern Africa", 
+            "region": "Africa", 
+            "iso_3166_2": "ISO 3166-2:ZW", 
+            "alpha_3": "ZWE"
+        }
+    }
+]

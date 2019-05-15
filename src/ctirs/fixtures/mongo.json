@@ -1,0 +1,11 @@
+[
+  {
+    "model": "ctirs.mongoconfig",
+    "fields": {
+      "host": "localhost",
+      "port": 27017,
+      "db": "ctirs"
+    }
+  }
+]
+                                  

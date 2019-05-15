@@ -1,0 +1,127 @@
+{% include 'header.html' %}
+<head>
+<!--  for system_configurations -->
+<link href="/static/ctirs/css/adapter_otx.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/adapter_otx.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<form name="modify_otx" id="modify-otx-form" action="/adapter/otx/modify" method="POST">{% csrf_token %}
+<div class="container">
+    <br/>
+    <h1>AlienVault OTX Adapter</h1>
+    <br/>
+    <hr/>
+    <h2>Settings</h2>
+    <div class="form-group">
+    <p id="error-msg">{{ error_msg_modify |default:'' }}</p>
+    <p id="info-msg">{{ info_msg_modify |default:'' }}</p>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                APIKEY
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-otx-apikey" type="text" name="apikey" class="form-control" value="{%if otx.apikey %}{{ otx.apikey }}{% endif %}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Community
+            </div>
+            <div class="col-xs-4">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" id="modify-community-dropdown-button" type="button" data-toggle="dropdown">
+                        {% if otx.community.name %}
+                        {{ otx.community.name }}
+                        {% else %}
+                        Choose Communtiy
+                        {% endif %}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="dropdown-menu-community-name">
+            	        {% if communities %}
+                    	{% for community in communities %}
+                        <li><a href="#" data-value="{{community.id}}">{{community.name}}</a></li>
+            	        {% endfor %}
+                    	{% endif %}
+                    </ul>
+                    <input type="hidden" id="modify-community-id" name="community_id" value="{{ otx.community.id }}">
+                </div>
+            </div>
+        </div><!-- <div class="row"> -->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Uploader
+            </div>
+            <div class="col-xs-4">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" id="modify-uploader-dropdown-button" type="button" data-toggle="dropdown">
+                        {% if otx.uploader %}
+                        {{ otx.uploader_name }}
+                        {% else %}
+                        Choose Uploader
+                        {% endif %}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="dropdown-menu-uploader-name">
+            	        {% if users %}
+                    	{% for user in users %}
+                        <li><a href="#" data-value="{{user.id}}">{{user.username}}</a></li>
+            	        {% endfor %}
+                    	{% endif %}
+                    </ul>
+                    <input type="hidden" id="modify-uploader-id" name="uploader_id" {%if otx.uploader %}value="{{otx.uploader}}{%endif%}">
+                </div>
+            </div>
+        </div><!-- <div class="row"> -->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="modify-otx-submit" class="btn btn-default">Modify</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</form>
+</div> <!--  <div class="container"> -->
+<form name="get_otx" id="get-otx-form" action="/adapter/otx/get" method="GET">
+<div class="container">
+    <br/>
+    <hr/>
+    <h2>Get</h2>
+    <p id="error-msg">{{ error_msg_get |default:'' }}</p>
+    <p id="info-msg">{{ info_msg_get |default:'' }}</p>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                From this datetime (UTC).
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-otx-last-requested" type="text" name="start" class="form-control" value="{%if otx.last_requested %}{{ otx.last_requested|date:'Y/m/d H:i:s'}}{% endif %}" placeholder="Ex: 2017/01/01 00:00:00"'/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="get-otx-submit" class="btn btn-default">Start</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</form>
+<div class="container">
+<form name="otx_detail" id="otx-detail" action="/adapter/otx/detail/" method="GET"></form>
+    <br/>
+    <hr/>
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="otx-detail-button" class="btn btn-default">Detail</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</body>
+</html>

@@ -1,0 +1,76 @@
+{% include 'header.html' %}
+<head>
+<!--  for system_configurations -->
+<link href="/static/ctirs/css/profile_configuration_common.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/system_configuration.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<div class="container">
+    <br/>
+    <h1>System</h1>
+    <br/>
+    <hr/>
+    <h2>Settings</h2>
+    <div class="form-group">
+    <p id="error-msg">{{ error_msg |default:'' }}</p>
+    <p id="info-msg">{{ info_msg |default:'' }}</p>
+    </div>
+	<form name="modify_system" id="modify-system-form" action="/configuration/system/modify" method="POST">{% csrf_token %}
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Community Root Directory
+            </div>
+            <div class="col-xs-6">
+            	<input id="modify-community-root-dir" type="text" name="community_root_dir" class="form-control" value="{{ system.community_root_dir }}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+            	Public Suffix List File
+            </div>
+            <div class="col-xs-6">
+            	<input id="modify-suffix-list-file-path" type="text" name="suffix_list_file_path" class="form-control" value="{{ system.public_suffix_list_file_path }}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+            	HTTP Proxy
+            </div>
+            <div class="col-xs-6">
+            	<input id="modify-http-proxy" type="text" name="http_proxy" class="form-control" {% if system %}value="{{ system.http_proxy }}" {% endif %}/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+            	HTTPS Proxy
+            </div>
+            <div class="col-xs-6">
+            	<input id="modify-https-proxy" type="text" name="https_proxy" class="form-control" {% if system %}value="{{ system.https_proxy }}" {% endif %}/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+	</form>
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="modify-system-submit" class="btn btn-default">Modify</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <hr/>
+    <div class="form-group">
+        <div class="row">
+			<form name="rebuild_cache" id="rebuild-cache-form" action="/configuration/system/rebuild_cache" method="GET"></form>
+            <button type="button" id="rebuild-cache-submit" class="btn btn-default">Rebuild Cache</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</body>
+</html>

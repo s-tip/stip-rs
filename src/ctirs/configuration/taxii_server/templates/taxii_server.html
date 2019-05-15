@@ -1,0 +1,104 @@
+{% include 'header.html' %}
+<head>
+<!--  for taxii_server_configurations -->
+<link href="/static/ctirs/css/profile_configuration_common.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/taxii_server_configuration.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<div class="container">
+    <br/>
+    <h1>TAXII Server</h1>
+    <br/>
+    <hr/>
+    <h2>TAXII Server Collection List</h2>
+    <hr/>
+    <table class="table table-striped table-hover" style="table-layout: fixed;">
+    <thead>
+    <tr>
+    <td>
+        Delete
+    </td>
+    <td>
+        Detail
+    </td>
+    <td>
+        Display Name
+    </td>
+    <td>
+        TAXII Collection Name
+    </td>
+    </tr>
+    </thead>
+    <tbody>
+    {% if taxii_servers %}
+    <form name="delete-taxii-server" id="delete-taxii-server-form" action="/configuration/taxii_server/delete" method="GET"></form>
+    <form name="detail-taxii-server" id="detail-taxii-server-form" action="/configuration/taxii_server/detail/" method="GET"></form>
+    {% for taxii_server in taxii_servers %}
+    <tr class="configure-tr">
+    <td>
+        <div class="form-group">
+            <button class="btn btn-default delete-taxii-server-button btn-sm btn-danger" type="button" id="{{taxii_server.id}}" setting_name="{{taxii_server.setting_name}}">Delete</button>
+        </div><!-- <div class="form-group"> -->
+    </td>
+    <td>
+        <div class="form-group">
+            <button class="btn btn-default detail-taxii-server-button btn-sm" type="button" id="{{taxii_server.id}}">Detail</button>
+        </div><!-- <div class="form-group"> -->
+    </td>
+    <td>
+        <p class="setting-name" style="word-wrap: break-word;">{{ taxii_server.setting_name }}</p>
+    </td>
+    <td>
+        <p class="collection-name" style="word-wrap: break-word;">{{ taxii_server.collection_name }}</p>
+    </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    {% endif %}
+    </table>
+    <hr/>
+    <h2>Create Server Collection</h2>
+    <br/>
+    <div class="form-group">
+	    <p class="error-msg" id="create-error-msg">{{ create_error_msg |default:'' }}</p>
+	    <p class="info-msg" id="create-info-msg">{{ create_info_msg |default:'' }}</p>
+	    
+        <form name="create-taxii-server" id="create-taxii-server-form" action="/configuration/taxii_server/create" method="GET">
+        <div class="col-xs-2">
+            Display Name
+        </div>
+        <div class="col-xs-4">
+            <input id="create-setting-name" type="text" name="setting_name" class="form-control"/>
+        </div>
+        <br/>
+        <br/>
+        <div class="col-xs-2">
+            TAXII Collection Name
+        </div>
+        <div class="col-xs-4">
+            <input id="create-collection-name" type="text" name="colleciton_name" class="form-control"/>
+        </div>
+        <br/>
+        <br/>
+        <div class="col-xs-2">
+         <button class="btn btn-default modify-taxii-client-button btn-info" type="button" id='create-taxii-server-submit'>Create</button>
+        </div>
+        </form>
+    </div><!-- <div class="form-group"> -->
+    <br/>
+    <hr/>
+    <h2>Reboot TAXII Server</h2>
+    <div class="form-group">
+	    <p class="error-msg" id="reboot-error-msg">{{ reboot_error_msg |default:'' }}</p>
+	    <p class="info-msg" id="reboot-info-msg">{{ reboot_info_msg |default:'' }}</p>
+        <form name="reboot-taxii-server" id="reboot-taxii-server-form" action="/configuration/taxii_server/reboot" method="GET">
+        <div class="col-xs-4">
+            <button type="button" id="reboot-taxii-server-submit" class="btn btn-danger">Reboot</button>
+        </div>
+	    </form>
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</body>
+</html>

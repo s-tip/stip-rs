@@ -1,0 +1,230 @@
+[
+  {
+    "pk": 1,
+    "model": "ctirs.gvauthuser",
+    "fields": {
+      "is_l1_view": true,
+      "is_l2_view": true,
+      "is_sharing_view": true,
+      "css_thema": "default" 
+    }
+  },
+  {
+    "pk": 1,
+    "model": "ctirs.profile",
+    "fields": {
+        "scan_csv": true,
+        "scan_pdf": true,
+        "scan_post": true,
+        "scan_txt": true,
+        "threat_actors": "",
+        "indicator_white_list": "" 
+    }
+  },
+  {
+    "pk": 1,
+    "model": "ctirs.stipuser",
+    "fields": {
+      "username": "admin",
+      "password": "pbkdf2_sha256$30000$S65gy11F01Z2$ZS2Gp4K9J06wZtlWGurNprGGoBEuXTvfSIYhMxhF0RU=",
+      "date_joined": "2019-01-01 00:00:00.000000",
+      "screen_name": "admin",
+      "language": "en",
+      "role": "admin",
+      "is_admin": true,
+      "is_superuser": true,
+      "sns_profile": 1,
+      "gv_auth_user": 1
+    }
+  },
+  {
+    "pk": 2,
+    "model": "ctirs.gvauthuser",
+    "fields": {
+      "is_l1_view": false,
+      "is_l2_view": false,
+      "is_sharing_view": false,
+      "css_thema": "default" 
+    }
+  },
+  {
+    "pk": 2,
+    "model": "ctirs.profile",
+    "fields": {
+        "scan_csv": false,
+        "scan_pdf": false,
+        "scan_post": false,
+        "scan_txt": false,
+        "threat_actors": "",
+        "indicator_white_list": "" 
+    }
+  },
+  {
+    "pk": 2,
+    "model": "ctirs.stipuser",
+    "fields": {
+      "username": "na",
+      "password": "pbkdf2_sha256$30000$xPXGUKFiFGtw$sl0ylLkvley0lVQUwUGTcWI5feSwZ4ODjL7+aRrYCK8=",
+      "date_joined": "2019-01-01 00:00:00.000000",
+      "screen_name": "na",
+      "language": "en",
+      "role": "user",
+      "is_admin": false,
+      "is_superuser": false,
+      "sns_profile": 2,
+      "gv_auth_user": 2
+    }
+  },
+  {
+    "pk": 3,
+    "model": "ctirs.gvauthuser",
+    "fields": {
+      "is_l1_view": false,
+      "is_l2_view": false,
+      "is_sharing_view": false,
+      "css_thema": "default" 
+    }
+  },
+  {
+    "pk": 3,
+    "model": "ctirs.profile",
+    "fields": {
+        "scan_csv": false,
+        "scan_pdf": false,
+        "scan_post": false,
+        "scan_txt": false,
+        "threat_actors": "",
+        "indicator_white_list": "" 
+    }
+  },
+  {
+    "pk": 3,
+    "model": "ctirs.stipuser",
+    "fields": {
+      "username": "anonymous",
+      "password": "pbkdf2_sha256$30000$bo9fOMD42hUV$3faBeAe5K31cJSfGCmteBcVsX11bUrVJvKLiEnI7iHI=",
+      "date_joined": "2019-01-01 00:00:00.000000",
+      "screen_name": "anonymous",
+      "language": "en",
+      "role": "user",
+      "is_admin": false,
+      "is_superuser": false,
+      "sns_profile": 3,
+      "gv_auth_user": 3
+    }
+  },
+  {
+    "pk": 4,
+    "model": "ctirs.gvauthuser",
+    "fields": {
+      "is_l1_view": false,
+      "is_l2_view": false,
+      "is_sharing_view": false,
+      "css_thema": "default" 
+    }
+  },
+  {
+    "pk": 4,
+    "model": "ctirs.profile",
+    "fields": {
+        "scan_csv": false,
+        "scan_pdf": false,
+        "scan_post": false,
+        "scan_txt": false,
+        "threat_actors": "",
+        "indicator_white_list": "" 
+    }
+  },
+  {
+    "pk": 4,
+    "model": "ctirs.stipuser",
+    "fields": {
+      "username": "gv_concierge",
+      "password": "pbkdf2_sha256$30000$HDlr7XrRQfQ4$UZqs2ualnlIHpovtek+oaj5IaivuJ1Y93F+7rhrOKcI=",
+      "date_joined": "2019-01-01 00:00:00.000000",
+      "screen_name": "gv_concierge",
+      "language": "en",
+      "role": "bot",
+      "is_admin": false,
+      "is_superuser": false,
+      "sns_profile": 4,
+      "gv_auth_user": 4
+    }
+  },
+  {
+    "pk": 5,
+    "model": "ctirs.gvauthuser",
+    "fields": {
+      "is_l1_view": false,
+      "is_l2_view": false,
+      "is_sharing_view": false,
+      "css_thema": "default" 
+    }
+  },
+  {
+    "pk": 5,
+    "model": "ctirs.profile",
+    "fields": {
+        "scan_csv": false,
+        "scan_pdf": false,
+        "scan_post": false,
+        "scan_txt": false,
+        "threat_actors": "",
+        "indicator_white_list": "" 
+    }
+  },
+  {
+    "pk": 5,
+    "model": "ctirs.stipuser",
+    "fields": {
+      "username": "alienvaultotx",
+      "password": "pbkdf2_sha256$30000$YkTlODmNEsgD$3poFqAjI6VNNdaS5ebz2vfAtYlUzQw5WeRnvo9mPElU=",
+      "date_joined": "2019-01-01 00:00:00.000000",
+      "screen_name": "OTX",
+      "language": "en",
+      "role": "user",
+      "is_admin": false,
+      "is_superuser": false,
+      "sns_profile": 5,
+      "gv_auth_user": 5
+    }
+  },
+  {
+    "pk": 6,
+    "model": "ctirs.gvauthuser",
+    "fields": {
+      "is_l1_view": false,
+      "is_l2_view": false,
+      "is_sharing_view": false,
+      "css_thema": "default" 
+    }
+  },
+  {
+    "pk": 6,
+    "model": "ctirs.profile",
+    "fields": {
+        "scan_csv": false,
+        "scan_pdf": false,
+        "scan_post": false,
+        "scan_txt": false,
+        "threat_actors": "",
+        "indicator_white_list": "" 
+    }
+  },
+  {
+    "pk": 6,
+    "model": "ctirs.stipuser",
+    "fields": {
+      "username": "misp",
+      "password": "pbkdf2_sha256$30000$j1L1EJehQnBK$/HooQx2wAUWynoRd2dGPelt+4hYPA7WVgwmBTRlFPsU=",
+      "date_joined": "2019-01-01 00:00:00.000000",
+      "screen_name": "misp",
+      "language": "en",
+      "role": "user",
+      "is_admin": false,
+      "is_superuser": false,
+      "sns_profile": 6,
+      "gv_auth_user": 6
+    }
+  }
+]

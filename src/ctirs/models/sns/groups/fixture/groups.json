@@ -1,0 +1,280 @@
+[
+    {
+        "pk": 1, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Malware", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "en", 
+            "members": [], 
+            "local_name": "マルウェア"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Ransomware", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "en", 
+            "members": [
+                4
+            ], 
+            "local_name": "ランサムウェア"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "DDos", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "DDos"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "APT", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "高度標的型攻撃 (APT)"
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Vulnerability", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "脆弱性"
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Phishing", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "フィッシング"
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Web Site", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "Webサイト"
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Cyber-attack Warning", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "攻撃予告"
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "IoT", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "IoT"
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Security Reports", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "セキュリティ報告書"
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Tokyo Olympics/Paralympics 2020", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "東京オリパラ 2020"
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Rugby World Cup 2019", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "ラグビーワールドカップ 2019"
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Carrier", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "通信業界"
+        }
+    }, 
+    {
+        "pk": 14, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Financial Services", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "金融業界"
+        }
+    }, 
+    {
+        "pk": 15, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Defense Industries and MoD", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "防衛産業及び防衛省"
+        }
+    }, 
+    {
+        "pk": 16, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Hokkaido Region", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "北海道地方"
+        }
+    }, 
+    {
+        "pk": 17, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Tohoku Region", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "東北地方"
+        }
+    }, 
+    {
+        "pk": 18, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Kanto Region", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "関東地方"
+        }
+    }, 
+    {
+        "pk": 19, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Chubu Region", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "中部地方"
+        }
+    }, 
+    {
+        "pk": 20, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Kansai Region", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "関西地方"
+        }
+    }, 
+    {
+        "pk": 21, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Chugoku Region", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "中国地方"
+        }
+    }, 
+    {
+        "pk": 22, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Shikoku Region", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "四国地方"
+        }
+    }, 
+    {
+        "pk": 23, 
+        "model": "ctirs.group", 
+        "fields": {
+            "en_name": "Kyushu Region", 
+            "description": "", 
+            "creator": 1, 
+            "locale": "ja", 
+            "members": [], 
+            "local_name": "九州地方"
+        }
+    }
+]

@@ -1,0 +1,8 @@
+.navbar{
+    margin-bottom: 0px;
+}
+
+.nav li a.active    {
+    color:#fff;
+    background:#67B5AC;
+}

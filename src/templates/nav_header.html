@@ -1,0 +1,59 @@
+<!--  for nav_header -->
+<head>
+<script type="text/javascript" src="/static/ctirs/js/nav_header.js"></script>
+<link href="/static/ctirs/css/nav_header.css" rel="stylesheet">
+</head>
+<nav class="navbar navbar-default navbar-inverse" id="navbar">
+    <div class="container-fluid">
+        <div class="nav-header">
+            <a class="navbar-brand" href="#">CTI Repostitory System{% if git_version %} <font style="font-size:8px;">({{git_version}})</font>{% endif %}</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/dashboard/">Dashboard</a></li>
+                <li><a href="/upload/">Upload</a></li>
+                <li><a href="/poll/">Poll</a></li>
+                {% if user.is_admin %}
+				<li class="dropdown">
+					<a href="#" id="navbar-adapter" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Adapter<span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="/adapter/otx/">AlienVault OTX</a></li>
+						<li><a href="/adapter/isight/">iSIGHT Parnters</a></li>
+						<li><a href="/adapter/misp/">MISP</a></li>
+					</ul>
+				</li>
+                {% endif %}
+                <li><a href="/list/">List</a></li>
+                {% if user.is_admin %}
+				<li class="dropdown">
+					<a href="#" id="navbar-configuration" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Configuration <span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="/configuration/community/">Community</a></li>
+						<li><a href="/configuration/user/">User</a></li>
+						<li><a href="/configuration/taxii_client/">Taxii Client</a></li>
+						<li><a href="/configuration/taxii_server/">Taxii Server</a></li>
+						<li><a href="/configuration/system/">System</a></li>
+						<li><a href="/configuration/mongo/">Mongo</a></li>
+					</ul>
+				</li>
+                {% endif %}
+                <li><a href="/logout/">Logout</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-center">
+              <li><a href="/profile/">
+                Hello,&nbsp;
+                {% if user %}
+                    {% if user.screen_name %}
+                        {{ user.screen_name }}
+                    {% else %}
+                        {{ user }}
+                    {% endif %}
+                {% else %}
+                    Anonymous
+                {% endif %}
+                &nbsp;(Last login: {{user.last_login|default:"First Login"}})
+                </a></li>
+            </ul>
+        </div> <!-- <div class="collapse navbar-collapse">-->
+    </div><!--  <div class="container-fluid"> -->
+</nav>

@@ -1,0 +1,148 @@
+{% include 'header.html' %}
+<head>
+<!--  for system_configurations -->
+<link href="/static/ctirs/css/adapter_isight.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/adapter_isight.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<form name="modify_isight" id="modify-isight-form" action="/adapter/isight/modify" method="POST">{% csrf_token %}
+<div class="container">
+    <br/>
+    <h1>iSIGHT Partners Adapter</h1>
+    <br/>
+    <hr/>
+    <h2>Settings</h2>
+    <div class="form-group">
+    <p id="error-msg">{{ error_msg_modify |default:'' }}</p>
+    <p id="info-msg">{{ info_msg_modify |default:'' }}</p>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Public Key
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-isight-public-key" type="text" name="public_key" class="form-control" value="{%if isight.public_key %}{{ isight.public_key }}{% endif %}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Private Key
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-isight-private-key" type="text" name="private_key" class="form-control" value="{%if isight.private_key %}{{ isight.private_key }}{% endif %}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Community
+            </div>
+            <div class="col-xs-4">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" id="modify-community-dropdown-button" type="button" data-toggle="dropdown">
+                        {% if isight.community.name %}
+                        {{ isight.community.name }}
+                        {% else %}
+                        Choose Communtiy
+                        {% endif %}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="dropdown-menu-community-name">
+            	        {% if communities %}
+                    	{% for community in communities %}
+                        <li><a href="#" data-value="{{community.id}}">{{community.name}}</a></li>
+            	        {% endfor %}
+                    	{% endif %}
+                    </ul>
+                    <input type="hidden" id="modify-community-id" name="community_id" value="{{isight.community.id}}">
+                </div>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Uploader
+            </div>
+            <div class="col-xs-4">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" id="modify-uploader-dropdown-button" type="button" data-toggle="dropdown">
+                        {% if isight.uploader %}
+                        {{ isight.uploader_name }}
+                        {% else %}
+                        Choose Uploader
+                        {% endif %}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="dropdown-menu-uploader-name">
+            	        {% if users %}
+                    	{% for user in users %}
+                        <li><a href="#" data-value="{{user.id}}">{{user.username}}</a></li>
+            	        {% endfor %}
+                    	{% endif %}
+                    </ul>
+                    <input type="hidden" id="modify-uploader-id" name="uploader_id" {%if isight.uploader %}value="{{isight.uploader}}"{%endif%}>
+                </div>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="modify-isight-submit" class="btn btn-default">Modify</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</form>
+
+<form name="get_isight" id="get-isight-form" action="/adapter/isight/get" method="GET">
+<div class="container">
+    <br/>
+    <hr/>
+    <h2>Get</h2>
+    <p id="error-msg">{{ error_msg_get |default:'' }}</p>
+    <p id="info-msg">{{ info_msg_get |default:'' }}</p>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Start this datetime (UTC).
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-isight-start-time" type="text" name="start_time" class="form-control" value="{%if isight.last_requested %}{{ isight.last_requested|date:'Y/m/d H:i:s'}}{% endif %}" placeholder="Ex: 2017/01/01 00:00:00"'/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                End this datetime (UTC).
+            </div>
+            <div class="col-xs-6">
+                <input id="modify-isight-end-time" type="text" name="end_time" class="form-control" placeholder="Ex: 2017/01/01 00:00:00"'/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="get-isight-submit" class="btn btn-default">Start</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</form>
+<div class="container">
+<form name="isight_detail" id="isight-detail" action="/adapter/isight/detail/" method="GET"></form>
+    <br/>
+    <hr/>
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="isight-detail-button" class="btn btn-default">Detail</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</body>
+</html>

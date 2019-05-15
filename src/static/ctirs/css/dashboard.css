@@ -1,0 +1,11 @@
+h1,h2{
+    font-family: 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+h1{
+    text-align: center;
+}
+.chart-js-div{
+    color: #000000;
+    background-color: #ffffff;
+}
