@@ -1,0 +1,68 @@
+{% include 'header.html' %}
+<head>
+<!--  for Toastr -->
+<link href="/static/toastr/css/toastr.min.css" rel="stylesheet">
+<script type="text/javascript" src="/static/toastr/js/toastr.min.js"></script>
+<!--  for community_configurations -->
+<link href="/static/ctirs/css/profile_configuration_common.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/community_configuration.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<form name="create_community" id="create-community-form" action="/configuration/community/create/" method="POST">{% csrf_token %}
+<div class="container">
+    <br/>
+    <h1>Community</h1>
+    <br/>
+    <hr/>
+    <h2>Create New Community</h2>
+    <div class="form-group">
+    <p id="error-msg">{{ error_msg |default:'' }}</p>
+    <p id="info-msg">{{ info_msg |default:'' }}</p>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Name
+            </div>
+            <div class="col-xs-4">
+                <input id="name" type="text" name="name" class="form-control"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <br/>
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="create-community-submit" class="btn btn-default">Create</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <hr/>
+    <h2>Community Configuration</h2>
+    {% if communities %}
+    <table class="table table-striped table-hover" style="table-layout: fixed;">
+    <thead>
+    <tr>
+    <td>
+        Community
+    </td>
+    </tr>
+    </thead>
+    <tbody>
+    {% for community in communities %}
+    <tr>
+    <td>
+        <a  href="/configuration/community/detail/{{community.id}}" title="click to modify">
+            {{ community.name }}
+        </a>
+    </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    {% endif %}
+    </table>
+    <hr/>
+</div> <!--  <div class="container"> -->
+</form>
+</body>
+</html>
