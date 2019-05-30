@@ -226,5 +226,43 @@
       "sns_profile": 6,
       "gv_auth_user": 6
     }
+  },
+  {
+    "pk": 7,
+    "model": "ctirs.stipuser",
+    "fields": {
+      "username": "slack",
+      "password": "pbkdf2_sha256$30000$9MUNW5NhowKv$fNc2jytf1yueZrCueuE1xEIj8ldFuod0tRCWy3MBHdA=",
+      "date_joined": "2019-01-01 00:00:00.000000",
+      "screen_name": "slack",
+      "language": "en",
+      "role": "user",
+      "is_admin": false,
+      "is_superuser": false,
+      "sns_profile": 7,
+      "gv_auth_user": 7
+    }
+  },
+  {
+    "pk": 7,
+    "model": "ctirs.gvauthuser",
+    "fields": {
+      "is_l1_view": false,
+      "is_l2_view": false,
+      "is_sharing_view": false,
+      "css_thema": "default" 
+    }
+  },
+  {
+    "pk": 7,
+    "model": "ctirs.profile",
+    "fields": {
+        "scan_csv": false,
+        "scan_pdf": false,
+        "scan_post": false,
+        "scan_txt": false,
+        "threat_actors": "",
+        "indicator_white_list": "" 
+    }
   }
 ]

@@ -42,6 +42,7 @@ class Feed(models.Model):
     STIP_SNS_REGION_CODE_PREFIX = const.STIP_SNS_REGION_CODE_KEY + ': '
     STIP_SNS_CI_PREFIX = const.STIP_SNS_CI_KEY + ': '
     STIP_SNS_REFERRED_URL_PREFIX = const.STIP_SNS_REFERRED_URL_KEY + ': '
+    STIP_SNS_STIX2_PACKAGE_ID_PREFIX = const.STIP_SNS_STIX2_PACKAGE_ID_KEY + ': '
 
     package_id = models.CharField(max_length=128,default='',primary_key=True)
     user = models.ForeignKey(STIPUser)
@@ -66,6 +67,7 @@ class Feed(models.Model):
     administrative_code = models.TextField(max_length=8,default=None,null=True)
     ci = models.CharField(max_length=128,default='',null=True)
     referred_url = models.TextField(max_length=1024,default=None,null=True)
+    stix2_package_id = models.CharField(max_length=128,default='',null=True)
     tmp_sharing_people = []
     build_cache_flag = False
 
@@ -246,6 +248,7 @@ class Feed(models.Model):
             self.referred_url = None
             self.country_code = None
             self.administrative_code = None
+            self.stix2_package_id = None
 
     #stix_package の user_name取得
     @staticmethod
@@ -270,6 +273,8 @@ class Feed(models.Model):
                             bean.ci = statement[len(Feed.STIP_SNS_CI_PREFIX):]
                         if statement.startswith(Feed.STIP_SNS_REFERRED_URL_PREFIX):
                             bean.referred_url = statement[len(Feed.STIP_SNS_REFERRED_URL_PREFIX):]
+                        if statement.startswith(Feed.STIP_SNS_STIX2_PACKAGE_ID_PREFIX):
+                            bean.stix2_package_id = statement[len(Feed.STIP_SNS_STIX2_PACKAGE_ID_PREFIX):]
                     #AISMarkingStructure から country_code と administrative_area を取得する
                     elif isinstance(marking_structure,AISMarkingStructure) == True:
                         information_source =  marking.information_source
@@ -462,6 +467,8 @@ class Feed(models.Model):
             feed.ci = feed.user.ci
         if bean.referred_url is not None:
             feed.referred_url = bean.referred_url
+        if bean.stix2_package_id is not None:
+            feed.stix2_package_id = bean.stix2_package_id
         feed.save()
         return feed
 
