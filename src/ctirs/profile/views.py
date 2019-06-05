@@ -2,6 +2,7 @@
 from django.shortcuts import render
 from ctirs.core.common import get_text_field_value, get_common_replace_dict
 from ctirs.error.views import error_page, error_page_inactive
+from ctirs.models import STIPUser
 from django.contrib.auth.decorators import login_required
 
 def get_profile_change_password_old_password(request):
@@ -46,6 +47,9 @@ def change_password(request):
             return render(request,'profile.html',replace_dict)
         #新しいパスワードに変更
         user.set_password(new_password)
+        if user.username == 'admin':
+            #build_in account のパスワード変更
+            STIPUser.change_build_password(new_password)
         user.is_modified_password = True
         user.save()
         #レンダリング

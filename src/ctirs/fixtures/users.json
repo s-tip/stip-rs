@@ -29,11 +29,13 @@
       "password": "pbkdf2_sha256$30000$S65gy11F01Z2$ZS2Gp4K9J06wZtlWGurNprGGoBEuXTvfSIYhMxhF0RU=",
       "date_joined": "2019-01-01 00:00:00.000000",
       "screen_name": "admin",
+      "affiliation": "",
       "language": "en",
       "role": "admin",
       "is_admin": true,
       "is_superuser": true,
       "sns_profile": 1,
+      "is_build_in": true,
       "gv_auth_user": 1
     }
   },
@@ -67,11 +69,13 @@
       "password": "pbkdf2_sha256$30000$xPXGUKFiFGtw$sl0ylLkvley0lVQUwUGTcWI5feSwZ4ODjL7+aRrYCK8=",
       "date_joined": "2019-01-01 00:00:00.000000",
       "screen_name": "na",
+      "affiliation": "",
       "language": "en",
       "role": "user",
       "is_admin": false,
       "is_superuser": false,
       "sns_profile": 2,
+      "is_build_in": true,
       "gv_auth_user": 2
     }
   },
@@ -105,11 +109,13 @@
       "password": "pbkdf2_sha256$30000$bo9fOMD42hUV$3faBeAe5K31cJSfGCmteBcVsX11bUrVJvKLiEnI7iHI=",
       "date_joined": "2019-01-01 00:00:00.000000",
       "screen_name": "anonymous",
+      "affiliation": "",
       "language": "en",
       "role": "user",
       "is_admin": false,
       "is_superuser": false,
       "sns_profile": 3,
+      "is_build_in": true,
       "gv_auth_user": 3
     }
   },
@@ -143,11 +149,13 @@
       "password": "pbkdf2_sha256$30000$HDlr7XrRQfQ4$UZqs2ualnlIHpovtek+oaj5IaivuJ1Y93F+7rhrOKcI=",
       "date_joined": "2019-01-01 00:00:00.000000",
       "screen_name": "gv_concierge",
+      "affiliation": "",
       "language": "en",
       "role": "bot",
       "is_admin": false,
       "is_superuser": false,
       "sns_profile": 4,
+      "is_build_in": true,
       "gv_auth_user": 4
     }
   },
@@ -181,11 +189,13 @@
       "password": "pbkdf2_sha256$30000$YkTlODmNEsgD$3poFqAjI6VNNdaS5ebz2vfAtYlUzQw5WeRnvo9mPElU=",
       "date_joined": "2019-01-01 00:00:00.000000",
       "screen_name": "OTX",
+      "affiliation": "",
       "language": "en",
       "role": "user",
       "is_admin": false,
       "is_superuser": false,
       "sns_profile": 5,
+      "is_build_in": true,
       "gv_auth_user": 5
     }
   },
@@ -211,6 +221,7 @@
         "indicator_white_list": "" 
     }
   },
+
   {
     "pk": 6,
     "model": "ctirs.stipuser",
@@ -219,28 +230,14 @@
       "password": "pbkdf2_sha256$30000$j1L1EJehQnBK$/HooQx2wAUWynoRd2dGPelt+4hYPA7WVgwmBTRlFPsU=",
       "date_joined": "2019-01-01 00:00:00.000000",
       "screen_name": "misp",
+      "affiliation": "",
       "language": "en",
       "role": "user",
       "is_admin": false,
       "is_superuser": false,
       "sns_profile": 6,
+      "is_build_in": true,
       "gv_auth_user": 6
-    }
-  },
-  {
-    "pk": 7,
-    "model": "ctirs.stipuser",
-    "fields": {
-      "username": "slack",
-      "password": "pbkdf2_sha256$30000$9MUNW5NhowKv$fNc2jytf1yueZrCueuE1xEIj8ldFuod0tRCWy3MBHdA=",
-      "date_joined": "2019-01-01 00:00:00.000000",
-      "screen_name": "slack",
-      "language": "en",
-      "role": "user",
-      "is_admin": false,
-      "is_superuser": false,
-      "sns_profile": 7,
-      "gv_auth_user": 7
     }
   },
   {
@@ -264,5 +261,24 @@
         "threat_actors": "",
         "indicator_white_list": "" 
     }
-  }
+  },
+  {
+    "pk": 7,
+    "model": "ctirs.stipuser",
+    "fields": {
+      "username": "slack",
+      "password": "pbkdf2_sha256$30000$9MUNW5NhowKv$fNc2jytf1yueZrCueuE1xEIj8ldFuod0tRCWy3MBHdA=",
+      "date_joined": "2019-01-01 00:00:00.000000",
+      "screen_name": "slack",
+      "affiliation": "",
+      "language": "en",
+      "role": "user",
+      "is_admin": false,
+      "is_superuser": false,
+      "sns_profile": 7,
+      "is_build_in": true,
+      "gv_auth_user": 7
+    }
+  },
+
 ]
