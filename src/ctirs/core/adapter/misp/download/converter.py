@@ -318,7 +318,7 @@ class MISP2STIXConverter(object):
             stix_package = STIXPackage(timestamp=event.dt,id_=package_id)
             stix_header = STIXHeader()
 
-            #set idengity information
+            #set identity information
             identity = Identity(name=self.identity_name)
             information_source = InformationSource(identity=identity)
             stix_header.information_source = information_source

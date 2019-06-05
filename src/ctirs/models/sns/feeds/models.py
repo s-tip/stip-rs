@@ -320,7 +320,7 @@ class Feed(models.Model):
         if bean.affiliation is not None and len(bean.affiliation) != 0:
             feed.screen_affiliation = bean.affiliation
         else:
-            feed.screen_affiliation = stip_user.affiliation
+            feed.screen_affiliation = stip_user.affiliation if stip_user.affiliation is not None else ''
 
         if bean.instance is not None and len(bean.instance) != 0:
             feed.screen_instance = bean.instance

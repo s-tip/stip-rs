@@ -63,6 +63,7 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     api_key = models.CharField(max_length=128,default='')
     timezone = models.CharField(max_length=128,default='UTC')
     is_modified_password = models.BooleanField(default=False)
+    is_buildin = models.BooleanField(default=False)
 
     #RS/StipUser から移動
     location = models.CharField(max_length=50, null=True, blank=True)
@@ -93,6 +94,14 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     @staticmethod
     def get_anonymous_user():
         return STIPUser.objects.get(username=STIPUser.ANONYMOUS_USER_ACCOUNT_NAME)
+
+    @staticmethod
+    def change_build_password(new_password):
+        for build_in_account in STIPUser.objects.filter(is_buildin=True):
+            build_in_account.set_password(new_password)
+            build_in_account.is_modified_password = True
+            build_in_account.save()
+        return
 
     #sns の authentication.models.Profile から移動
     def get_screen_name(self):
