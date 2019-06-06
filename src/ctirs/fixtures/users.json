@@ -35,7 +35,7 @@
       "is_admin": true,
       "is_superuser": true,
       "sns_profile": 1,
-      "is_build_in": true,
+      "is_buildin": true,
       "gv_auth_user": 1
     }
   },
@@ -75,7 +75,7 @@
       "is_admin": false,
       "is_superuser": false,
       "sns_profile": 2,
-      "is_build_in": true,
+      "is_buildin": true,
       "gv_auth_user": 2
     }
   },
@@ -115,7 +115,7 @@
       "is_admin": false,
       "is_superuser": false,
       "sns_profile": 3,
-      "is_build_in": true,
+      "is_buildin": true,
       "gv_auth_user": 3
     }
   },
@@ -155,7 +155,7 @@
       "is_admin": false,
       "is_superuser": false,
       "sns_profile": 4,
-      "is_build_in": true,
+      "is_buildin": true,
       "gv_auth_user": 4
     }
   },
@@ -195,7 +195,7 @@
       "is_admin": false,
       "is_superuser": false,
       "sns_profile": 5,
-      "is_build_in": true,
+      "is_buildin": true,
       "gv_auth_user": 5
     }
   },
@@ -236,7 +236,7 @@
       "is_admin": false,
       "is_superuser": false,
       "sns_profile": 6,
-      "is_build_in": true,
+      "is_buildin": true,
       "gv_auth_user": 6
     }
   },
@@ -276,9 +276,9 @@
       "is_admin": false,
       "is_superuser": false,
       "sns_profile": 7,
-      "is_build_in": true,
+      "is_buildin": true,
       "gv_auth_user": 7
     }
-  },
+  }
 
 ]
