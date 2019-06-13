@@ -35,7 +35,7 @@ class MispUploadAdapterControl(object):
             misp_event.add_tag(tag)
         resp = self.py_misp.add_event(misp_event)
         if resp.has_key('Event') == True:
-            return
+            return resp
         else:
             raise Exception(str(resp['errors']))
 
