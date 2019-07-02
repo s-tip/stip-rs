@@ -155,14 +155,14 @@ class Feed(models.Model):
 
     @staticmethod
     def get_attach_file_name(stix_id):
-        attachment_stix_dir = Feed.get_attach_stix_dir_path(stix_id)
-        return os.listdir(attachment_stix_dir)[0]
+        af = AttachFile.objects.get(package_id=stix_id)
+        return af.file_name
 
     @staticmethod
     def get_attach_file_path(stix_id):
         attachment_stix_dir = Feed.get_attach_stix_dir_path(stix_id)
         file_name = Feed.get_attach_file_name(stix_id)
-        return attachment_stix_dir + os.sep + file_name
+        return attachment_stix_dir + os.sep.decode('utf-8') + file_name
 
     @staticmethod
     def get_cached_file_path(feed_file_name_id):
