@@ -302,10 +302,10 @@ class MISP2STIXConverter(object):
             event.parse(child)
             self.events.append(event)
             
-    def get_misp_pacakge_id(self,misp_domain_name,event):
-        return'%s:%s_%s-%s' % (self.DEFAULT_NS_NAME,'MISP_import',misp_domain_name,event.uuid)
+    def get_misp_pacakge_id(self,stix_id_prefix,event):
+        return'%s:%s_%s-%s' % (self.DEFAULT_NS_NAME,'MISP_import',stix_id_prefix,event.uuid)
 
-    def convert(self,published_only=True,misp_domain_name='',**kw_arg):
+    def convert(self,stix_id_prefix='',published_only=True,**kw_arg):
         self.parse(**kw_arg)
         
         stix_packages = []
@@ -314,7 +314,7 @@ class MISP2STIXConverter(object):
                 if event.published == False:
                     continue
             #id generator
-            package_id = self.get_misp_pacakge_id(misp_domain_name,event)
+            package_id = self.get_misp_pacakge_id(stix_id_prefix,event)
             stix_package = STIXPackage(timestamp=event.dt,id_=package_id)
             stix_header = STIXHeader()
 

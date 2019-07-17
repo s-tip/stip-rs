@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import traceback
-import urlparse
 from mongoengine import DoesNotExist
 from ctirs.core.mongo.documents import MispAdapter,Vias,ScheduleJobs
 from ctirs.core.mongo.documents_stix import StixFiles
@@ -70,7 +69,7 @@ class MispAdapterDownloadControl(object):
         #misp アダプタの設定を取得
         misp_conf = MispAdapter.get()
         url = misp_conf.url
-        misp_domain_name = urlparse.urlparse(url).hostname
+        stix_id_prefix = misp_conf.stix_id_prefix
         apikey = misp_conf.apikey
         published_only = misp_conf.published_only
         #登録情報を取得
@@ -80,12 +79,14 @@ class MispAdapterDownloadControl(object):
             
         #mispから取得
         try:
+            if url[-1] != '/':
+                url += '/'
             url = url + 'events/xml/download.json'
             md = MISPDownloader(url,apikey)
             text = md.get(from_dt=from_dt,to_dt=to_dt)
             if text is None:
                 return 0
-            stix_packages = self.mc.convert(text=text.encode('utf-8'),published_only=published_only,misp_domain_name=misp_domain_name)
+            stix_packages = self.mc.convert(text=text.encode('utf-8'),published_only=published_only,stix_id_prefix=stix_id_prefix)
         except Exception as e:
             traceback.print_exc()
             raise e

@@ -41,6 +41,7 @@ class MISPDownloader(object):
             self.url,
             data = json.dumps(payload),
             headers = self.header,
+            verify = False,
             proxies=proxies)
 
         if resp.status_code == 404:
