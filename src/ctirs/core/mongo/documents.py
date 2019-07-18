@@ -384,6 +384,8 @@ class isightAdapter(Document):
     interval_schedule_job = fields.ReferenceField(ScheduleJobs)
 
 class MispAdapter(Document):
+    DEFAULT_STIX_ID_PREFIX = 'misp_instance'
+
     @classmethod
     def get(cls):
         try:
@@ -397,12 +399,13 @@ class MispAdapter(Document):
         return misp
 
     @classmethod
-    def modify_settings(cls,url,apikey,identity,community_id,uploader_id,published_only):
+    def modify_settings(cls,url,apikey,stix_id_prefix,identity,community_id,uploader_id,published_only):
         community = Communities.objects.get(id=community_id)
         misp = MispAdapter.objects.get()
         misp.community = community
         misp.url = url
         misp.apikey = apikey
+        misp.stix_id_prefix = stix_id_prefix
         misp.identity = identity
         misp.uploader = uploader_id
         misp.published_only = published_only
@@ -460,6 +463,7 @@ class MispAdapter(Document):
     uploader = fields.IntField()
     url = fields.StringField(max_length=1024)
     apikey = fields.StringField(max_length=100)
+    stix_id_prefix = fields.StringField(max_length=100,default=DEFAULT_STIX_ID_PREFIX)
     identity = fields.StringField(max_length=100)
     published_only = fields.BooleanField(default=True)
     last_requested = fields.DateTimeField(default=None)

@@ -434,7 +434,10 @@ def share_misp(request):
         j = mc.upload_misp(package_id)
         event_id = j[u'Event'][u'id']
         misp_conf = MispAdapter.get()
-        url = '%sevents/view/%s' % (misp_conf.url,event_id)
+        tmp_url = misp_conf.url
+        if tmp_url[-1] != '/':
+            tmp_url += '/'
+        url = '%sevents/view/%s' % (tmp_url,event_id)
         r = {}
         r[u'url'] = url
         return JsonResponse(r,safe=False)

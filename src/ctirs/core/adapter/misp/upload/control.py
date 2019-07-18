@@ -22,7 +22,7 @@ class MispUploadAdapterControl(object):
         scheme = urlparse.urlparse(url).scheme
         host = urlparse.urlparse(url).hostname
         url = '%s://%s/%s' % (scheme,host,'events')
-        self.py_misp = PyMISP(url=url,key=misp_conf.apikey,ssl=(scheme=='https'))
+        self.py_misp = PyMISP(url=url,key=misp_conf.apikey,ssl=False)
         return
 
     #package_id から　stix を抽出し、misp import 形式に変換し upload する
