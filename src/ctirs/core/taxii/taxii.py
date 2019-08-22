@@ -52,7 +52,7 @@ class Client(object):
         self._ssl = taxii.ssl
 
         #proxy 設定があれば設定する
-        self._proxies = System.get_requets_proxies()
+        self._proxies = System.get_request_proxies()
         if self._proxies is not None:
             p = urlparse(self._address)
             if p.scheme == 'https':

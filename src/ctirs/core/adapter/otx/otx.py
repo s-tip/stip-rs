@@ -63,7 +63,7 @@ class OtxAdapterControl(object):
             
         #otxから取得
         try:
-            proxies = System.get_requets_proxies()
+            proxies = System.get_request_proxies()
             otx = OTXv2(key,proxies)
             slices = otx.getsince(mtimestamp)
         except Exception as e:

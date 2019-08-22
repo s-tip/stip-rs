@@ -36,7 +36,7 @@ class MISPDownloader(object):
         payload_request['tags'] = []
         payload['request'] = payload_request
 
-        proxies = System.get_requets_proxies()
+        proxies = System.get_request_proxies()
         resp = requests.post(
             self.url,
             data = json.dumps(payload),
