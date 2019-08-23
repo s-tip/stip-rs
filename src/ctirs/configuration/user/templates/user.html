@@ -97,19 +97,19 @@
     </tr>
     </thead>
     <tbody>
-    {% for user in users %}
+    {% for each_user in users %}
     <tr>
     <td>
-        {{ user }}
+        {{ each_user }}
     </td>
     <td>
-        {{ user.screen_name }}
+        {{ each_user.screen_name }}
     </td>
     <td>
-        <input class="change-auth" type="checkbox" username="{{ user }}" config_name="is_active" {% if user.is_active %}checked{% endif %} {% if user.is_superuser %}disabled{% endif %}>
+        <input class="change-auth" type="checkbox" username="{{ each_user }}" config_name="is_active" {% if each_user.is_active %}checked{% endif %} {% if not user.is_superuser %}disabled{% endif %}>
     </td>
     <td>
-        <input class="change-auth" type="checkbox" username="{{ user }}" config_name="is_admin" {% if user.is_admin %}checked{% endif %} {% if user.is_superuser %}disabled{% endif %}>
+        <input class="change-auth" type="checkbox" username="{{ each_user }}" config_name="is_admin" {% if each_user.is_admin %}checked{% endif %} {% if not user.is_superuser %}disabled{% endif %}>
     </td>
     </tr>
     {% endfor %}
