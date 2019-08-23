@@ -214,6 +214,10 @@ class System(models.Model):
         db_table = 'stip_rs_system'
     
     @staticmethod
+    def get_request_proxies():
+        return System.get_requets_proxies()
+
+    @staticmethod
     def get_requets_proxies():
         try:
             config = System.objects.get()

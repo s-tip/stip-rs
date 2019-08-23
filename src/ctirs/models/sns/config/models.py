@@ -24,6 +24,7 @@ class SNSConfig(models.Model):
     DEFAULT_NS_URL = 'http://fsi.fujitsu.com'
     DEFAULT_NS_NAME = 's-tip'
     DEFAULT_SLACK_BOT_CHANNEL = '#s-tip'
+    DEFAULT_PAHNTOM_SOURCE_NAME= 'local'
 
     SNS_VERSION = None
 
@@ -58,6 +59,10 @@ class SNSConfig(models.Model):
     stix_ns_name = models.TextField(max_length=128,default=DEFAULT_NS_NAME)
     slack_bot_token = models.CharField(max_length=128, default='')
     slack_bot_channel = models.CharField(max_length=128,default=DEFAULT_SLACK_BOT_CHANNEL)
+    phantom_host = models.TextField(max_length=128,default='')
+    phantom_source_name = models.TextField(max_length=128,default=DEFAULT_PAHNTOM_SOURCE_NAME)
+    phantom_playbook_name = models.TextField(max_length=128,default='')
+    phantom_auth_token = models.TextField(max_length=128,default='')
     
     objects = SNSConfigManager()
 
@@ -177,10 +182,6 @@ class SNSConfig(models.Model):
     def get_rs_regist_stix_url():
         return '%s%s' % (SNSConfig.get_rs_host(),'/api/v1/stix_files')
 
-    #@staticmethod
-    #def get_rs_get_stix_url():
-    #    return '%s%s' % (SNSConfig.get_rs_host(),'/api/v1/stix_files')
-
     @staticmethod
     def get_rs_get_matching_url():
         return '%s%s' % (SNSConfig.get_rs_host(),'/api/v1/gv/matched_packages')
@@ -217,30 +218,6 @@ class SNSConfig(models.Model):
     def get_rs_community_name():
         sns_config = SNSConfig.get_sns_config()
         return SNSConfig.get_value_with_null_check(sns_config.rs_community_name,default_value=SNSConfig.DEFAULT_RS_COMMUNITY_NAME)
-
-    @staticmethod
-    def get_proxy_http():
-        sns_config = SNSConfig.get_sns_config()
-        return SNSConfig.get_value_with_null_check(sns_config.proxy_http)
-
-    @staticmethod
-    def get_proxy_https():
-        sns_config = SNSConfig.get_sns_config()
-        return SNSConfig.get_value_with_null_check(sns_config.proxy_https)
-
-    @staticmethod
-    def get_proxies():
-        http_proxy = SNSConfig.get_proxy_http()
-        https_proxy = SNSConfig.get_proxy_https()
-        if http_proxy is None and https_proxy is None:
-            return None
-        else:
-            proxies = {}
-            if http_proxy is not None:
-                proxies[u'http'] = http_proxy
-            if https_proxy is not None:
-                proxies[u'https'] = https_proxy
-            return proxies
 
     @staticmethod
     def get_gv_l2_url():
@@ -301,6 +278,6 @@ class SNSConfig(models.Model):
     def get_slack_bot_chnnel():
         sns_config = SNSConfig.get_sns_config()
         return SNSConfig.get_value_with_null_check(sns_config.slack_bot_channel,default_value=SNSConfig.DEFAULT_SLACK_BOT_CHANNEL)
-    
+
     class Meta:
         db_table = 'stip_sns_system'

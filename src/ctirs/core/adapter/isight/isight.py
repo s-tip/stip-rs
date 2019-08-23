@@ -202,7 +202,7 @@ class iSightAdapterControl(object):
     #API通信
     def _load_data(self,query,headers):
         url = 'https://%s%s' % (self.API_URL,query)
-        proxies = System.get_requets_proxies()
+        proxies = System.get_request_proxies()
         resp = requests.get(url,headers=headers,proxies=proxies)
         return resp
     

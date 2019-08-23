@@ -37,16 +37,12 @@ def change_auth(request):
         value  = True if get_configuration_user_ajax_change_auth_value(request) == u'true' else False
 
         u = STIPUser.objects.get(username = username)
-        #superユーザーの変更は不可能
-        if u.is_superuser == True:
-            r = {'status': 'NG',
-                 'message' : '%s is superuser.' % (u)}
-            return JsonResponse(r,safe=False)
         #keyに応じて属性の値を変更
         if(key == u'is_active'):
             u.is_active = value
         elif(key == u'is_admin'):
             u.is_admin = value
+            u.is_superuser = value
         #変更を保存
         u.save()
         r = {'status': 'OK',
