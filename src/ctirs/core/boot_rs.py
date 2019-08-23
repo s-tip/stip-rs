@@ -17,18 +17,11 @@ class StipRsBoot(AppConfig):
             #collectstatic
             call_command('collectstatic','--noinput')
             
-            #migrate を行うタイミング
-            #DB が存在しない時のエラー
-            try:
-                print '>>> STIPUser record count: ' + str(STIPUser.objects.count())
-                #STIPUser が取得可能なので 初期 migrate 不要
-                print '>>> Skip migrate'
-            except:
-                #エラーの場合は migrate
-                call_command('migrate')
+            #makemigrations/migrate
+            call_command('makemigrations')
+            call_command('migrate')
 
             #create_user_user は loaddata でデータ注入できると思われる
-            #loaddata (users)
             stip_user_count = STIPUser.objects.count()
             print '>>> users record count: ' + str(stip_user_count)
             if stip_user_count == 0:
