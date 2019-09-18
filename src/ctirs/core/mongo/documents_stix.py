@@ -410,6 +410,8 @@ class StixFiles(Document):
     def get_slide_1_x(self):
         if self.version == "2.0":
             stix2slider.convert_stix._ID_NAMESPACE = self.NS_S_TIP_NAME
+            from stix2slider.options import initialize_options
+            initialize_options()
             return stix2slider.slide_file(self.origin_path)
         return None
 
