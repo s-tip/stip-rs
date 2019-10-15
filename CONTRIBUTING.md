@@ -9,7 +9,7 @@ S-TIP Individual CLA (ICLA). If the contributor submits patches on behalf of a c
 then additionally the S-TIP Corporate CLA (CCLA) must be agreed. 
 Even if the contributor is included in such CCLA, she/he is still required to agree with the ICLA. 
 To submit the CLAs please:
-* read the [ICLA.txt](ICLA.txt) and if needed the [CCLA.txt](CCLA.txt)
+* read the [ICLA.txt](https://github.com/s-tip/stip-common/blob/master/ICLA.txt) and if needed the [CCLA.txt](https://github.com/s-tip/stip-common/blob/master/CCLA.txt)
 * sign CLA on GitHub with cla-assistant
 
 If you have any questions, please send e-mail to s-tip@googlegroups.com.
