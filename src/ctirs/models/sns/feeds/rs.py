@@ -222,3 +222,22 @@ def share_misp(api_user,package_id):
             params = params,
             verify=False)
     return rsp.json()
+
+def post_stix_v2_sightings(api_user,observed_data_id,first_seen,last_seen,count):
+    data = {}
+    headers = _get_ctirs_api_http_headers(api_user)
+    if first_seen is not None:
+        data['first_seen'] = first_seen
+    if last_seen is not None:
+        data['last_seen'] = last_seen
+    if count is not None:
+        data['count'] = count
+    url_pattern =  '%s' % (SNSConfig.get_rs_post_stix_file_v2_sighting())
+    url = url_pattern % (observed_data_id)
+    rsp = requests.post(
+            url,
+            headers=headers,
+            data=data,
+            verify=False)
+    return rsp.json()
+
