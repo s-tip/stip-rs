@@ -213,6 +213,10 @@ class SNSConfig(models.Model):
     @staticmethod
     def get_rs_get_share_misp_url():
         return '%s%s' % (SNSConfig.get_rs_host(),'/api/v1/sns/share_misp')
+
+    @staticmethod
+    def get_rs_post_stix_file_v2_sighting():
+        return '%s%s' % (SNSConfig.get_rs_host(),'/api/v1/stix_files_v2/%s/sighting')
     
     @staticmethod
     def get_rs_community_name():
@@ -278,6 +282,7 @@ class SNSConfig(models.Model):
     def get_slack_bot_chnnel():
         sns_config = SNSConfig.get_sns_config()
         return SNSConfig.get_value_with_null_check(sns_config.slack_bot_channel,default_value=SNSConfig.DEFAULT_SLACK_BOT_CHANNEL)
+
 
     class Meta:
         db_table = 'stip_sns_system'
