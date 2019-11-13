@@ -511,6 +511,68 @@ def _get_ipv4_similarity_type(start_cache,end_cache):
 def _get_ip_4th_value(ipv4):
     return int(ipv4.split('.')[3])
 
+# 関連 CTI 検索 (GV/API 経由共通)
+def get_matched_packages(package_id,exact=True,similar_ipv4=False,similar_domain=False):
+    exact_dict = {}
+    similar_ipv4_dict = {}
+    similar_domain_dict = {}
+    package_id_list = []
+
+    #exact match情報取得
+    if exact == True:
+        infos = _get_exact_matched_info(package_id)
+        for info in infos:
+            key = info.package_id
+            package_id_list.append(key)
+            if exact_dict.has_key(key) == False:
+                exact_dict[key] = 1
+            else:
+                exact_dict[key] += 1
+                    
+    #IPv4 類似度情報取得
+    if similar_ipv4 == True:
+        infos = _get_similar_ipv4(package_id)
+        for info in infos:
+            cache = info['cache']
+            key = cache.package_id
+            package_id_list.append(key)
+            if similar_ipv4_dict.has_key(key) == False:
+                similar_ipv4_dict[key] = 1
+            else:
+                similar_ipv4_dict[key] += 1
+                    
+    #domain 類似度情報取得
+    if similar_domain == True:
+        infos = _get_similar_domain(package_id)
+        for info in infos:
+            cache = info['cache']
+            key = cache.package_id
+            package_id_list.append(key)
+            if similar_domain_dict.has_key(key) == False:
+                similar_domain_dict[key] = 1
+            else:
+                similar_domain_dict[key] += 1
+            
+    #返却データ作成
+    #package_id の set を作成(重複を省くため)
+    package_id_set = list(set(package_id_list))
+
+    ret = []
+    for p_id in package_id_set:
+        d = {}
+        d['package_id'] = p_id 
+        d['package_name'] = StixFiles.objects.get(package_id = p_id).package_name
+        if exact == True:
+            d['exact'] = 0 if exact_dict.has_key(p_id)== False else exact_dict[p_id]
+        if ((similar_ipv4 == True) or (similar_domain == True)):
+            s_dict = {
+                'ipv4' : 0 if similar_ipv4_dict.has_key(p_id)== False else similar_ipv4_dict[p_id],
+                'domain': 0 if similar_domain_dict.has_key(p_id)== False else similar_domain_dict[p_id]}
+            d['similar'] = s_dict
+        ret.append(d)
+    return ret
+            
+
 #GET /api/v1/gv/matched_packages
 def matched_packages(request):
     PACKAGE_ID_KEY = 'package_id'
@@ -530,64 +592,7 @@ def matched_packages(request):
         similar_ipv4 = get_boolean_value(request.GET,SIMILAR_IPV4_KEY,False)
         similar_domain = get_boolean_value(request.GET,SIMILAR_DOMAIN_KEY,False)
         
-        exact_dict = {}
-        similar_ipv4_dict = {}
-        similar_domain_dict = {}
-        package_id_list = []
-
-        #exact match情報取得
-        if exact == True:
-            infos = _get_exact_matched_info(package_id)
-            for info in infos:
-                key = info.package_id
-                package_id_list.append(key)
-                if exact_dict.has_key(key) == False:
-                    exact_dict[key] = 1
-                else:
-                    exact_dict[key] += 1
-                    
-        #IPv4 類似度情報取得
-        if similar_ipv4 == True:
-            infos = _get_similar_ipv4(package_id)
-            for info in infos:
-                cache = info['cache']
-                key = cache.package_id
-                package_id_list.append(key)
-                if similar_ipv4_dict.has_key(key) == False:
-                    similar_ipv4_dict[key] = 1
-                else:
-                    similar_ipv4_dict[key] += 1
-                    
-        #domain 類似度情報取得
-        if similar_domain == True:
-            infos = _get_similar_domain(package_id)
-            for info in infos:
-                cache = info['cache']
-                key = cache.package_id
-                package_id_list.append(key)
-                if similar_domain_dict.has_key(key) == False:
-                    similar_domain_dict[key] = 1
-                else:
-                    similar_domain_dict[key] += 1
-            
-        #返却データ作成
-        #package_id の set を作成(重複を省くため)
-        package_id_set = list(set(package_id_list))
-
-        ret = []
-        for p_id in package_id_set:
-            d = {}
-            d['package_id'] = p_id 
-            d['package_name'] = StixFiles.objects.get(package_id = p_id).package_name
-            if exact == True:
-                d['exact'] = 0 if exact_dict.has_key(p_id)== False else exact_dict[p_id]
-            if ((similar_ipv4 == True) or (similar_domain == True)):
-                s_dict = {
-                    'ipv4' : 0 if similar_ipv4_dict.has_key(p_id)== False else similar_ipv4_dict[p_id],
-                    'domain': 0 if similar_domain_dict.has_key(p_id)== False else similar_domain_dict[p_id]}
-                d['similar'] = s_dict
-            ret.append(d)
-            
+        ret = get_matched_packages(package_id,exact=exact,similar_ipv4=similar_ipv4,similar_domain=similar_domain)
         resp = get_normal_response_json()
         resp['data'] = ret
         return JsonResponse(resp)
