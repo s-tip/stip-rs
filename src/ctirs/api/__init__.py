@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
+import os
 import json
-import datetime
-import ctirs
 from django.http.response import HttpResponse
 from ctirs.models.rs.models import STIPUser
+from ctirs.core.mongo.documents_stix import StixFiles
 
-#apikey認証
-#認証されない場合はNoneを返却
-#認証された場合はCtirsAuthUserを返却
+# apikey認証
+# 認証されない場合はNoneを返却
+# 認証された場合はCtirsAuthUserを返却
 def authentication(request):
     username = _get_api_user(request)
     api_key = _get_api_api_key(request)
@@ -23,15 +23,16 @@ def authentication(request):
         return None
     return user_doc
 
-#http_headerに
-#username=<username>
-#apkey=<apikey>
-#を格納する
+# http_headerに
+# username=<username>
+# apkey=<apikey>
+# を格納する
 def _get_api_user(request):
     try:
         return request.META['HTTP_USERNAME']
     except KeyError:
         return None
+
 def _get_api_api_key(request):
     try:
         return request.META['HTTP_APIKEY']
@@ -61,11 +62,13 @@ class JsonResponse(HttpResponse):
         data = json.dumps(data, cls=encoder)
         super(JsonResponse, self).__init__(content=data, **kwargs)
 
+
 def error(e):
     d = {}
     d['return_code'] = '1'
     d['userMessage'] = e.message
-    return JsonResponse(d,status=500,safe=False)
+    return JsonResponse(d, status=500, safe=False)
+
 
 def get_normal_response_json():
     d = {}
@@ -73,9 +76,15 @@ def get_normal_response_json():
     d['userMessage'] = 'Success'
     return d
 
+
 def get_put_normal_status():
     d = get_normal_response_json()
-    return JsonResponse(d,status=201,safe=False)
+    return JsonResponse(d, status=201, safe=False)
+
+
+def get_delete_normal_status():
+    return JsonResponse(None, status=200, safe=False)
+
 
 def is_exist_file_option(request):
     try:
@@ -84,3 +93,24 @@ def is_exist_file_option(request):
     except KeyError:
         pass
     return False
+
+
+def get_rest_api_document_info(doc):
+    return JsonResponse(doc.get_rest_api_document_info(), safe=False)
+
+
+def get_rest_api_document_content(doc):
+    return JsonResponse(doc.get_rest_api_document_content(), safe=False)
+
+
+def delete_stix_document(id_=None, package_id=None):
+    if id_ is not None:
+        origin_path = StixFiles.delete_by_id(id_)
+    elif package_id is not None:
+        origin_path = StixFiles.delete_by_package_id(package_id)
+    else:
+        return
+    # ファイル削除
+    if os.path.exists(origin_path):
+        os.remove(origin_path)
+    return
