@@ -4,7 +4,7 @@ from pymisp.api import PyMISP
 from pymisp.tools.stix import load_stix
 from stix.core.stix_package import STIXPackage
 from ctirs.core.mongo.documents import MispAdapter
-from ctirs.core.mongo.documents_stix import StixFiles
+from ctirs.core.mongo.documents_stix import StixFiles, System
 from stix.extensions.marking.tlp import TLPMarkingStructure
 
 class MispUploadAdapterControl(object):
@@ -22,7 +22,7 @@ class MispUploadAdapterControl(object):
         scheme = urlparse.urlparse(url).scheme
         host = urlparse.urlparse(url).hostname
         url = '%s://%s/%s' % (scheme,host,'events')
-        self.py_misp = PyMISP(url=url,key=misp_conf.apikey,ssl=False)
+        self.py_misp = PyMISP(url=url,key=misp_conf.apikey,ssl=False,proxies=System.get_request_proxies())
         return
 
     #package_id から　stix を抽出し、misp import 形式に変換し upload する
