@@ -20,9 +20,8 @@ from ctirs.core.mongo.documents import Communities, Vias, InformationSources
 from ctirs.models.rs.models import System
 from stip.common.tld import TLD
 
+
 # STIX2 で使われる時間文字列から datetime に変換する
-
-
 def stix2_str_to_datetime(s):
     return datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=pytz.utc)
 
@@ -454,9 +453,8 @@ class StixFiles(Document):
         }
         return d
 
+
 # IndicatorsV2Cachees
-
-
 class IndicatorV2Caches(Document):
     indicator_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
@@ -491,9 +489,8 @@ class IndicatorV2Caches(Document):
         document.save()
         return document
 
+
 ####################### STIX 2.x  #######################
-
-
 class Stix2Base(Document):
     # STIX 2.x 規定の共通プロパティ
     type_ = fields.StringField(max_length=16)
@@ -566,9 +563,8 @@ class Stix2Base(Document):
         document.package_id = stix_file.package_id
         return document
 
+
 # attack-pattern
-
-
 class StixAttackPatterns(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
@@ -594,9 +590,8 @@ class StixAttackPatterns(Stix2Base):
         document.save()
         return document
 
+
 # campaign (STIX 2.0)
-
-
 class StixCampaignsV2(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
@@ -631,9 +626,8 @@ class StixCampaignsV2(Stix2Base):
         document.save()
         return document
 
+
 # courses-of-action (STIX 2.0)
-
-
 class StixCoursesOfActionV2(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
@@ -658,9 +652,8 @@ class StixCoursesOfActionV2(Stix2Base):
         document.save()
         return document
 
+
 # Identity
-
-
 class StixIdentities(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
@@ -692,9 +685,8 @@ class StixIdentities(Stix2Base):
         document.save()
         return document
 
+
 # indicator (STIX 2.0)
-
-
 class StixIndicatorsV2(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
@@ -729,9 +721,8 @@ class StixIndicatorsV2(Stix2Base):
         document.save()
         return document
 
+
 # intrusion-set
-
-
 class StixIntrusionSets(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
@@ -775,9 +766,8 @@ class StixIntrusionSets(Stix2Base):
         document.save()
         return document
 
+
 # location
-
-
 class StixLocations(Stix2Base):
     # STIX 2.1 規定の独自プロパティ
     description = fields.StringField(max_length=10240)
@@ -824,9 +814,8 @@ class StixLocations(Stix2Base):
         document.save()
         return document
 
+
 # malware
-
-
 class StixMalwares(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
@@ -852,9 +841,8 @@ class StixMalwares(Stix2Base):
         document.save()
         return document
 
+
 # note
-
-
 class StixNotes(Stix2Base):
     # STIX 2.01規定の独自プロパティ
     abstract = fields.StringField(max_length=1024)
@@ -883,9 +871,8 @@ class StixNotes(Stix2Base):
         document.save()
         return document
 
+
 # observed-data
-
-
 class StixObservedData(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     first_observed = fields.DateTimeField(default=datetime.datetime.now)
@@ -914,9 +901,8 @@ class StixObservedData(Stix2Base):
         document.save()
         return document
 
+
 # opinion
-
-
 class StixOpinions(Stix2Base):
     # STIX 2.1 規定の独自プロパティ
     explanation = fields.StringField(max_length=10240)
@@ -945,9 +931,8 @@ class StixOpinions(Stix2Base):
         document.save()
         return document
 
+
 # report
-
-
 class StixReports(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
@@ -976,9 +961,8 @@ class StixReports(Stix2Base):
         document.save()
         return document
 
+
 # threat-actor (STIX 2.0)
-
-
 class StixThreatActorsV2(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
@@ -1025,9 +1009,8 @@ class StixThreatActorsV2(Stix2Base):
         document.save()
         return document
 
+
 # tool
-
-
 class StixTools(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
@@ -1056,9 +1039,8 @@ class StixTools(Stix2Base):
         document.save()
         return document
 
+
 # Vulnerablity
-
-
 class StixVulnerabilities(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
@@ -1096,9 +1078,8 @@ class StixVulnerabilities(Stix2Base):
         ExploitTargetCaches.create_2_x(document)
         return document
 
+
 # relationship
-
-
 class StixRelationships(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     relationship_type = fields.StringField(max_length=1024)
@@ -1126,9 +1107,9 @@ class StixRelationships(Stix2Base):
             document.target_ref = object_['target_ref']
         document.save()
         return document
+
+
 # sighting
-
-
 class StixSightings(Stix2Base):
     # STIX 2.0 規定の独自プロパティ
     first_seen = fields.DateTimeField()
@@ -1232,9 +1213,8 @@ class StixSightings(Stix2Base):
         document.save()
         return document
 
+
 # Language-Content
-
-
 class StixLanguageContents(Stix2Base):
     # STIX 2.1規定の独自プロパティ
     object_ref = fields.StringField(max_length=1024)
@@ -1258,9 +1238,8 @@ class StixLanguageContents(Stix2Base):
         document.save()
         return document
 
+
 # その他
-
-
 class StixOthers(Stix2Base):
     meta = {
         'collection': 'stix_others'
@@ -1280,10 +1259,9 @@ class StixOthers(Stix2Base):
         document.save()
         return document
 
+
 ####################### STIX 1.x  #######################
 # StixIndicators
-
-
 class StixIndicators(Document):
     indicator_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
@@ -1349,9 +1327,8 @@ class StixIndicators(Document):
         IndicatorV2Caches.create(indicator, stix_file, indicator['id'])
         return
 
+
 # StixObservables
-
-
 class StixObservables(Document):
     observable_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
@@ -1418,9 +1395,8 @@ class StixObservables(Document):
         ObservableCaches.create_2_x(observable, stix_file, observable['id'])
         return
 
+
 # StixCampaigns
-
-
 class StixCampaigns(Document):
     campaign_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
@@ -1448,9 +1424,8 @@ class StixCampaigns(Document):
         document.save()
         return
 
+
 # StixIncident
-
-
 class StixIncidents(Document):
     incident_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
@@ -1478,9 +1453,8 @@ class StixIncidents(Document):
         document.save()
         return
 
+
 # StixThreatActors
-
-
 class StixThreatActors(Document):
     ta_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
@@ -1508,9 +1482,8 @@ class StixThreatActors(Document):
         document.save()
         return
 
+
 # StixExploitTargets
-
-
 class StixExploitTargets(Document):
     et_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
@@ -1547,9 +1520,8 @@ class StixExploitTargets(Document):
         ExploitTargetCaches.create(et, stix_file, et.id_)
         return
 
+
 # StixCoursesOfAction
-
-
 class StixCoursesOfAction(Document):
     coa_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
@@ -1577,9 +1549,8 @@ class StixCoursesOfAction(Document):
         document.save()
         return
 
+
 # StixTtps
-
-
 class StixTTPs(Document):
     ttp_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
@@ -1612,9 +1583,8 @@ class StixTTPs(Document):
                 ExploitTargetCaches.create(et.item, stix_file, ttp.id_)
         return
 
+
 # ExpoitTargetCaches
-
-
 class ExploitTargetCaches(Document):
     TYPE_CHOICES = (
         ('cve_id', 'cve_id'),
@@ -1688,9 +1658,8 @@ class ExploitTargetCaches(Document):
             document.save()
         return
 
+
 # ObseravbleCache
-
-
 class ObservableCaches(Document):
     TYPE_CHOICES = (
         ('uri', 'uri'),

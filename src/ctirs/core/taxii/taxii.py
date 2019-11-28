@@ -115,8 +115,8 @@ class Client(object):
             if key_file is not None:
                 os.remove(key_file)
 
-    # TAXII 2.0 用 GET request Header
 
+    # TAXII 2.0 用 GET request Header
     def get_taxii_20_get_request_header(self):
         return {
             'Accept': self.TAXII_2_ACCEPT,
@@ -333,8 +333,8 @@ class Client(object):
         url = base_url + 'collections/' + self._collection_name + '/objects/'
         return url
 
-    # poll(version 2.0) entry
 
+    # poll(version 2.0) entry
     def poll_20(self):
         self.debug_print('>>> poll_20:enter')
 

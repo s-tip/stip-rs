@@ -21,22 +21,20 @@ STIP_SNS_TOOL_NAME_VALUE = 'S-TIP'
 STIP_SNS_TOOL_VENDOR_VALUE = 'Fujitsu'
 STIP_SNS_USER_NAME_PREFIX = 'User Name: '
 
+
 # 共通
 #     : 指定文字列は str(datetime) / 2018-02-22 08:54:47.187184 形式で GMT のタイムゾーン時間帯で送る
 #     : +09:00 のようなtimezone付きは python 2.7 ではサポートしていないようなのでつけない
 # 文字列からdatetime型を返却する
-
-
 def get_datetime_from_str(s, default=None):
     try:
         return datetime.datetime.strptime(s, '%Y-%m-%d %H:%M:%S.%f').replace(tzinfo=pytz.utc)
     except BaseException:
         return default
 
-#GET /api/v1/sns/feeds
+
+# GET /api/v1/sns/feeds
 # start_time の 引数を返却
-
-
 def get_feeds_start_time(request):
     # 引数1: start_time : この時間を最新として古い順に検索する
     #     : デフォルトは datetime.datetime.now()
@@ -54,10 +52,9 @@ def get_feeds_start_time(request):
         start_time = datetime.datetime.now(pytz.utc)
     return start_time
 
-#GET /api/v1/sns/feeds
+
+# GET /api/v1/sns/feeds
 # last_feed の 引数を返却
-
-
 def get_feeds_last_feed(request):
     #last_feed : この時間より新しいフィードを取得する
     try:
@@ -72,10 +69,9 @@ def get_feeds_last_feed(request):
         last_feed = None
     return last_feed
 
-#GET /api/v1/sns/feeds
+
+# GET /api/v1/sns/feeds
 # range_big_datetime の 引数を返却
-
-
 def get_feeds_range_big_datetime(request):
     # range_big_datetime
     try:
@@ -90,10 +86,9 @@ def get_feeds_range_big_datetime(request):
         dt = None
     return dt
 
-#GET /api/v1/sns/feeds
+
+# GET /api/v1/sns/feeds
 # range_small_datetime の 引数を返却
-
-
 def get_feeds_range_small_datetime(request):
     # range_small_datetime
     try:
@@ -108,10 +103,9 @@ def get_feeds_range_small_datetime(request):
         dt = None
     return dt
 
-#GET /api/v1/sns/feeds
+
+# GET /api/v1/sns/feeds
 # content の 引数を返却
-
-
 def get_feeds_content(request):
     # 引数3: content : contentを返却するときはTrue(大文字小文字問わず)指定。デフォルトはFalse
     try:
@@ -121,10 +115,9 @@ def get_feeds_content(request):
     except ValueError:
         return False
 
-#GET /api/v1/sns/feeds
+
+# GET /api/v1/sns/feeds
 # user_id の 引数を返却 (longで)
-
-
 def get_feeds_user_id(request):
     try:
         return int(request.GET['user_id'])
@@ -133,34 +126,30 @@ def get_feeds_user_id(request):
     except ValueError:
         return None
 
-#GET /api/v1/sns/feeds
+
+# GET /api/v1/sns/feeds
 # instance の 引数を返却 (longで)
-
-
 def get_feeds_instance(request):
     try:
         return request.GET['instance']
     except KeyError:
         return None
 
-#GET /api/v1/sns/feeds
+
+# GET /api/v1/sns/feeds
 # index の 引数を返却
-
-
 def get_feeds_index(request):
     return get_int_value(request, 'index')
 
-#GET /api/v1/sns/feeds
+
+# GET /api/v1/sns/feeds
 # size の 引数を返却
-
-
 def get_feeds_size(request):
     return get_int_value(request, 'size')
 
+
 # 引数の文字列を int 変換して返却
 # key がない, 変換失敗時は default 返却
-
-
 def get_int_value(request, key, default=0):
     try:
         return int(request.GET[key])
@@ -169,31 +158,27 @@ def get_int_value(request, key, default=0):
     except ValueError:
         return default
 
-#GET /api/v1/sns/attaches
+
+# GET /api/v1/sns/attaches
 # package_id の 引数を返却
-
-
 def get_attaches_package_id(request):
     return get_package_id_from_get_argument(request)
 
-#GET /api/v1/sns/comments
+
+# GET /api/v1/sns/comments
 # package_id の 引数を返却
-
-
 def get_comments_original_package_id(request):
     return get_package_id_from_get_argument(request)
 
-#GET /api/v1/sns/content
+
+# GET /api/v1/sns/content
 # package_id の 引数を返却
-
-
 def get_content_original_package_id(request):
     return get_package_id_from_get_argument(request)
 
-#GET /api/v1/sns/check
+
+# GET /api/v1/sns/check
 # last_time の 引数を返却
-
-
 def get_check_last_datetime(request):
     # 引数1: last_datetime : この時間より新しい日時の個数を検索する
     try:
@@ -207,38 +192,34 @@ def get_check_last_datetime(request):
         last_time = None
     return last_time
 
-#GET /api/v1/sns/check
+
+# GET /api/v1/sns/check
 # usr_id の 引数を返却
-
-
 def get_check_user_id(request):
     try:
         return request.GET['user_id']
     except KeyError:
         return None
 
-#GET /api/v1/sns/query
+
+# GET /api/v1/sns/query
 # query_string の 引数を返却
-
-
 def get_query_query_string(request):
     try:
         return request.GET['query_string']
     except KeyError:
         return None
 
+
 # GET パラメタから package_id を取得する
-
-
 def get_package_id_from_get_argument(request):
     try:
         return request.GET['package_id']
     except KeyError:
         return None
 
+
 # StixFile ドキュメントから返却辞書を作成
-
-
 def get_return_dictionary_from_stix_file_document(stix_file, content=False):
     d = {}
     d['package_id'] = str(stix_file.package_id)
@@ -252,7 +233,7 @@ def get_return_dictionary_from_stix_file_document(stix_file, content=False):
     return d
 
 
-#GET /api/v1/sns/feeds
+# GET /api/v1/sns/feeds
 @csrf_exempt
 def feeds(request):
     try:
@@ -355,7 +336,7 @@ def attaches(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/sns/related_packages
+# GET /api/v1/sns/related_packages
 @csrf_exempt
 def related_packages(request):
     try:
@@ -377,7 +358,7 @@ def related_packages(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/sns/content
+# GET /api/v1/sns/content
 @csrf_exempt
 def content(request):
     try:
@@ -396,7 +377,7 @@ def content(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/sns/comments
+# GET /api/v1/sns/comments
 @csrf_exempt
 def comments(request):
     try:
@@ -418,7 +399,7 @@ def comments(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/sns/likers
+# GET /api/v1/sns/likers
 @csrf_exempt
 def likers(request):
     try:
@@ -458,7 +439,7 @@ def likers(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/sns/share_misp
+# GET /api/v1/sns/share_misp
 @csrf_exempt
 def share_misp(request):
     try:
@@ -483,7 +464,7 @@ def share_misp(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/sns/query
+# GET /api/v1/sns/query
 @csrf_exempt
 def query(request):
     try:
@@ -529,9 +510,8 @@ def query(request):
         traceback.print_exc()
         return error(e)
 
+
 # S-TIP SNS の STIX から User Name を返却する
-
-
 def get_stip_sns_username(stix_package):
     try:
         for marking in stix_package.stix_header.handling:
@@ -544,10 +524,9 @@ def get_stip_sns_username(stix_package):
     except BaseException:
         return None
 
+
 # S-TIP SNS の Like STIX であれば Liker アカウントを返却
 # 未対象時は None 返却
-
-
 def get_liker(stix_package):
     if is_stip_sns_stix(stix_package) == False:
         return None
@@ -566,9 +545,8 @@ def get_unliker(stix_package):
         return None
     return get_stip_sns_username(stix_package)
 
+
 # S-TIP SNS の Comment STIX か
-
-
 def is_stip_sns_comment_stix(stix_package):
     if is_stip_sns_stix(stix_package) == False:
         return False

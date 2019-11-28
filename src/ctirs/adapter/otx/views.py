@@ -27,18 +27,16 @@ def get_adapter_otx_modify_uploader_id(request):
 def get_adapter_otx_get_start(request):
     return get_text_field_value(request, 'start', default_value=None)
 
+
 # replace辞書取得
-
-
 def get_replace_dict():
     replace_dict = {}
     replace_dict['communities'] = Communities.objects.all()
     replace_dict['users'] = STIPUser.objects.all()
     return get_otx_dict(replace_dict)
 
+
 # otx辞書取得
-
-
 def get_otx_dict(replace_dict):
     replace_dict['otx'] = OtxAdapter.get()
     # communityが削除されている場合はNoneを格納する

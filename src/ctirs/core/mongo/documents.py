@@ -93,9 +93,8 @@ except BaseException:
 class Webhooks(Document):
     url = fields.StringField(max_length=1024)
 
+
 # Information Souces
-
-
 class InformationSources(Document):
     name = fields.StringField(max_length=128, unique=True, null=False)
 
@@ -106,9 +105,8 @@ class InformationSources(Document):
         d.save()
         return d
 
+
 # TaxiiServerの設定
-
-
 class TaxiiServers(Document):
     setting_name = fields.StringField(max_length=128, required=True, unique=True, null=False)
     collection_name = fields.StringField(max_length=128, required=True, unique=True, null=False)
@@ -129,9 +127,8 @@ class TaxiiServers(Document):
         self.information_sources = information_sources
         self.save()
 
+
 # ScheduleCron設定保存クラス　
-
-
 class ScheduleCronJobs(Document):
     @classmethod
     def create(cls, **kwargs):
@@ -174,9 +171,8 @@ class ScheduleCronJobs(Document):
     minute = fields.StringField(max_length=128, default='*')
     second = fields.StringField(max_length=128, default='*')
 
+
 # ScheduleInterval設定保存クラス　
-
-
 class ScheduleIntervalJobs(Document):
     @classmethod
     def create(cls, **kwargs):

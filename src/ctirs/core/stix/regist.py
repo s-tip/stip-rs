@@ -93,9 +93,8 @@ def regist(stix_file_path, community, via, package_name=None):
         cl.push(stix_file_doc)
     return
 
+
 # STIX 1.1 から produced time を作成する　
-
-
 def get_produced_time_stix_1_x(doc):
     # STIXPacakge の timestamp から
     if doc.timestamp is not None:
@@ -106,9 +105,8 @@ def get_produced_time_stix_1_x(doc):
     except AttributeError:
         return None
 
+
 # S-TIP SNS で作成された STIX であるか?
-
-
 def is_produced_by_stip_sns(doc):
     try:
         # S-TIP SNS 作成 STIX に含まれる Identity の Name の値 の prefix を取得する
@@ -131,9 +129,8 @@ def is_produced_by_stip_sns(doc):
         # SNS 特有フィールドがないので S-TIP SNS 作成ではない
         return False
 
+
 # S-TIP SNS 作成のSTIXがオリジナル投稿か/titleで判定?
-
-
 def get_stip_sns_type_from_title(title):
     if title.startswith(S_TIP_SNS_UNLIKE_TITLE_PREFIX):
         return StixFiles.STIP_SNS_TYPE_UNLIKE
@@ -213,9 +210,8 @@ def set_stix_bean_from_doc(package_bean, doc):
             pass
     return
 
+
 # SNS 投稿種別を取得する
-
-
 def get_stip_sns_type(doc):
     title = doc.stix_header.title
     # Title による判断
@@ -236,15 +232,13 @@ def get_stip_sns_type(doc):
     # marking による判定でオリジナル投稿を返却する
     return get_stip_sns_type_from_marking(markings)
 
+
 # instance 名から sns_user_name を取得する
-
-
 def get_sns_user_name_from_instance(instance):
     return instance.lower().replace(' ', '')
 
+
 # STIXファイルから取得できる情報である package_beanを取得する
-
-
 def get_package_bean(stix_file_path):
     package_bean = StixFiles.PackageBean()
     # STIX 1.1 parse

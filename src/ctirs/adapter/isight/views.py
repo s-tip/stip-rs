@@ -36,18 +36,16 @@ def get_adapter_isight_get_start_time(request):
 def get_adapter_isight_get_end_time(request):
     return get_text_field_value(request, 'end_time', default_value=None)
 
+
 # replace辞書取得
-
-
 def get_replace_dict():
     replace_dict = {}
     replace_dict['communities'] = Communities.objects.all()
     replace_dict['users'] = STIPUser.objects.all()
     return get_isight_dict(replace_dict)
 
+
 # isight辞書取得
-
-
 def get_isight_dict(replace_dict):
     replace_dict['isight'] = isightAdapter.get()
     # communityが削除されている場合はNoneを格納する
@@ -127,9 +125,8 @@ def get(request):
         # エラーページ
         return error_page(request)
 
+
 # 時間文字列はYYYY/MM/DD HH:MM:SSをepoch_timeに変換
-
-
 def _get_epoch_time(s):
     dt = datetime.datetime.strptime(s, '%Y/%m/%d %H:%M:%S').replace(tzinfo=pytz.utc)
     return calendar.timegm(dt.timetuple())

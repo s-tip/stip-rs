@@ -12,15 +12,13 @@ def get_login_username(request):
 def get_login_passwrod(request):
     return get_text_field_value(request, 'password', default_value='')
 
+
 # ログイン画面を表示
-
-
 def login_top(request):
     return render(request, 'cover.html', {})
 
+
 # ログイン画面から認証
-
-
 def login(request):
     replace_dict = {}
     # テキストフィールドからusername/password取得

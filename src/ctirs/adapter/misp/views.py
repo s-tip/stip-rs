@@ -47,18 +47,16 @@ def get_adapter_misp_get_end_date(request):
 def get_adapter_misp_get_published_only(request):
     return (get_text_field_value(request, 'published_only', default_value='"false') == 'published_only')
 
+
 # replace辞書取得
-
-
 def get_replace_dict():
     replace_dict = {}
     replace_dict['communities'] = Communities.objects.all()
     replace_dict['users'] = STIPUser.objects.all()
     return get_misp_dict(replace_dict)
 
+
 # misp辞書取得
-
-
 def get_misp_dict(replace_dict):
     replace_dict['misp'] = MispAdapter.get()
     # communityが削除されている場合はNoneを格納する
@@ -143,8 +141,7 @@ def get(request):
         # エラーページ
         return error_page(request)
 
+
 # 時間文字列はYYYY/MM/DD datetimeに変換
-
-
 def _get_datetime_from_str(s):
     return datetime.datetime.strptime(s, '%Y/%m/%d').replace(tzinfo=pytz.utc)

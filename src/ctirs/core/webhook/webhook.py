@@ -6,9 +6,8 @@ import requests
 OPERATION_CREATE = 'create'
 OPERATION_TEST = 'test'
 
+
 # StixFile作成時のwebhook
-
-
 def webhook_create(community, stix_file_doc):
     webhook_doc = {}
     webhook_doc['operation'] = OPERATION_CREATE
@@ -22,18 +21,16 @@ def webhook_create(community, stix_file_doc):
             # webhookに失敗しても処理は止めない(loggingのみ)
             traceback.print_exc()
 
+
 # test用のwebhook
-
-
 def webhook_test(webhook):
     webhook_doc = {}
     webhook_doc['operation'] = OPERATION_TEST
     webhook_json = json.dumps(webhook_doc)
     webhook_post(webhook, webhook_json)
 
+
 # webhook post
-
-
 def webhook_post(webhook, webhook_json):
     rsp = requests.post(
         webhook.url,

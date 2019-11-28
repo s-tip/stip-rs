@@ -8,9 +8,8 @@ import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
 
+
 # CTIM-RSに登録する
-
-
 def regist_ctim_rs(api_user, package_name, stix_file_path):
     with open(stix_file_path, 'rb') as fp:
         files = {
@@ -30,9 +29,8 @@ def regist_ctim_rs(api_user, package_name, stix_file_path):
             verify=False)
     return
 
+
 # CTIM-RSからmatchingを取得する
-
-
 def get_matching_from_rs(api_user, id_):
     url = '%s' % (SNSConfig.get_rs_get_matching_url())
     headers = _get_ctirs_api_http_headers(api_user)
@@ -47,9 +45,8 @@ def get_matching_from_rs(api_user, id_):
         verify=False)
     return rsp.json()['data']
 
+
 # CTIM-RSのwebapi用のhttp header
-
-
 def _get_ctirs_api_http_headers(api_user):
     # username,api_key は api_userごとの値を使用する
     return {
@@ -57,23 +54,20 @@ def _get_ctirs_api_http_headers(api_user):
         'username': api_user.username,
     }
 
+
 # package_idからファイル名に変更
-#: がファイル名に使えないため -- に変更する
-
-
+# : がファイル名に使えないため -- に変更する
 def convert_package_id_to_filename(package_id):
     return package_id.replace(':', '--')
 
+
 # ファイル名からpacakge_idに変更
-
-
 def convert_filename_to_package_id(filename):
     return filename.replace('--', ':')
 
+
 # package_id に該当するファイルが cache dir に存在する場合はそのファイルパスを
 # 存在しない場合は RS から取得して cache_dir に格納してそのファイルパスを返却する
-
-
 def get_stix_file_path(api_user, package_id):
     # cache のファイルパスを作成する
     file_name = convert_package_id_to_filename(package_id)
@@ -94,19 +88,17 @@ def get_stix_file_path(api_user, package_id):
                 pass
     return file_path
 
+
 # datetime 型から RS 引数フォーマットの日時文字列に変更する
 # 例 : 2018-02-22 08:54:47.187184
-
-
 def get_dtstr_from_datetime(dt):
     return dt.astimezone(timezone('UTC')).strftime('%Y-%m-%d %H:%M:%S.%f')
+
 
 ########
 # SNS 用
 # 投稿用 STIX リストを時間順に取得
 # def get_feeds_from_rs(api_user,start_time=None,last_feed_datetime=None,user_id=None):
-
-
 def get_feeds_from_rs(
         api_user,
         start_time=None,
@@ -151,10 +143,9 @@ def get_feeds_from_rs(
         verify=False)
     return rsp.json()['feeds']
 
+
 # SNS 用
 # 検索
-
-
 def query(
         api_user,
         query_string):
@@ -170,9 +161,8 @@ def query(
         verify=False)
     return rsp.json()['feeds']
 
+
 # 投稿用 STIX を取得
-
-
 def get_content_from_rs(api_user, package_id):
     # /api/v1/sns/content をコールし、 content のみを返却する
     j = get_package_info_from_package_id(api_user, package_id)
@@ -191,9 +181,8 @@ def get_package_info_from_package_id(api_user, package_id):
         verify=False)
     return rsp.json()
 
+
 # 関連 STIX (Like, Unlike, Comment) 取得
-
-
 def get_related_packages_from_rs(api_user, package_id):
     url = '%s' % (SNSConfig.get_rs_get_related_packages_url())
     params = {}
@@ -206,9 +195,8 @@ def get_related_packages_from_rs(api_user, package_id):
         verify=False)
     return rsp.json()
 
+
 # comments 取得
-
-
 def get_comment_from_rs(api_user, package_id):
     url = '%s' % (SNSConfig.get_rs_get_comments_url())
     params = {}
@@ -221,9 +209,8 @@ def get_comment_from_rs(api_user, package_id):
         verify=False)
     return rsp.json()
 
+
 # likers 取得
-
-
 def get_likers_from_rs(api_user, package_id):
     url = '%s' % (SNSConfig.get_rs_get_likers_url())
     params = {}
@@ -236,9 +223,8 @@ def get_likers_from_rs(api_user, package_id):
         verify=False)
     return rsp.json()
 
+
 # MISP 共有
-
-
 def share_misp(api_user, package_id):
     url = '%s' % (SNSConfig.get_rs_get_share_misp_url())
     params = {}

@@ -1,4 +1,3 @@
-
 from django.http import HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.http.response import JsonResponse
@@ -27,10 +26,9 @@ def stix_files_package_id(request, package_id):
     except Exception as e:
         return api_root.error(e)
 
+
 # STIX ファイル情報取得
 # GET /api/v1/stix_files_package_id/<package_id>
-
-
 def get_stix_file_package_id_document_info(request, package_id):
     try:
         doc = StixFiles.objects.get(package_id=package_id)
@@ -38,20 +36,18 @@ def get_stix_file_package_id_document_info(request, package_id):
     except Exception as _:
         return api_root.error(Exception('The specified id not found.'))
 
+
 # STIX ファイル情報削除
 # DELETE /api/v1/stix_files_package_id/<package_id>
-
-
 def delete_stix_file_package_id_document_info(package_id):
     try:
         api_root.delete_stix_document(package_id=package_id)
     except Exception as e:
         return api_root.error(e)
 
+
 # STIX ファイル取得
 # GET /api/v1/stix_files_package_id/<package_id>/stix
-
-
 def stix_files_package_id_stix(request, package_id):
     # apikey認証
     ctirs_auth_user = api_root.authentication(request)
@@ -63,10 +59,9 @@ def stix_files_package_id_stix(request, package_id):
     except Exception as e:
         return api_root.error(e)
 
+
 # 関連 CTI 取得
 # GET /api/v1/stix_files_package_id/<package_id>/related_packages
-
-
 def stix_files_package_id_related_packages(request, package_id):
     # apikey認証
     ctirs_auth_user = api_root.authentication(request)

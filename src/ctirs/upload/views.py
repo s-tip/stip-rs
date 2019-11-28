@@ -28,9 +28,8 @@ def get_file_field_value(request, item_name):
     except MultiValueDictKeyError:
         return None
 
+
 # STIXファイル取得/指定無時はNone/リストで返却される
-
-
 def get_sharing_stix(request):
     return get_file_field_value(request, 'stix')
 

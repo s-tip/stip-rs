@@ -31,10 +31,9 @@ SIMILARTY_6_EDGE_TYPE = 'Similarity: 6'
 SIMILARTY_7_EDGE_TYPE = 'Similarity: 7'
 SIMILARTY_8_EDGE_TYPE = 'Similarity: 8'
 
+
 # 共通
 # REST API から boolean の値を取得する
-
-
 def get_boolean_value(d, key, default_value):
     if (key in d) == False:
         return default_value
@@ -45,10 +44,9 @@ def get_boolean_value(d, key, default_value):
         return True if v.lower() == 'true' else False
     return None
 
-#GET /api/v1/gv/l1_info_for_l1table
+
+# GET /api/v1/gv/l1_info_for_l1table
 # L1用 table 返却
-
-
 def l1_info_for_l1table(request):
     try:
         if request.method != 'GET':
@@ -170,9 +168,8 @@ def l1_info_for_l1table(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/gv/package_list
 
-
+# GET /api/v1/gv/package_list
 def package_list(request):
     REQUIRED_COMMENT_KEY = 'required_comment'
     LIMIT_KEY = 'limit'
@@ -223,9 +220,8 @@ def package_list(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/gv/package_name_list
 
-
+# GET /api/v1/gv/package_name_list
 def package_name_list(request):
     LIMIT_KEY = 'limit'
     try:
@@ -259,9 +255,8 @@ def package_name_list(request):
         traceback.print_exc()
         return error(e)
 
+
 # exact matchした情報を取得する
-
-
 def _get_exact_matched_info(package_id):
     ret_observable_cashes = []
 
@@ -370,9 +365,8 @@ def _get_matches_observable_caches_vs_indicator_v2_cache(observable_caches, indi
             ret_observable_cashes.append(observable_cache)
     return ret_observable_cashes
 
+
 # IPv4 の類似結果情報を取得する
-
-
 def _get_similar_ipv4(package_id):
     CACHE_TYPE = 'ipv4'
     # 指定の package_id で ipv4 のものを取得する
@@ -399,9 +393,8 @@ def _get_similar_ipv4(package_id):
             r.append(v)
     return r
 
+
 # domain の類似結果情報を取得する
-
-
 def _get_similar_domain(package_id):
     CACHE_TYPE = 'domain_name'
     rs_system = System.objects.get()
@@ -436,10 +429,9 @@ def _get_similar_domain(package_id):
                 r.append(v)
     return r
 
+
 # domain の 類似度を判定する
 # すでにtypeがdomainであること、tldが一致していることが前提
-
-
 def _get_domain_similarity_type(start_cache, end_cache):
     try:
         score_cache = SimilarScoreCache.objects.get(
@@ -490,9 +482,8 @@ def _get_domain_similarity_type(start_cache, end_cache):
     SimilarScoreCache.create(SimilarScoreCache.DOMAIN_SCORE_CACHE_TYPE, start_cache, end_cache, edge_type)
     return edge_type
 
+
 # IPv4 の 類似度を判定する
-
-
 def _get_ipv4_similarity_type(start_cache, end_cache):
     try:
         score_cache = SimilarScoreCache.objects.get(
@@ -526,15 +517,13 @@ def _get_ipv4_similarity_type(start_cache, end_cache):
     SimilarScoreCache.create(SimilarScoreCache.IPV4_SCORE_CACHE_TYPE, start_cache, end_cache, edge_type)
     return edge_type
 
+
 # 指定された IPv4 文字列の第4オクテットの数値を取得する
-
-
 def _get_ip_4th_value(ipv4):
     return int(ipv4.split('.')[3])
 
+
 # 関連 CTI 検索 (GV/API 経由共通)
-
-
 def get_matched_packages(package_id, exact=True, similar_ipv4=False, similar_domain=False):
     exact_dict = {}
     similar_ipv4_dict = {}
@@ -596,7 +585,7 @@ def get_matched_packages(package_id, exact=True, similar_ipv4=False, similar_dom
     return ret
 
 
-#GET /api/v1/gv/matched_packages
+# GET /api/v1/gv/matched_packages
 def matched_packages(request):
     PACKAGE_ID_KEY = 'package_id'
     EXACT_KEY = 'exact'
@@ -624,7 +613,7 @@ def matched_packages(request):
         return error(e)
 
 
-#GET /api/v1/gv/contents_and_edges
+# GET /api/v1/gv/contents_and_edges
 @csrf_exempt
 def contents_and_edges(request):
     PACKAGE_ID_KEY = 'package_id'
@@ -785,10 +774,9 @@ def contents_and_edges(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/gv/package_list_for_sharing_table
+
+# GET /api/v1/gv/package_list_for_sharing_table
 # sharing table (package)返却
-
-
 def package_list_for_sharing_table(request):
     try:
         if request.method != 'GET':
@@ -872,10 +860,9 @@ def stix_files_id(request, package_id):
     except Exception as e:
         return error(e)
 
+
 # GET /api/v1/gv/stix_file/<package_id>
 # stix_file 返却
-
-
 def get_stix_files_id(request, package_id):
     try:
         # 認証する
@@ -892,10 +879,9 @@ def get_stix_files_id(request, package_id):
         traceback.print_exc()
         return error(e)
 
+
 # DELETE /api/v1/gv/stix_file/<package_id>
 # stix_file 削除
-
-
 def delete_stix_files_id(request, package_id):
     try:
         # 認証する
@@ -936,10 +922,9 @@ def stix_file_comment(request, package_id):
         traceback.print_exc()
         return error(e)
 
+
 # GET /api/v1/gv/stix_file/<package_id>/l1_info
 # L1情報取得
-
-
 def stix_file_l1_info(request, package_id):
     try:
         if request.method != 'GET':
@@ -968,10 +953,9 @@ def stix_file_l1_info(request, package_id):
         traceback.print_exc()
         return error(e)
 
+
 # GET /api/v1/gv/stix_file/<package_id>/stix
 # STIX content 作成
-
-
 def stix_file_stix(request, package_id):
     try:
         if request.method != 'GET':
@@ -988,10 +972,9 @@ def stix_file_stix(request, package_id):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/gv/communities
+
+# GET /api/v1/gv/communities
 # STIX content 作成
-
-
 def communities(request):
     try:
         if request.method != 'GET':
@@ -1009,10 +992,9 @@ def communities(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/gv/count_by_type
+
+# GET /api/v1/gv/count_by_type
 # STIX content 作成
-
-
 def count_by_type(request):
     try:
         if request.method != 'GET':
@@ -1047,9 +1029,8 @@ def count_by_type(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/gv/latest_package_list
 
-
+# GET /api/v1/gv/latest_package_list
 def latest_package_list(request):
     DEFAULT_LATEST_NUM = 10
     try:
@@ -1118,19 +1099,17 @@ def count_by_community(community, latest_days):
         ret.append(count)
     return ret
 
+
 # 本日から指定の数日分のdatetime型(00:00:00固定)を返却
-
-
 def _get_past_day(today, delta_int):
     past_delta = datetime.timedelta(days=delta_int)
     past_day = today - past_delta
     past_day = datetime.datetime(past_day.year, past_day.month, past_day.day)
     return past_day
 
-#GET /api/v1/gv/latest_stix_count_by_community
+
+# GET /api/v1/gv/latest_stix_count_by_community
 # 1日ごとの各コミュニティーごとのファイル数を返却する
-
-
 def latest_stix_count_by_community(request):
     LASTEST_DAYS_KEY = 'latest_days'
     DEFAULT_LATEST_DAYS = 7
@@ -1162,9 +1141,8 @@ def latest_stix_count_by_community(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/gv/language_contents
 
-
+# GET /api/v1/gv/language_contents
 def language_contents(request):
     try:
         if request.method != 'GET':
@@ -1189,9 +1167,8 @@ def language_contents(request):
         traceback.print_exc()
         return error(e)
 
+
 # package_id指定のstix辞書形式を返却
-
-
 def _get_stix_content_dict(stix_file):
     if stix_file.version.startswith('2.'):
         # STIX 2.x
@@ -1201,9 +1178,8 @@ def _get_stix_content_dict(stix_file):
         stix_package = STIXPackage.from_xml(stix_file.origin_path)
         return stix_package.to_dict()
 
+
 # contents_and_edgesで返却するpackage_idごとの辞書を作成する
-
-
 def _get_contents_item(package_id):
     stix_file = StixFiles.objects.get(package_id=package_id)
     return {

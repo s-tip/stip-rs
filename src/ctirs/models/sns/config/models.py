@@ -1,8 +1,7 @@
 from django.db import models
 
+
 ####################
-
-
 class SNSConfigManager(models.Manager):
     pass
 

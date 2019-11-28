@@ -60,9 +60,8 @@ def get_no_accept_json_data(message, error_id='To be determined', error_code='To
         }
     }
 
+
 # HTTP_ACCEPT チェック
-
-
 def check_http_accept(request, expect_content_type=HTTP_ACCEPT_CONTENT_TYPE, expect_version=HTTP_ACCEPT_VERSION):
     #debug_print('>>>request.META[HTTP_ACCEPT]:' + str(request.META['HTTP_ACCEPT']))
     # , で複数の HTTP_ACCEPT が存在する場合に備え分割
@@ -92,9 +91,8 @@ def check_http_accept(request, expect_content_type=HTTP_ACCEPT_CONTENT_TYPE, exp
         break
     return is_invalid
 
+
 # HTTP_AUTHORIZATION チェック
-
-
 def check_common_authorization(request):
     # credential check
     if ('HTTP_AUTHORIZATION' in request.META) != True:

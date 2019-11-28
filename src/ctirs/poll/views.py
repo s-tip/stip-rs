@@ -45,9 +45,8 @@ def detail(request, id_):
         # エラーページ
         return error_page(request)
 
+
 # formの日時フォーマット文字列からdatetime型に変換して返却
-
-
 def get_datetime_from_string(str_):
     if str_ is None:
         return None

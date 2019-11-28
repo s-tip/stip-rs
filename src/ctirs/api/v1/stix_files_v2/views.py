@@ -87,10 +87,9 @@ def language_contents(request, object_ref):
     except Exception as e:
         return error(e)
 
+
 # セレクタがリストの要素を表しているか
 # 異なる場合は -1, 表している場合はその index
-
-
 def get_list_index_from_selector(selector):
     try:
         if (selector[0] == '[') and (selector[-1] == ']'):
@@ -99,9 +98,8 @@ def get_list_index_from_selector(selector):
     except BaseException:
         return -1
 
+
 # o_ の中に selector に示されたキーが存在するか?
-
-
 def is_exist_objects(selector, o_):
     # list 要素チェック
     index = get_list_index_from_selector(selector)
@@ -119,9 +117,8 @@ def is_exist_objects(selector, o_):
 def get_selector_trimed_last_index(selector):
     elems = selector.split('')
 
+
 # language_contents 作成
-
-
 def post_language_contents(request, object_ref, ctirs_auth_user):
     try:
         j = json.loads(request.body)
@@ -200,9 +197,8 @@ def post_language_contents(request, object_ref, ctirs_auth_user):
         traceback.print_exc()
         return error(e)
 
+
 # language_contents  取得
-
-
 def get_language_contents(request, object_ref):
     try:
         # 表示する長さ
@@ -243,9 +239,8 @@ def get_object_main(request, object_id):
         traceback.print_exc()
         return error(e)
 
+
 # object_id から object 情報取得
-
-
 def get_object(object_id):
     collections = [StixAttackPatterns, StixCampaignsV2,
                    StixCoursesOfActionV2, StixIdentities, StixIndicatorsV2,

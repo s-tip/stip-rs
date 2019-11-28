@@ -1,9 +1,8 @@
 from django.db import models
 from ctirs.models import STIPUser
 
+
 ####################
-
-
 class TaxiiManager(models.Manager):
     def create(self, name, address='', port=0, ssl=False, path='', collection='', login_id='', login_password=''):
         t = Taxii()
@@ -37,9 +36,8 @@ class Taxii(models.Model):
     class Meta:
         db_table = 'stip_gv_taxii'
 
+
 ####################
-
-
 class AliasesManager(models.Manager):
     def create(self, alias, stip_user, pid):
         t = Aliases()
@@ -59,9 +57,8 @@ class Aliases(models.Model):
     class Meta:
         db_table = 'stip_gv_aliases'
 
+
 ####################
-
-
 class ConfigManager(models.Manager):
     def modify_system(self, default_taxii_name, path_sharing_policy_specifications='', path_bootstrap_css_dir='', ctirs_host=''):
         config = self.get()

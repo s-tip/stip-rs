@@ -5,9 +5,8 @@ from ctirs.core.mongo.documents import TaxiiClients
 def get_trim_double_quotation(s):
     return s.strip('\"')
 
+
 # textfieldからitem_name指定の値を取得。未定義時はdefault_value
-
-
 def get_text_field_value(request, item_name, default_value=None):
     if request.method == 'GET':
         l = request.GET
@@ -25,9 +24,8 @@ def get_text_field_value(request, item_name, default_value=None):
     except MultiValueDictKeyError:
         return default_value
 
+
 # 同じページを返却する場合のlocationを取得する(デフォルトは/)
-
-
 def get_next_location(request):
     return get_text_field_value(request, 'next', default_value='/')
 

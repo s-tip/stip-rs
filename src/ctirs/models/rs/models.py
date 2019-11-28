@@ -10,9 +10,8 @@ from ctirs.models.sns.authentication.models import Profile
 from ctirs.models.sns.core.models import Region
 import stip.common.const as const
 
+
 #####################
-
-
 class STIPUserManager(BaseUserManager):
     def create_user(self, username, screen_name, password, is_admin=False):
         if not username:
@@ -189,9 +188,8 @@ def pre_save_stipuser(sender, instance, **kwargs):
 
 pre_save.connect(pre_save_stipuser, sender=STIPUser)
 
+
 #####################
-
-
 class SystemManager(models.Manager):
     def modify(self, community_root_dir, suffix_list_file_path, http_proxy=None, https_proxy=None):
         config = self.get()
@@ -242,9 +240,8 @@ class System(models.Model):
             proxies['https'] = config.https_proxy
         return proxies
 
+
 #####################
-
-
 class MongoConfigManager(models.Manager):
     def modify(self, host, port, db):
         c = self.get()
