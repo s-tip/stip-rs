@@ -5,6 +5,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import escape
 from ctirs.models import STIPUser
 
+
 @python_2_unicode_compatible
 class Activity(models.Model):
     FAVORITE = 'F'
@@ -14,7 +15,7 @@ class Activity(models.Model):
     ACTIVITY_TYPES = (
         (FAVORITE, 'Favorite'),
         (LIKE, 'Like'),
-        )
+    )
 
     user = models.ForeignKey(STIPUser)
     activity_type = models.CharField(max_length=1, choices=ACTIVITY_TYPES)
@@ -39,7 +40,7 @@ class Notification(models.Model):
         (LIKED, 'Liked'),
         (COMMENTED, 'Commented'),
         (ALSO_COMMENTED, 'Also Commented'),
-        )
+    )
 
     _LIKED_TEMPLATE = '<a href="/{0}/">{1}</a> liked your post: <a href="/feeds/{2}/">{3}</a>'  # noqa: E501
     _COMMENTED_TEMPLATE = '<a href="/{0}/">{1}</a> commented on your post: <a href="/feeds/{2}/">{3}</a>'  # noqa: E501
@@ -66,21 +67,21 @@ class Notification(models.Model):
                 escape(self.from_user.get_screen_name()),
                 self.package_id,
                 escape(self.get_summary(''))
-                )
+            )
         elif self.notification_type == self.COMMENTED:
             return self._COMMENTED_TEMPLATE.format(
                 escape(self.from_user.username),
                 escape(self.from_user.get_screen_name()),
                 self.package_id,
                 escape(self.get_summary(''))
-                )
+            )
         elif self.notification_type == self.ALSO_COMMENTED:
             return self._ALSO_COMMENTED_TEMPLATE.format(
                 escape(self.from_user.username),
                 escape(self.from_user.get_screen_name()),
                 self.package_id,
                 escape(self.get_summary(''))
-                )
+            )
         else:
             return 'Ooops! Something went wrong.'
 

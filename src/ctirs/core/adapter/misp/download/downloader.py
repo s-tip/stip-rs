@@ -3,20 +3,21 @@ import json
 import requests
 from ctirs.models.rs.models import System
 
+
 class MISPDownloader(object):
-    def __init__(self,url,api_key):
+    def __init__(self, url, api_key):
         self.url = url
         self.header = {}
         self.header['Content-Type'] = 'application/json'
         self.header['Authorization'] = api_key
 
-    def get_date_str(self,dt):
+    def get_date_str(self, dt):
         return dt.strftime('%Y-%m-%d')
 
     def get(self,
-        from_dt=None,
-        to_dt=None,
-        withAttachment=False):
+            from_dt=None,
+            to_dt=None,
+            withAttachment=False):
         payload = {}
         payload_request = {}
         payload_request['eventid'] = False
@@ -38,9 +39,9 @@ class MISPDownloader(object):
         proxies = System.get_request_proxies()
         resp = requests.post(
             self.url,
-            data = json.dumps(payload),
-            headers = self.header,
-            verify = False,
+            data=json.dumps(payload),
+            headers=self.header,
+            verify=False,
             proxies=proxies)
 
         if resp.status_code == 404:
@@ -53,4 +54,3 @@ class MISPDownloader(object):
             print('Exit.')
             return None
         return resp.text
-

@@ -4,14 +4,15 @@ import pytz
 from mongoengine import fields
 from mongoengine.document import Document
 from mongoengine.errors import DoesNotExist
-from ctirs.models.rs.models import STIPUser,System
+from ctirs.models.rs.models import STIPUser, System
 from ctirs import COMMUNITY_ORIGIN_DIR_NAME
+
 
 class Communities(Document):
     NOT_ASSIGN_COMMUNITY_NAME = 'SYSTEM_RESERVED (Not Assign)'
     DEFAULT_COMMUNITY_NAME = 'Default Community'
-    name = fields.StringField(unique=True,max_length=30)
-    dir_path = fields.StringField(unique=True,max_length=1024)
+    name = fields.StringField(unique=True, max_length=30)
+    dir_path = fields.StringField(unique=True, max_length=1024)
     webhooks = fields.ListField()
 
     @classmethod
@@ -22,42 +23,42 @@ class Communities(Document):
     def get_not_assign_community(cls):
         try:
             return Communities.objects.get(name=Communities.NOT_ASSIGN_COMMUNITY_NAME)
-        except:
-            #新規作成する
+        except BaseException:
+            # 新規作成する
             Communities.init_community(Communities.NOT_ASSIGN_COMMUNITY_NAME)
-            #再度取得する
+            # 再度取得する
             return Communities.get_not_assign_community()
 
     @classmethod
-    def get_clients_from_community(cls,community):
+    def get_clients_from_community(cls, community):
         l = []
-        for taxii_client in TaxiiClients.objects.filter(community=community,push=True):
+        for taxii_client in TaxiiClients.objects.filter(community=community, push=True):
             from ctirs.core.taxii.taxii import Client
             l.append(Client(taxii_client=taxii_client))
         return l
 
     @classmethod
-    #コミュニティ初期化
-    def init_community(cls,community_name):
-        #Community作成
+    # コミュニティ初期化
+    def init_community(cls, community_name):
+        # Community作成
         c = Communities()
         c.name = community_name
         c.save()
         try:
-            #ディレクトリ名作成
+            # ディレクトリ名作成
             community_all_root_dir = System.objects.get_community_root_dir()
-            community_root_dir = os.path.join(community_all_root_dir,str(c.id))
-            #すでに存在する場合はエラー
-            if os.path.exists(community_root_dir) == True:
+            community_root_dir = os.path.join(community_all_root_dir, str(c.id))
+            # すでに存在する場合はエラー
+            if os.path.exists(community_root_dir):
                 c.delete()
                 raise Exception('Can\'t create directory (%s)' % ('because already exists.'))
-            #ディレクトリ作成
+            # ディレクトリ作成
             os.mkdir(community_root_dir)
-            #originalディレクトリ作成
-            origin_root_dir = os.path.join(community_root_dir,COMMUNITY_ORIGIN_DIR_NAME)
+            # originalディレクトリ作成
+            origin_root_dir = os.path.join(community_root_dir, COMMUNITY_ORIGIN_DIR_NAME)
             os.mkdir(origin_root_dir)
 
-            #Community更新
+            # Community更新
             c.dir_path = community_root_dir
             c.save()
         except Exception as e:
@@ -66,7 +67,7 @@ class Communities(Document):
         return
 
     @classmethod
-    #導入直後の初回起動時などにコレクションがないときに自動的に作成する
+    # 導入直後の初回起動時などにコレクションがないときに自動的に作成する
     def init_communities(cls):
         init_communities = ['Default Community', 'AlienVault OTX', 'MISP', 'stip-taxii-server', 'from_sns']
         for init_community in init_communities:
@@ -74,57 +75,66 @@ class Communities(Document):
 
     def to_dict(self):
         return {
-                'name'  :   self.name,
-                'id'    :   str(self.id)
-                }
-#起動時に Communities を check する
-#Communities　がない場合は作成する
+            'name': self.name,
+            'id': str(self.id)
+        }
+
+
+# 起動時に Communities を check する
+# Communities　がない場合は作成する
 try:
     if Communities.objects.count() == 0:
         Communities.init_communities()
-except:
-    #migrate 前に通過してエラーになるので例外は pass
+except BaseException:
+    # migrate 前に通過してエラーになるので例外は pass
     pass
+
 
 class Webhooks(Document):
     url = fields.StringField(max_length=1024)
 
-#Information Souces
+# Information Souces
+
+
 class InformationSources(Document):
-    name = fields.StringField(max_length=128,unique=True,null=False)
+    name = fields.StringField(max_length=128, unique=True, null=False)
 
     @classmethod
-    def create(cls,name):
+    def create(cls, name):
         d = InformationSources()
-        d.name =name
+        d.name = name
         d.save()
         return d
-    
-#TaxiiServerの設定
+
+# TaxiiServerの設定
+
+
 class TaxiiServers(Document):
-    setting_name = fields.StringField(max_length=128,required=True,unique=True,null=False)
-    collection_name = fields.StringField(max_length=128,required=True,unique=True,null=False)
-    #中身は InforamtionSources
+    setting_name = fields.StringField(max_length=128, required=True, unique=True, null=False)
+    collection_name = fields.StringField(max_length=128, required=True, unique=True, null=False)
+    # 中身は InforamtionSources
     information_sources = fields.ListField()
 
     @classmethod
-    #create 時に設定名とコレクション名が必要
-    def create(cls,setting_name,collection_name):
+    # create 時に設定名とコレクション名が必要
+    def create(cls, setting_name, collection_name):
         ts = TaxiiServers()
         ts.setting_name = setting_name
         ts.collection_name = collection_name
         ts.save()
         return ts
-    
-    #information_sourcesを更新する
-    def modify_information_sources(self,information_sources):
+
+    # information_sourcesを更新する
+    def modify_information_sources(self, information_sources):
         self.information_sources = information_sources
         self.save()
 
-#ScheduleCron設定保存クラス　
+# ScheduleCron設定保存クラス　
+
+
 class ScheduleCronJobs(Document):
     @classmethod
-    def create(cls,**kwargs):
+    def create(cls, **kwargs):
         document = ScheduleCronJobs()
         try:
             document.year = kwargs['year']
@@ -156,18 +166,20 @@ class ScheduleCronJobs(Document):
             document.second = '*'
         document.save()
         return document
-    year = fields.StringField(max_length=128,default='*')
-    month = fields.StringField(max_length=128,default='*')
-    day = fields.StringField(max_length=128,default='*')
-    week = fields.StringField(max_length=128,default='*')
-    hour = fields.StringField(max_length=128,default='*')
-    minute = fields.StringField(max_length=128,default='*')
-    second = fields.StringField(max_length=128,default='*')
+    year = fields.StringField(max_length=128, default='*')
+    month = fields.StringField(max_length=128, default='*')
+    day = fields.StringField(max_length=128, default='*')
+    week = fields.StringField(max_length=128, default='*')
+    hour = fields.StringField(max_length=128, default='*')
+    minute = fields.StringField(max_length=128, default='*')
+    second = fields.StringField(max_length=128, default='*')
 
-#ScheduleInterval設定保存クラス　
+# ScheduleInterval設定保存クラス　
+
+
 class ScheduleIntervalJobs(Document):
     @classmethod
-    def create(cls,**kwargs):
+    def create(cls, **kwargs):
         document = ScheduleIntervalJobs()
         try:
             document.seconds = int(kwargs['seconds'])
@@ -177,25 +189,27 @@ class ScheduleIntervalJobs(Document):
         return document
     seconds = fields.IntField()
 
-#ScheduleJobsクラス
+# ScheduleJobsクラス
+
+
 class ScheduleJobs(Document):
     JOB_CRON = 'cron'
     JOB_INTERVAL = 'interval'
     STATUS_IN_OPERATION = 'in_operation'
     STATUS_STOP = 'stop'
 
-    JOB_TYPES=(
-        (JOB_CRON,      'cron'),
-        (JOB_INTERVAL,  'interval'),
+    JOB_TYPES = (
+        (JOB_CRON, 'cron'),
+        (JOB_INTERVAL, 'interval'),
     )
 
-    STATSES=(
-        (STATUS_IN_OPERATION    ,'In Operation'),
-        (STATUS_STOP           ,'Stop'),
+    STATSES = (
+        (STATUS_IN_OPERATION, 'In Operation'),
+        (STATUS_STOP, 'Stop'),
     )
 
     @classmethod
-    def create(cls,type_,**kwargs):
+    def create(cls, type_, **kwargs):
         if type_ == cls.JOB_CRON:
             cron_job = ScheduleCronJobs.create(**kwargs)
             document = ScheduleJobs()
@@ -212,7 +226,7 @@ class ScheduleJobs(Document):
             document.status = cls.STATUS_STOP
             document.save()
             return document
-    
+
     def remove(self):
         if self.job_type == self.JOB_CRON:
             self.cron_job.delete()
@@ -220,10 +234,11 @@ class ScheduleJobs(Document):
             self.interval_job.delete()
         self.delete()
 
-    job_type = fields.StringField(max_length=32,choices=JOB_TYPES)
+    job_type = fields.StringField(max_length=32, choices=JOB_TYPES)
     cron_job = fields.ReferenceField(ScheduleCronJobs)
     interval_job = fields.ReferenceField(ScheduleIntervalJobs)
-    status = fields.StringField(max_length=32,choices=STATSES)
+    status = fields.StringField(max_length=32, choices=STATSES)
+
 
 class OtxAdapter(Document):
     @classmethod
@@ -238,7 +253,7 @@ class OtxAdapter(Document):
         return otx
 
     @classmethod
-    def modify_settings(cls,apikey,community_id,uploader_id):
+    def modify_settings(cls, apikey, community_id, uploader_id):
         community = Communities.objects.get(id=community_id)
         otx = OtxAdapter.objects.get()
         otx.community = community
@@ -253,16 +268,16 @@ class OtxAdapter(Document):
         otx.save()
 
     @classmethod
-    #job追加
-    def add_job(cls,type_,**kwargs):
-        job = ScheduleJobs.create(type_,**kwargs)
+    # job追加
+    def add_job(cls, type_, **kwargs):
+        job = ScheduleJobs.create(type_, **kwargs)
         otx = OtxAdapter.objects.get()
         if job.job_type == ScheduleJobs.JOB_CRON:
-            #type が cron の場合はリストに追加
+            # type が cron の場合はリストに追加
             otx.jobs.append(job)
             otx.save()
         elif job.job_type == ScheduleJobs.JOB_INTERVAL:
-            #type が interval の場合は document を 更新
+            # type が interval の場合は document を 更新
             if otx.interval_schedule_job is not None:
                 otx.interval_schedule_job.interval_job.delete()
                 otx.interval_schedule_job.delete()
@@ -271,36 +286,37 @@ class OtxAdapter(Document):
         return job
 
     @classmethod
-    #job削除
-    def remove_job(cls,jobs_id):
+    # job削除
+    def remove_job(cls, jobs_id):
         job = ScheduleJobs.objects.get(id=jobs_id)
         otx = OtxAdapter.objects.get()
         otx.jobs.remove(job)
         otx.save()
         return
-    
+
     @classmethod
-    #job削除
+    # job削除
     def remove_internal_job(cls):
         otx = OtxAdapter.objects.get()
         if otx.interval_schedule_job is not None:
             otx.interval_schedule_job.interval_job.delete()
             otx.interval_schedule_job.delete()
             otx.interval_schedule_job = None
-            otx.save()    
-            
+            otx.save()
+
     @property
     def uploader_name(self):
         otx = OtxAdapter.objects.get()
         return STIPUser.objects.get(id=otx.uploader).username
 
-    #uploader には STIPUser の ID を格納
+    # uploader には STIPUser の ID を格納
     uploader = fields.IntField()
     apikey = fields.StringField(max_length=100)
     last_requested = fields.DateTimeField(default=None)
     community = fields.ReferenceField(Communities)
     jobs = fields.ListField()
     interval_schedule_job = fields.ReferenceField(ScheduleJobs)
+
 
 class isightAdapter(Document):
     @classmethod
@@ -316,7 +332,7 @@ class isightAdapter(Document):
         return isight
 
     @classmethod
-    def modify_settings(cls,public_key,private_key,community_id,uploader_id):
+    def modify_settings(cls, public_key, private_key, community_id, uploader_id):
         community = Communities.objects.get(id=community_id)
         isight = isightAdapter.objects.get()
         isight.community = community
@@ -332,16 +348,16 @@ class isightAdapter(Document):
         isight.save()
 
     @classmethod
-    #job追加
-    def add_job(cls,type_,**kwargs):
-        job = ScheduleJobs.create(type_,**kwargs)
+    # job追加
+    def add_job(cls, type_, **kwargs):
+        job = ScheduleJobs.create(type_, **kwargs)
         isight = isightAdapter.objects.get()
         if job.job_type == ScheduleJobs.JOB_CRON:
-            #type が cron の場合はリストに追加
+            # type が cron の場合はリストに追加
             isight.jobs.append(job)
             isight.save()
         elif job.job_type == ScheduleJobs.JOB_INTERVAL:
-            #type が interval の場合は document を 更新
+            # type が interval の場合は document を 更新
             if isight.interval_schedule_job is not None:
                 isight.interval_schedule_job.interval_job.delete()
                 isight.interval_schedule_job.delete()
@@ -350,8 +366,8 @@ class isightAdapter(Document):
         return job
 
     @classmethod
-    #job削除
-    def remove_job(cls,jobs_id):
+    # job削除
+    def remove_job(cls, jobs_id):
         job = ScheduleJobs.objects.get(id=jobs_id)
         isight = isightAdapter.objects.get()
         isight.jobs.remove(job)
@@ -359,7 +375,7 @@ class isightAdapter(Document):
         return
 
     @classmethod
-    #job削除
+    # job削除
     def remove_internal_job(cls):
         isight = isightAdapter.objects.get()
         if isight.interval_schedule_job is not None:
@@ -373,7 +389,7 @@ class isightAdapter(Document):
         otx = OtxAdapter.objects.get()
         return STIPUser.objects.get(id=otx.uploader).username
 
-    #uploader には STIPUser の ID を格納
+    # uploader には STIPUser の ID を格納
     uploader = fields.IntField()
     public_key = fields.StringField(max_length=100)
     private_key = fields.StringField(max_length=100)
@@ -381,6 +397,7 @@ class isightAdapter(Document):
     community = fields.ReferenceField(Communities)
     jobs = fields.ListField()
     interval_schedule_job = fields.ReferenceField(ScheduleJobs)
+
 
 class MispAdapter(Document):
     DEFAULT_STIX_ID_PREFIX = 'misp_instance'
@@ -398,7 +415,7 @@ class MispAdapter(Document):
         return misp
 
     @classmethod
-    def modify_settings(cls,url,apikey,stix_id_prefix,identity,community_id,uploader_id,published_only):
+    def modify_settings(cls, url, apikey, stix_id_prefix, identity, community_id, uploader_id, published_only):
         community = Communities.objects.get(id=community_id)
         misp = MispAdapter.objects.get()
         misp.community = community
@@ -417,16 +434,16 @@ class MispAdapter(Document):
         misp.save()
 
     @classmethod
-    #job追加
-    def add_job(cls,type_,**kwargs):
-        job = ScheduleJobs.create(type_,**kwargs)
+    # job追加
+    def add_job(cls, type_, **kwargs):
+        job = ScheduleJobs.create(type_, **kwargs)
         misp = MispAdapter.objects.get()
         if job.job_type == ScheduleJobs.JOB_CRON:
-            #type が cron の場合はリストに追加
+            # type が cron の場合はリストに追加
             misp.jobs.append(job)
             misp.save()
         elif job.job_type == ScheduleJobs.JOB_INTERVAL:
-            #type が interval の場合は document を 更新
+            # type が interval の場合は document を 更新
             if misp.interval_schedule_job is not None:
                 misp.interval_schedule_job.interval_job.delete()
                 misp.interval_schedule_job.delete()
@@ -435,8 +452,8 @@ class MispAdapter(Document):
         return job
 
     @classmethod
-    #job削除
-    def remove_job(cls,jobs_id):
+    # job削除
+    def remove_job(cls, jobs_id):
         job = ScheduleJobs.objects.get(id=jobs_id)
         misp = MispAdapter.objects.get()
         misp.jobs.remove(job)
@@ -444,7 +461,7 @@ class MispAdapter(Document):
         return
 
     @classmethod
-    #job削除
+    # job削除
     def remove_internal_job(cls):
         misp = MispAdapter.objects.get()
         if misp.interval_schedule_job is not None:
@@ -458,11 +475,11 @@ class MispAdapter(Document):
         misp = MispAdapter.objects.get()
         return STIPUser.objects.get(id=misp.uploader).username
 
-    #uploader には STIPUser の ID を格納
+    # uploader には STIPUser の ID を格納
     uploader = fields.IntField()
     url = fields.StringField(max_length=1024)
     apikey = fields.StringField(max_length=100)
-    stix_id_prefix = fields.StringField(max_length=100,default=DEFAULT_STIX_ID_PREFIX)
+    stix_id_prefix = fields.StringField(max_length=100, default=DEFAULT_STIX_ID_PREFIX)
     identity = fields.StringField(max_length=100)
     published_only = fields.BooleanField(default=True)
     last_requested = fields.DateTimeField(default=None)
@@ -470,7 +487,8 @@ class MispAdapter(Document):
     jobs = fields.ListField()
     interval_schedule_job = fields.ReferenceField(ScheduleJobs)
 
-#起動時に各種アダプタ collectionを check する。存在しない場合は作成してくれる
+
+# 起動時に各種アダプタ collectionを check する。存在しない場合は作成してくれる
 if OtxAdapter.objects.count() == 0:
     adapter = OtxAdapter()
     adapter.save()
@@ -481,10 +499,11 @@ if MispAdapter.objects.count() == 0:
     adapter = MispAdapter()
     adapter.save()
 
+
 class TaxiiClients(Document):
-    TAXII_PROTOCOL_VERSION_CHOICES=(
-        ('1.1','1.1'),
-        ('2.0','2.0'),
+    TAXII_PROTOCOL_VERSION_CHOICES = (
+        ('1.1', '1.1'),
+        ('2.0', '2.0'),
     )
 
     @classmethod
@@ -495,7 +514,7 @@ class TaxiiClients(Document):
         return l
 
     @classmethod
-    def create(cls,name,address='',port=0,ssl=False,path='',collection='',login_id='',login_password='',community_id='',ca=False,key_file=None,cert_file=None,protocol_version='',push=False,uploader_id=None):
+    def create(cls, name, address='', port=0, ssl=False, path='', collection='', login_id='', login_password='', community_id='', ca=False, key_file=None, cert_file=None, protocol_version='', push=False, uploader_id=None):
         community = Communities.objects.get(id=community_id)
         try:
             t = TaxiiClients.objects.get(name=name)
@@ -524,15 +543,15 @@ class TaxiiClients(Document):
         t.save()
         return
 
-    #job追加
-    def add_job(self,type_,**kwargs):
-        job = ScheduleJobs.create(type_,**kwargs)
+    # job追加
+    def add_job(self, type_, **kwargs):
+        job = ScheduleJobs.create(type_, **kwargs)
         if job.job_type == ScheduleJobs.JOB_CRON:
-            #type が cron の場合はリストに追加
+            # type が cron の場合はリストに追加
             self.jobs.append(job)
             self.save()
         elif job.job_type == ScheduleJobs.JOB_INTERVAL:
-            #type が interval の場合は document を 更新
+            # type が interval の場合は document を 更新
             if self.interval_schedule_job is not None:
                 self.interval_schedule_job.interval_job.delete()
                 self.interval_schedule_job.delete()
@@ -540,20 +559,20 @@ class TaxiiClients(Document):
             self.save()
         return job
 
-    #job削除
-    def remove_job(self,jobs_id):
+    # job削除
+    def remove_job(self, jobs_id):
         job = ScheduleJobs.objects.get(id=jobs_id)
         self.jobs.remove(job)
         self.save()
 
-    #job削除(interval)
+    # job削除(interval)
     def remove_interval_job(self):
         if self.interval_schedule_job is not None:
             self.interval_schedule_job.interval_job.delete()
             self.interval_schedule_job.delete()
             self.save()
-        
-    #template表示用/communityが削除されずに残っているか
+
+    # template表示用/communityが削除されずに残っているか
     def is_exist_community(self):
         try:
             v = self.community
@@ -565,51 +584,52 @@ class TaxiiClients(Document):
     def uploader_name(self):
         return STIPUser.objects.get(id=self.uploader).username
 
-    name = fields.StringField(max_length=100,unique=True)
-    address = fields.StringField(max_length=100,default='localhost')
+    name = fields.StringField(max_length=100, unique=True)
+    address = fields.StringField(max_length=100, default='localhost')
     port = fields.IntField(default=80)
     ssl = fields.BooleanField(default=False)
-    path = fields.StringField(max_length=100,default='/taxii-data')
-    collection = fields.StringField(max_length=100,default='Default')
-    login_id = fields.StringField(max_length=100,default='login_id')
-    login_password = fields.StringField(max_length=100,default='login_password')
+    path = fields.StringField(max_length=100, default='/taxii-data')
+    collection = fields.StringField(max_length=100, default='Default')
+    login_id = fields.StringField(max_length=100, default='login_id')
+    login_password = fields.StringField(max_length=100, default='login_password')
     community = fields.ReferenceField(Communities)
     is_use_cert = fields.BooleanField(default=False)
     cert_file = fields.StringField(max_length=10240)
     key_file = fields.StringField(max_length=10240)
     last_requested = fields.DateTimeField(default=None)
-    protocol_version = fields.StringField(max_length=16,choices=TAXII_PROTOCOL_VERSION_CHOICES,default='1.1')
+    protocol_version = fields.StringField(max_length=16, choices=TAXII_PROTOCOL_VERSION_CHOICES, default='1.1')
     push = fields.BooleanField(default=False)
-    #uploader には STIPUser の ID を格納
+    # uploader には STIPUser の ID を格納
     uploader = fields.IntField()
     jobs = fields.ListField()
     interval_schedule_job = fields.ReferenceField(ScheduleJobs)
 
+
 class Vias(Document):
-    VIA_CHOICES=(
-        ('file_upload','Local File'),
-        ('taxii_poll','Taxii Poll'),
-        ('adapter','Adapter'),
-        ('rest','Rest API'),
-        ('taxii_publish','Taxii Publish'),
-        ('not_assign','NOT ASSIGN'),
+    VIA_CHOICES = (
+        ('file_upload', 'Local File'),
+        ('taxii_poll', 'Taxii Poll'),
+        ('adapter', 'Adapter'),
+        ('rest', 'Rest API'),
+        ('taxii_publish', 'Taxii Publish'),
+        ('not_assign', 'NOT ASSIGN'),
     )
 
-    via = fields.StringField(max_length=32,choices=VIA_CHOICES)
-    #uploader には STIPUser の ID を格納
+    via = fields.StringField(max_length=32, choices=VIA_CHOICES)
+    # uploader には STIPUser の ID を格納
     uploader = fields.IntField()
     taxii_client = fields.ReferenceField(TaxiiClients)
     adapter_name = fields.StringField(max_length=32)
     taxii_publisher = fields.StringField(max_length=32)
 
     @classmethod
-    def get_not_assign_via(cls,uploader=None):
+    def get_not_assign_via(cls, uploader=None):
         via = 'not_assign'
         try:
-            #すでにある場合は返却
-            return Vias.objects.get(via=via,uploader=uploader)
+            # すでにある場合は返却
+            return Vias.objects.get(via=via, uploader=uploader)
         except DoesNotExist:
-            #存在しない場合は新規作成/保存後返却
+            # 存在しない場合は新規作成/保存後返却
             document = Vias()
             document.via = via
             document.uploader = uploader
@@ -617,13 +637,13 @@ class Vias(Document):
             return document
 
     @classmethod
-    def get_via_file_upload(cls,uploader=None):
-        via = 'file_upload' 
+    def get_via_file_upload(cls, uploader=None):
+        via = 'file_upload'
         try:
-            #すでにある場合は返却
-            return Vias.objects.get(via=via,uploader=uploader)
+            # すでにある場合は返却
+            return Vias.objects.get(via=via, uploader=uploader)
         except DoesNotExist:
-            #存在しない場合は新規作成/保存後返却
+            # 存在しない場合は新規作成/保存後返却
             document = Vias()
             document.via = via
             document.uploader = uploader
@@ -631,13 +651,13 @@ class Vias(Document):
             return document
 
     @classmethod
-    def get_via_rest_api_upload(cls,uploader=None):
-        via = 'rest' 
+    def get_via_rest_api_upload(cls, uploader=None):
+        via = 'rest'
         try:
-            #すでにある場合は返却
-            return Vias.objects.get(via=via,uploader=uploader)
+            # すでにある場合は返却
+            return Vias.objects.get(via=via, uploader=uploader)
         except DoesNotExist:
-            #存在しない場合は新規作成/保存後返却
+            # 存在しない場合は新規作成/保存後返却
             document = Vias()
             document.via = via
             document.uploader = uploader
@@ -645,13 +665,13 @@ class Vias(Document):
             return document
 
     @classmethod
-    def get_via_taxii_poll(cls,taxii_client=None,uploader=None):
-        via = 'taxii_poll' 
+    def get_via_taxii_poll(cls, taxii_client=None, uploader=None):
+        via = 'taxii_poll'
         try:
-            #すでにある場合は返却
-            return Vias.objects.get(via=via,taxii_client=taxii_client,uploader=uploader)
+            # すでにある場合は返却
+            return Vias.objects.get(via=via, taxii_client=taxii_client, uploader=uploader)
         except DoesNotExist:
-            #存在しない場合は新規作成/保存後返却
+            # 存在しない場合は新規作成/保存後返却
             document = Vias()
             document.via = via
             document.taxii_client = taxii_client
@@ -660,12 +680,12 @@ class Vias(Document):
             return document
 
     @classmethod
-    def get_via_adapter(cls,via,adapter_name,uploader=None):
+    def get_via_adapter(cls, via, adapter_name, uploader=None):
         try:
-            #すでにある場合は返却
-            return Vias.objects.get(via=via,adapter_name=adapter_name,uploader=uploader)
+            # すでにある場合は返却
+            return Vias.objects.get(via=via, adapter_name=adapter_name, uploader=uploader)
         except DoesNotExist:
-            #存在しない場合は新規作成/保存後返却
+            # 存在しない場合は新規作成/保存後返却
             document = Vias()
             document.via = via
             document.adapter_name = adapter_name
@@ -674,86 +694,85 @@ class Vias(Document):
             return document
 
     @classmethod
-    def get_via_adapter_otx(cls,uploader=None):
-        via = 'adapter' 
+    def get_via_adapter_otx(cls, uploader=None):
+        via = 'adapter'
         adapter_name = 'AlienVault'
-        return cls.get_via_adapter(via,adapter_name,uploader)
+        return cls.get_via_adapter(via, adapter_name, uploader)
 
     @classmethod
-    def get_via_adapter_isight(cls,uploader=None):
-        via = 'adapter' 
+    def get_via_adapter_isight(cls, uploader=None):
+        via = 'adapter'
         adapter_name = 'iSIGHT Partners'
-        return cls.get_via_adapter(via,adapter_name,uploader)
+        return cls.get_via_adapter(via, adapter_name, uploader)
 
     @classmethod
-    def get_via_adapter_misp(cls,uploader=None):
-        via = 'adapter' 
+    def get_via_adapter_misp(cls, uploader=None):
+        via = 'adapter'
         adapter_name = 'MISP'
-        return cls.get_via_adapter(via,adapter_name,uploader)
+        return cls.get_via_adapter(via, adapter_name, uploader)
 
     @classmethod
-    def get_via_taxii_publish(cls,taxii_publisher='undefined'):
-        via = 'taxii_publish' 
+    def get_via_taxii_publish(cls, taxii_publisher='undefined'):
+        via = 'taxii_publish'
         try:
-            #すでにある場合は返却
-            return Vias.objects.get(via=via,taxii_publisher=taxii_publisher)
+            # すでにある場合は返却
+            return Vias.objects.get(via=via, taxii_publisher=taxii_publisher)
         except DoesNotExist:
-            #存在しない場合は新規作成/保存後返却
+            # 存在しない場合は新規作成/保存後返却
             document = Vias()
             document.via = via
             document.taxii_publisher = taxii_publisher
             document.save()
             return document
 
-    #uploaderから screen_name 取得
+    # uploaderから screen_name 取得
     def get_screen_name_from_uploader(self):
         try:
-            return STIPUser.objects.get(id=self.uploader).screen_name 
-        except:
-            #uploaderがない場合
+            return STIPUser.objects.get(id=self.uploader).screen_name
+        except BaseException:
+            # uploaderがない場合
             return 'undefined'
 
-    #uploaderのscreen_nameを取得
+    # uploaderのscreen_nameを取得
     def get_uploader_screen_name(self):
         try:
             if self.via == 'taxii_poll':
                 if self.uploader is not None:
-                    #uploaderの指定がある場合
+                    # uploaderの指定がある場合
                     return self.get_screen_name_from_uploader()
                 else:
-                    #uploaderの指定がない場合は adapter 名
+                    # uploaderの指定がない場合は adapter 名
                     return self.taxii_client.name
             elif self.via == 'rest':
-                #restの場合はuploader
+                # restの場合はuploader
                 return self.get_screen_name_from_uploader()
             elif self.via == 'file_upload':
-                #file_uploadの場合はuploader
+                # file_uploadの場合はuploader
                 return self.get_screen_name_from_uploader()
             elif self.via == 'adapter':
                 if self.uploader is not None:
-                    #uploaderの指定がある場合
+                    # uploaderの指定がある場合
                     return self.get_screen_name_from_uploader()
                 else:
-                    #uploaderの指定がない場合は adapter 名
+                    # uploaderの指定がない場合は adapter 名
                     return self.adapter_name
             elif self.via == 'taxii_publish':
-                #taxii_publishの場合はpublisher名
+                # taxii_publishの場合はpublisher名
                 return self.taxii_publisher
             elif self.via == 'not_assign':
                 return self.get_screen_name_from_uploader()
             else:
                 return 'undefined'
-        except:
-            #設定やユーザが削除されてエラーの場合は undefined とする
+        except BaseException:
+            # 設定やユーザが削除されてエラーの場合は undefined とする
             return 'undefined'
-        
-    #sSearchを含むVIA_CHOICESを返却する
+
+    # sSearchを含むVIA_CHOICESを返却する
     @classmethod
-    def get_search_via_choices(cls,sSearch):
+    def get_search_via_choices(cls, sSearch):
         ret = []
         for choice in cls.VIA_CHOICES:
-            v1,v2 = choice
+            v1, v2 = choice
             if sSearch.upper() in v2.upper():
                 ret.append(v1)
         return ret
-

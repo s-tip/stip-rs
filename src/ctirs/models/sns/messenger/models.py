@@ -53,8 +53,8 @@ class Message(models.Model):
                 'last': conversation['last'],
                 'unread': Message.objects.filter(user=user,
                                                  conversation__pk=conversation[
-                                                    'conversation'],
+                                                     'conversation'],
                                                  is_read=False).count(),
-                })
+            })
 
         return users

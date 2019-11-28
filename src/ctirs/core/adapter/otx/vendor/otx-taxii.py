@@ -17,7 +17,7 @@ def saveTimestamp(mtimestamp=None):
             f.write(mtimestamp)
         return mtimestamp
 
-    except:
+    except BaseException:
         print('Unable to find/open %s' % OTX_FILE)
 
 
@@ -27,7 +27,7 @@ def readTimestamp():
             mtimestamp = f.read()
         return mtimestamp
 
-    except:
+    except BaseException:
         print("No %s found:\n\tIt appears 'otx-taxii.py first_run' has not been run" % OTX_FILE)
 
 

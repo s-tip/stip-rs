@@ -18,13 +18,14 @@ from mixbox.namespaces import Namespace
 from IPy import *
 
 PULSE_SERVER_BASE = "https://otx.alienvault.com/"
-STIXNAMESPACE =  Namespace("https://otx.alienvault.com", "alienvault-otx")
+STIXNAMESPACE = Namespace("https://otx.alienvault.com", "alienvault-otx")
 set_id_namespace(STIXNAMESPACE)
+
 
 class StixExport:
     def __init__(self, pulse):
         self.stix_package = STIXPackage()
-	self.stix_header = STIXHeader()
+        self.stix_header = STIXHeader()
         self.pulse = pulse
         self.hash_translation = {"FileHash-MD5": Hash.TYPE_MD5, "FileHash-SHA1": Hash.TYPE_SHA1,
                                  "FileHash-SHA256": Hash.TYPE_SHA256}
@@ -45,12 +46,11 @@ class StixExport:
 
         self.stix_package.stix_header = self.stix_header
 
-    	hashes = []
-    	addresses = []
-    	domains = []
-    	urls = []
-    	mails = []
-
+        hashes = []
+        addresses = []
+        domains = []
+        urls = []
+        mails = []
 
         for p_indicator in self.pulse["indicators"]:
             if p_indicator["type"] in self.hash_translation:
@@ -62,7 +62,6 @@ class StixExport:
                 file_.add_hash(hash_)
                 observable_ = Observable(file_)
 
-
             elif p_indicator["type"] in self.address_translation:
                 new_ind = Indicator()
                 new_ind.description = p_indicator["description"]
@@ -71,14 +70,12 @@ class StixExport:
                                            'category': self.address_translation[p_indicator["type"]]})
                 observable_ = Observable(ipv4_)
 
-
             elif p_indicator["type"] in self.name_translation:
                 new_ind = Indicator()
                 new_ind.description = p_indicator["description"]
                 new_ind.title = "%s from %spulse/%s" % (p_indicator["indicator"], PULSE_SERVER_BASE, str(self.pulse["id"]))
-                domain_ = DomainName.from_dict({'value': p_indicator["indicator"], 'type':'FQDN'})                
+                domain_ = DomainName.from_dict({'value': p_indicator["indicator"], 'type': 'FQDN'})
                 observable_ = Observable(domain_)
-
 
             elif p_indicator["type"] == "URL":
                 new_ind = Indicator()
@@ -87,12 +84,11 @@ class StixExport:
                 url_ = URI.from_dict({'value': p_indicator["indicator"], 'type': URI.TYPE_URL})
                 observable_ = Observable(url_)
 
-
             elif p_indicator["type"] == "email":
                 email_ = Address.from_dict({'address_value': p_indicator["indicator"], 'category': Address.CAT_EMAIL})
                 observable_ = Observable(email_)
 
-            #elif p_indicator["type"] == "CVE":
+            # elif p_indicator["type"] == "CVE":
             #    vuln_ = Vulnerability()
             #    vuln_.cveid = p_indicator["indicator"].upper()
             #    observable_ = Observable(vuln_)
@@ -111,7 +107,6 @@ class StixExport:
             else:
                 continue
 
-
             mind = Indicator()
             mind.description = p_indicator["description"]
             mind.title = "%s from %spulse/%s" % (p_indicator["indicator"], PULSE_SERVER_BASE, str(self.pulse["id"]))
@@ -119,7 +114,5 @@ class StixExport:
             mind.add_observable(observable_)
             self.stix_package.add_indicator(mind)
 
-            
-	   
     def to_xml(self):
         return self.stix_package.to_xml()

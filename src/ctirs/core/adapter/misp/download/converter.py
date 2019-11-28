@@ -8,7 +8,7 @@ from cybox.objects.file_object import File
 from cybox.objects.uri_object import URI
 from cybox.objects.domain_name_object import DomainName
 from cybox.objects.address_object import Address
-from stix.core import STIXPackage ,STIXHeader
+from stix.core import STIXPackage, STIXHeader
 from stix.common import InformationSource, Identity
 from stix.indicator import Indicator
 from stix.data_marking import Marking, MarkingSpecification
@@ -16,6 +16,7 @@ from stix.extensions.marking.tlp import TLPMarkingStructure
 from cybox.objects.email_message_object import EmailMessage
 
 tz_utc = timezone('UTC')
+
 
 class Tag(object):
     TLP_RED = 'RED'
@@ -32,7 +33,7 @@ class Tag(object):
         self.user_id = -1
         self.tlp = None
 
-    def parse(self,tag):
+    def parse(self, tag):
         for child in tag:
             if child.tag == 'id':
                 self.id_ = int(child.text)
@@ -56,6 +57,7 @@ class Tag(object):
             elif child.tag == 'user_id':
                 self.user_id = int(child.text)
 
+
 class Attribute(object):
     def __init__(self):
         self.id_ = -1
@@ -76,7 +78,7 @@ class Attribute(object):
         self.value = ''
         self.ShadowAttribute = None
 
-    def parse(self,attribute):
+    def parse(self, attribute):
         for child in attribute:
             if child.tag == 'id':
                 self.id_ = int(child.text)
@@ -94,7 +96,7 @@ class Attribute(object):
                 self.distribution = child.text
             elif child.tag == 'timestamp':
                 self.timestamp = child.text
-                self.dt = datetime.datetime.fromtimestamp(int(self.timestamp),tz=tz_utc)
+                self.dt = datetime.datetime.fromtimestamp(int(self.timestamp), tz=tz_utc)
             elif child.tag == 'comment':
                 self.comment = child.text
             elif child.tag == 'sharing_group_id':
@@ -114,7 +116,7 @@ class Attribute(object):
         if self.deleted == 0:
             observable = self.get_observable()
             if observable is not None:
-                indicator = Indicator(title=str(self.id_),timestamp=self.dt,description=self.comment)
+                indicator = Indicator(title=str(self.id_), timestamp=self.dt, description=self.comment)
                 indicator.observable = self.get_observable()
             else:
                 indicator = None
@@ -136,7 +138,7 @@ class Attribute(object):
             o_ = File()
             o_.sha256 = self.value
         elif self.type_ == 'url':
-            o_ = URI(value=self.value,type_=URI.TYPE_URL)
+            o_ = URI(value=self.value, type_=URI.TYPE_URL)
         elif self.type_ == 'hostname':
             o_ = DomainName()
             o_.value = self.value
@@ -146,21 +148,22 @@ class Attribute(object):
             o_.value = self.value
             o_.type_ = 'domain'
         elif self.type_ == 'ip-dst':
-            o_ = Address(address_value=self.value,category=Address.CAT_IPV4)
+            o_ = Address(address_value=self.value, category=Address.CAT_IPV4)
             o_.is_destination = True
             o_.is_Source = False
         elif self.type_ == 'email-src':
-            o_ = Address(address_value=self.value,category=Address.CAT_EMAIL)
+            o_ = Address(address_value=self.value, category=Address.CAT_EMAIL)
         elif self.type_ == 'email-subject':
             o_ = EmailMessage()
             o_.subject = self.value
         else:
-            #print 'skip>>>>: type_: ' + str(self.type_)
+            # print 'skip>>>>: type_: ' + str(self.type_)
             o_ = None
         return o_
 
     def __str__(self):
         return 'id:' + str(self.id_) + ' / value:' + self.value
+
 
 class Org(object):
     def __init__(self):
@@ -168,7 +171,7 @@ class Org(object):
         self.name = ''
         self.uuid = ''
 
-    def parse(self,org):
+    def parse(self, org):
         for child in org:
             if child.tag == 'id':
                 self.id_ = int(child.text)
@@ -176,8 +179,10 @@ class Org(object):
                 self.name = child.text
             elif child.tag == 'uuid':
                 self.uuid = child.text
+
     def __str__(self):
         return 'id:' + str(self.id_) + ' / name:' + self.name
+
 
 class Event(object):
     def __init__(self):
@@ -201,19 +206,19 @@ class Event(object):
         self.orgcs = []
         self.tags = []
 
-    def get_data_from_list_by_id(self,list_,id_):
+    def get_data_from_list_by_id(self, list_, id_):
         for item in list_:
             if item.id_ == id_:
                 return item
         return None
 
-    def get_org(self,id_):
-        return self.get_data_from_list_by_id(self.orgs,id_)
+    def get_org(self, id_):
+        return self.get_data_from_list_by_id(self.orgs, id_)
 
-    def get_orgc(self,id_):
-        return self.get_data_from_list_by_id(self.orgcs,id_)
+    def get_orgc(self, id_):
+        return self.get_data_from_list_by_id(self.orgcs, id_)
 
-    def parse(self,event):
+    def parse(self, event):
         for child in event:
             if child.tag == 'id':
                 self.id_ = int(child.text)
@@ -235,7 +240,7 @@ class Event(object):
                 self.analysis = child.text
             elif child.tag == 'timestamp':
                 self.timestamp = child.text
-                self.dt = datetime.datetime.fromtimestamp(int(self.timestamp),tz=tz_utc)
+                self.dt = datetime.datetime.fromtimestamp(int(self.timestamp), tz=tz_utc)
             elif child.tag == 'distribution':
                 self.distribution = child.text
             elif child.tag == 'publish_timestamp':
@@ -263,62 +268,63 @@ class Event(object):
 
     def __str__(self):
         s = ''
-        s += ('%s: %d\n' % ('Event.id',self.id_))
-        s += ('%s: %s\n' % ('Event.info',self.info))
+        s += ('%s: %d\n' % ('Event.id', self.id_))
+        s += ('%s: %s\n' % ('Event.info', self.info))
         for attribute in self.attributes:
-            s += ('%s: %s\n' % ('Event.attribute',str(attribute)))
+            s += ('%s: %s\n' % ('Event.attribute', str(attribute)))
         return s
-    
+
+
 class MISP2STIXConverter(object):
     DEFAULT_IDENTITY_NAME = 'default_identity_name'
     DEFAULT_NS_URL = 'http://s-tip.fujitsu.com'
     DEFAULT_NS_NAME = 's-tip'
 
     def __init__(self,
-        identity_name=DEFAULT_IDENTITY_NAME,
-        ns_url=DEFAULT_NS_URL,
-        ns_name=DEFAULT_NS_NAME,
-        ):
+                 identity_name=DEFAULT_IDENTITY_NAME,
+                 ns_url=DEFAULT_NS_URL,
+                 ns_name=DEFAULT_NS_NAME,
+                 ):
         self.identity_name = identity_name
         self.events = []
 
-        ns_ctim_sns = Namespace(ns_url,ns_name,schema_location=None)
+        ns_ctim_sns = Namespace(ns_url, ns_name, schema_location=None)
         idgen.set_id_namespace(ns_ctim_sns)
         self.generator = idgen._get_generator()
 
-    def parse(self,xml_file_path=None,text=None):
-        self.events=[]
+    def parse(self, xml_file_path=None, text=None):
+        self.events = []
         if xml_file_path is not None:
             tree = ET.parse(xml_file_path)
             element = tree.getroot()
         elif text is not None:
             element = ET.fromstring(text)
         else:
-            #print 'no element data.'
+            # print 'no element data.'
             return None
-        
+
         for child in element:
             event = Event()
             event.parse(child)
             self.events.append(event)
-            
-    def get_misp_pacakge_id(self,stix_id_prefix,event):
-        return'%s:%s_%s-%s' % (self.DEFAULT_NS_NAME,'MISP_import',stix_id_prefix,event.uuid)
 
-    def convert(self,stix_id_prefix='',published_only=True,**kw_arg):
+    def get_misp_pacakge_id(self, stix_id_prefix, event):
+        return'%s:%s_%s-%s' % (self.DEFAULT_NS_NAME, 'MISP_import', stix_id_prefix, event.uuid)
+
+    def convert(self, stix_id_prefix='', published_only=True, **kw_arg):
         self.parse(**kw_arg)
-        
+
         stix_packages = []
         for event in self.events:
-            if published_only == True:
-                if event.published == False:
+            if published_only:
+                if not event.published:
                     continue
-            #id generator
-            package_id = self.get_misp_pacakge_id(stix_id_prefix,event)
-            stix_package = STIXPackage(timestamp=event.dt,id_=package_id)
+            # id generator
+            package_id = self.get_misp_pacakge_id(stix_id_prefix, event)
+            stix_package = STIXPackage(timestamp=event.dt, id_=package_id)
             stix_header = STIXHeader()
 
-            #set identity information
+            # set identity information
             identity = Identity(name=self.identity_name)
             information_source = InformationSource(identity=identity)
             stix_header.information_source = information_source
@@ -330,7 +336,7 @@ class MISP2STIXConverter(object):
                     break
 
             if tlp is not None:
-                #TLP for Generic format
+                # TLP for Generic format
                 tlp_marking_structure = TLPMarkingStructure()
                 tlp_marking_structure.color = tlp
                 marking_specification = MarkingSpecification()
@@ -340,7 +346,6 @@ class MISP2STIXConverter(object):
                 marking = Marking()
                 marking.add_marking(marking_specification)
                 stix_header.handling = marking
-
 
             stix_header.title = event.info
             stix_header.description = event.info

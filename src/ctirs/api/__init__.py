@@ -7,6 +7,8 @@ from ctirs.core.mongo.documents_stix import StixFiles
 # apikey認証
 # 認証されない場合はNoneを返却
 # 認証された場合はCtirsAuthUserを返却
+
+
 def authentication(request):
     username = _get_api_user(request)
     api_key = _get_api_api_key(request)
@@ -26,11 +28,14 @@ def authentication(request):
 # username=<username>
 # apkey=<apikey>
 # を格納する
+
+
 def _get_api_user(request):
     try:
         return request.META['HTTP_USERNAME']
     except KeyError:
         return None
+
 
 def _get_api_api_key(request):
     try:
@@ -56,7 +61,7 @@ class JsonResponse(HttpResponse):
     def __init__(self, data, encoder=None, safe=True, **kwargs):
         if safe and not isinstance(data, dict):
             raise TypeError('In order to allow non-dict objects to be '
-                'serialized set the safe parameter to False')
+                            'serialized set the safe parameter to False')
         kwargs.setdefault('content_type', 'application/json')
         data = json.dumps(data, cls=encoder)
         super(JsonResponse, self).__init__(content=data, **kwargs)

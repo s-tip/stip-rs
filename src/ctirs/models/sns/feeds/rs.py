@@ -1,228 +1,258 @@
+from ctirs.models.sns.config.models import SNSConfig
 import os
 from pytz import timezone
 import stip.common.const as const
-#InsecureReqeustWarningを非表示にする
+# InsecureReqeustWarningを非表示にする
 import requests
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
-from ctirs.models.sns.config.models import SNSConfig
 
-#CTIM-RSに登録する
-def regist_ctim_rs(api_user,package_name,stix_file_path):
-    with open(stix_file_path,'rb') as fp:
+# CTIM-RSに登録する
+
+
+def regist_ctim_rs(api_user, package_name, stix_file_path):
+    with open(stix_file_path, 'rb') as fp:
         files = {
-                    'stix':fp,
-                }
+            'stix': fp,
+        }
         headers = _get_ctirs_api_http_headers(api_user)
         payload = {
-                    'community_name' : SNSConfig.get_rs_community_name(),
-                    'package_name' : package_name,
-                }
+            'community_name': SNSConfig.get_rs_community_name(),
+            'package_name': package_name,
+        }
 
         requests.post(
             SNSConfig.get_rs_regist_stix_url(),
-            headers = headers,
-            files = files,
-            data = payload,
+            headers=headers,
+            files=files,
+            data=payload,
             verify=False)
     return
 
-#CTIM-RSからmatchingを取得する
-def get_matching_from_rs(api_user,id_):
-    url =  '%s' % (SNSConfig.get_rs_get_matching_url())
+# CTIM-RSからmatchingを取得する
+
+
+def get_matching_from_rs(api_user, id_):
+    url = '%s' % (SNSConfig.get_rs_get_matching_url())
     headers = _get_ctirs_api_http_headers(api_user)
     params = {
-        'package_id' :id_,
-        'exact' : True,
+        'package_id': id_,
+        'exact': True,
     }
     rsp = requests.get(
-            url,
-            headers = headers,
-            params = params,
-            verify=False)
+        url,
+        headers=headers,
+        params=params,
+        verify=False)
     return rsp.json()['data']
 
-#CTIM-RSのwebapi用のhttp header
+# CTIM-RSのwebapi用のhttp header
+
+
 def _get_ctirs_api_http_headers(api_user):
-    #username,api_key は api_userごとの値を使用する
+    # username,api_key は api_userごとの値を使用する
     return {
         'apikey': api_user.api_key,
         'username': api_user.username,
-        }
+    }
 
-#package_idからファイル名に変更
+# package_idからファイル名に変更
 #: がファイル名に使えないため -- に変更する
+
+
 def convert_package_id_to_filename(package_id):
-    return package_id.replace(':','--')
+    return package_id.replace(':', '--')
 
-#ファイル名からpacakge_idに変更
+# ファイル名からpacakge_idに変更
+
+
 def convert_filename_to_package_id(filename):
-    return filename.replace('--',':')
+    return filename.replace('--', ':')
 
-#package_id に該当するファイルが cache dir に存在する場合はそのファイルパスを
-#存在しない場合は RS から取得して cache_dir に格納してそのファイルパスを返却する
-def get_stix_file_path(api_user,package_id):
-    #cache のファイルパスを作成する
+# package_id に該当するファイルが cache dir に存在する場合はそのファイルパスを
+# 存在しない場合は RS から取得して cache_dir に格納してそのファイルパスを返却する
+
+
+def get_stix_file_path(api_user, package_id):
+    # cache のファイルパスを作成する
     file_name = convert_package_id_to_filename(package_id)
     #file_path = django_settings.STIX_CACHE_DIR + file_name
     file_path = const.STIX_CACHE_DIR + file_name
-    #cache に存在するかチェックする
+    # cache に存在するかチェックする
     if os.path.exists(file_path) == False:
-        #存在しない場合は RS から 取得してファイルキャッシュに格納する
-        content = get_content_from_rs(api_user,package_id)
+        # 存在しない場合は RS から 取得してファイルキャッシュに格納する
+        content = get_content_from_rs(api_user, package_id)
         try:
-            with open(file_path,'w') as fp:
+            with open(file_path, 'w') as fp:
                 fp.write(content)
-        except:
+        except BaseException:
             try:
-                #エラー時は削除する
+                # エラー時は削除する
                 os.remove(file_path)
-            except:
+            except BaseException:
                 pass
     return file_path
 
-#datetime 型から RS 引数フォーマットの日時文字列に変更する
-#例 : 2018-02-22 08:54:47.187184 
+# datetime 型から RS 引数フォーマットの日時文字列に変更する
+# 例 : 2018-02-22 08:54:47.187184
+
+
 def get_dtstr_from_datetime(dt):
     return dt.astimezone(timezone('UTC')).strftime('%Y-%m-%d %H:%M:%S.%f')
-    
+
 ########
-#SNS 用
-#投稿用 STIX リストを時間順に取得
-#def get_feeds_from_rs(api_user,start_time=None,last_feed_datetime=None,user_id=None):
+# SNS 用
+# 投稿用 STIX リストを時間順に取得
+# def get_feeds_from_rs(api_user,start_time=None,last_feed_datetime=None,user_id=None):
+
+
 def get_feeds_from_rs(
         api_user,
         start_time=None,
         last_feed_datetime=None,
         user_id=None,
-        range_small_datetime=None, #期間範囲指定の小さい方(古い方)。この時間を含む
-        range_big_datetime=None,   #期間範囲指定の大きい方(新しい方)。この時間を含む
+        range_small_datetime=None,  # 期間範囲指定の小さい方(古い方)。この時間を含む
+        range_big_datetime=None,  # 期間範囲指定の大きい方(新しい方)。この時間を含む
         index=0,
         size=-1):
-    #start_time は aware な datetime
-    url =  '%s' % (SNSConfig.get_rs_get_feeds_url())
+    # start_time は aware な datetime
+    url = '%s' % (SNSConfig.get_rs_get_feeds_url())
     headers = _get_ctirs_api_http_headers(api_user)
     params = {}
-    #start_time 指定があった場合は設定する
+    # start_time 指定があった場合は設定する
     if start_time is not None:
-        #2018-02-22 08:54:47.187184 のようなフォーマットをGMTでおくる
+        # 2018-02-22 08:54:47.187184 のようなフォーマットをGMTでおくる
         params['start_time'] = get_dtstr_from_datetime(start_time)
-    #last_feed_datetime 指定があった場合は設定する
+    # last_feed_datetime 指定があった場合は設定する
     if last_feed_datetime is not None:
-        #2018-02-22 08:54:47.187184 のようなフォーマットをGMTでおくる
+        # 2018-02-22 08:54:47.187184 のようなフォーマットをGMTでおくる
         params['last_feed'] = get_dtstr_from_datetime(last_feed_datetime)
-    #range_small_datetime 指定があった場合は設定する
+    # range_small_datetime 指定があった場合は設定する
     if range_small_datetime is not None:
-        #2018-02-22 08:54:47.187184 のようなフォーマットをGMTでおくる
+        # 2018-02-22 08:54:47.187184 のようなフォーマットをGMTでおくる
         params['range_small_datetime'] = get_dtstr_from_datetime(range_small_datetime)
-    #range_big_datetime 指定があった場合は設定する
+    # range_big_datetime 指定があった場合は設定する
     if range_big_datetime is not None:
-        #2018-02-22 08:54:47.187184 のようなフォーマットをGMTでおくる
+        # 2018-02-22 08:54:47.187184 のようなフォーマットをGMTでおくる
         params['range_big_datetime'] = get_dtstr_from_datetime(range_big_datetime)
 
-    #index, size 追加
+    # index, size 追加
     params['index'] = str(index)
     params['size'] = str(size)
-    #user_id 指定があった場合は設定する
+    # user_id 指定があった場合は設定する
     if user_id is not None:
         params['user_id'] = user_id
-    params['instance']= SNSConfig.get_sns_identity_name()
+    params['instance'] = SNSConfig.get_sns_identity_name()
     rsp = requests.get(
-            url,
-            headers = headers,
-            params = params,
-            verify=False)
+        url,
+        headers=headers,
+        params=params,
+        verify=False)
     return rsp.json()['feeds']
 
-#SNS 用
-#検索
+# SNS 用
+# 検索
+
+
 def query(
         api_user,
         query_string):
-    url =  '%s' % (SNSConfig.get_rs_query_url())
+    url = '%s' % (SNSConfig.get_rs_query_url())
     headers = _get_ctirs_api_http_headers(api_user)
     params = {}
-    #index, size 追加
+    # index, size 追加
     params['query_string'] = query_string
     rsp = requests.get(
-            url,
-            headers = headers,
-            params = params,
-            verify=False)
+        url,
+        headers=headers,
+        params=params,
+        verify=False)
     return rsp.json()['feeds']
 
-#投稿用 STIX を取得
-def get_content_from_rs(api_user,package_id):
-    #/api/v1/sns/content をコールし、 content のみを返却する
-    j = get_package_info_from_package_id(api_user,package_id)
+# 投稿用 STIX を取得
+
+
+def get_content_from_rs(api_user, package_id):
+    # /api/v1/sns/content をコールし、 content のみを返却する
+    j = get_package_info_from_package_id(api_user, package_id)
     return j['content']
 
-def get_package_info_from_package_id(api_user,package_id):
-    url =  '%s' % (SNSConfig.get_rs_get_content_url())
+
+def get_package_info_from_package_id(api_user, package_id):
+    url = '%s' % (SNSConfig.get_rs_get_content_url())
     params = {}
     params['package_id'] = package_id
     headers = _get_ctirs_api_http_headers(api_user)
     rsp = requests.get(
-            url,
-            headers = headers,
-            params = params,
-            verify=False)
+        url,
+        headers=headers,
+        params=params,
+        verify=False)
     return rsp.json()
 
-#関連 STIX (Like, Unlike, Comment) 取得
-def get_related_packages_from_rs(api_user,package_id):
-    url =  '%s' % (SNSConfig.get_rs_get_related_packages_url())
+# 関連 STIX (Like, Unlike, Comment) 取得
+
+
+def get_related_packages_from_rs(api_user, package_id):
+    url = '%s' % (SNSConfig.get_rs_get_related_packages_url())
     params = {}
     params['package_id'] = package_id
     headers = _get_ctirs_api_http_headers(api_user)
     rsp = requests.get(
-            url,
-            headers = headers,
-            params = params,
-            verify=False)
+        url,
+        headers=headers,
+        params=params,
+        verify=False)
     return rsp.json()
 
-#comments 取得
-def get_comment_from_rs(api_user,package_id):
-    url =  '%s' % (SNSConfig.get_rs_get_comments_url())
+# comments 取得
+
+
+def get_comment_from_rs(api_user, package_id):
+    url = '%s' % (SNSConfig.get_rs_get_comments_url())
     params = {}
     params['package_id'] = package_id
     headers = _get_ctirs_api_http_headers(api_user)
     rsp = requests.get(
-            url,
-            headers = headers,
-            params = params,
-            verify=False)
+        url,
+        headers=headers,
+        params=params,
+        verify=False)
     return rsp.json()
 
-#likers 取得
-def get_likers_from_rs(api_user,package_id):
-    url =  '%s' % (SNSConfig.get_rs_get_likers_url())
+# likers 取得
+
+
+def get_likers_from_rs(api_user, package_id):
+    url = '%s' % (SNSConfig.get_rs_get_likers_url())
     params = {}
     params['package_id'] = package_id
     headers = _get_ctirs_api_http_headers(api_user)
     rsp = requests.get(
-            url,
-            headers = headers,
-            params = params,
-            verify=False)
+        url,
+        headers=headers,
+        params=params,
+        verify=False)
     return rsp.json()
 
-#MISP 共有
-def share_misp(api_user,package_id):
-    url =  '%s' % (SNSConfig.get_rs_get_share_misp_url())
+# MISP 共有
+
+
+def share_misp(api_user, package_id):
+    url = '%s' % (SNSConfig.get_rs_get_share_misp_url())
     params = {}
     params['package_id'] = package_id
     headers = _get_ctirs_api_http_headers(api_user)
     rsp = requests.get(
-            url,
-            headers = headers,
-            params = params,
-            verify=False)
+        url,
+        headers=headers,
+        params=params,
+        verify=False)
     return rsp.json()
 
-def post_stix_v2_sightings(api_user,observed_data_id,first_seen,last_seen,count):
+
+def post_stix_v2_sightings(api_user, observed_data_id, first_seen, last_seen, count):
     data = {}
     headers = _get_ctirs_api_http_headers(api_user)
     if first_seen is not None:
@@ -231,12 +261,11 @@ def post_stix_v2_sightings(api_user,observed_data_id,first_seen,last_seen,count)
         data['last_seen'] = last_seen
     if count is not None:
         data['count'] = count
-    url_pattern =  '%s' % (SNSConfig.get_rs_post_stix_file_v2_sighting())
+    url_pattern = '%s' % (SNSConfig.get_rs_post_stix_file_v2_sighting())
     url = url_pattern % (observed_data_id)
     rsp = requests.post(
-            url,
-            headers=headers,
-            data=data,
-            verify=False)
+        url,
+        headers=headers,
+        data=data,
+        verify=False)
     return rsp.json()
-

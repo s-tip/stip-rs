@@ -29,6 +29,8 @@ def stix_files_package_id(request, package_id):
 
 # STIX ファイル情報取得
 # GET /api/v1/stix_files_package_id/<package_id>
+
+
 def get_stix_file_package_id_document_info(request, package_id):
     try:
         doc = StixFiles.objects.get(package_id=package_id)
@@ -38,6 +40,8 @@ def get_stix_file_package_id_document_info(request, package_id):
 
 # STIX ファイル情報削除
 # DELETE /api/v1/stix_files_package_id/<package_id>
+
+
 def delete_stix_file_package_id_document_info(package_id):
     try:
         api_root.delete_stix_document(package_id=package_id)
@@ -46,6 +50,8 @@ def delete_stix_file_package_id_document_info(package_id):
 
 # STIX ファイル取得
 # GET /api/v1/stix_files_package_id/<package_id>/stix
+
+
 def stix_files_package_id_stix(request, package_id):
     # apikey認証
     ctirs_auth_user = api_root.authentication(request)
@@ -59,6 +65,8 @@ def stix_files_package_id_stix(request, package_id):
 
 # 関連 CTI 取得
 # GET /api/v1/stix_files_package_id/<package_id>/related_packages
+
+
 def stix_files_package_id_related_packages(request, package_id):
     # apikey認証
     ctirs_auth_user = api_root.authentication(request)
