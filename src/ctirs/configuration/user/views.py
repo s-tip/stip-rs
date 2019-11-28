@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from ctirs.core.common import get_text_field_value, get_common_replace_dict
 from ctirs.error.views import error_page,error_page_no_view_permission, error_page_free_format, error_page_inactive
@@ -21,7 +20,7 @@ def get_configuration_user_create_user_is_admin(request):
     return get_configuration_user_check_value(request,'is_admin')
 
 def get_configuration_user_check_value(request,key):
-    if request.POST.has_key(key) == True:
+    if (key in request.POST) == True:
         if(request.POST[key] == 'on'):
             return True
     return False

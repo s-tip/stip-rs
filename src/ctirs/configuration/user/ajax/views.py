@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.http.response import JsonResponse
 from ctirs.core.common import get_text_field_value
 from django.views.decorators.csrf import csrf_protect
@@ -34,13 +33,13 @@ def change_auth(request):
     try:
         username =  get_configuration_user_ajax_change_auth_username(request)
         key = get_configuration_user_ajax_change_auth_key(request)
-        value  = True if get_configuration_user_ajax_change_auth_value(request) == u'true' else False
+        value  = True if get_configuration_user_ajax_change_auth_value(request) == 'true' else False
 
         u = STIPUser.objects.get(username = username)
         #keyに応じて属性の値を変更
-        if(key == u'is_active'):
+        if(key == 'is_active'):
             u.is_active = value
-        elif(key == u'is_admin'):
+        elif(key == 'is_admin'):
             u.is_admin = value
             u.is_superuser = value
         #変更を保存

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 import datetime
 import pytz
@@ -10,7 +9,7 @@ import libtaxii
 import libtaxii.clients as clients
 import libtaxii.messages_11 as tm11
 import libtaxii.constants as const
-from urlparse import urlparse
+from urllib.parse import urlparse
 #from xml.dom.minidom import parseString
 from ctirs.core.mongo.documents import TaxiiClients,Vias,ScheduleJobs
 from ctirs.core.schedule.schedule import CtirsScheduler
@@ -152,14 +151,14 @@ class Client(object):
             if schedule_job.status == ScheduleJobs.STATUS_STOP:
                 pass
             else:
-                print 'already working.'
+                print('already working.')
             return
         #schedule_jobと一緒(cron_jobリストにふくまれている)
         if schedule_job in self._jobs:
             if schedule_job.status == ScheduleJobs.STATUS_STOP:
                 pass
             else:
-                print 'already working.'
+                print('already working.')
                 return
         else:
             raise Exception('invalid job_id')
@@ -173,13 +172,13 @@ class Client(object):
             if schedule_job.status == ScheduleJobs.STATUS_IN_OPERATION:
                 pass
             else:
-                print 'not yet start.'
+                print('not yet start.')
             return
         if schedule_job in self._jobs:
             if schedule_job.status == ScheduleJobs.STATUS_IN_OPERATION:
                 pass
             else:
-                print 'not yet start.'
+                print('not yet start.')
                 return
         else:
             raise Exception('invalid job_id')
@@ -278,7 +277,7 @@ class Client(object):
         return count
     
     def debug_print(self,msg):
-        print msg
+        print(msg)
         
     #poll, push 共通 base_url 取得
     def get_taxii20_base_url(self):
@@ -313,7 +312,7 @@ class Client(object):
         self.debug_print('----')
         
         base_url = None
-        if j.has_key('default') == True:
+        if ('default' in j) == True:
             base_url = j['default']
         else:
             #default がない場合は url を使う

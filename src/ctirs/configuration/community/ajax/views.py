@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_protect
 from ctirs.core.common import get_text_field_value
@@ -35,7 +34,7 @@ def test_webhook(request):
         r = {'status': 'OK',
              'message' : 'Success.'}
     except Exception as e:
-        print 'Exception:' + str(e)
+        print('Exception:' + str(e))
         r = {'status': 'NG',
              'message' : str(e)}
     finally:

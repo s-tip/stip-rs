@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.utils.datastructures import MultiValueDictKeyError
 from ctirs.core.mongo.documents import TaxiiClients
 

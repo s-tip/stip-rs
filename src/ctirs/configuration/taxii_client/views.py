@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from ctirs.core.common import get_text_field_value, get_common_replace_dict
 from ctirs.error.views import error_page,error_page_no_view_permission, error_page_free_format, error_page_inactive
@@ -28,10 +27,10 @@ def get_taxii_client_create_login_password(request):
     return get_text_field_value(request,'login_password',default_value='')
 
 def get_taxii_client_create_ssl(request):
-    return request.POST.has_key('ssl')
+    return 'ssl' in request.POST
 
 def get_taxii_client_create_ca(request):
-    return request.POST.has_key('ca')
+    return 'ca' in request.POST
 
 def get_taxii_client_create_certificate(request):
     return get_text_field_value(request,'certificate',default_value=None)
@@ -46,7 +45,7 @@ def get_taxii_client_create_protocol_version(request):
     return get_text_field_value(request,'protocol_version',default_value='')
 
 def get_taxii_client_create_push(request):
-    return request.POST.has_key('push')
+    return 'push' in request.POST
 
 def get_taxii_client_create_uploader_id(request):
     return get_text_field_value(request,'uploader_id',default_value='')

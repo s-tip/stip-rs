@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 import json
 import requests
 from ctirs.models.rs.models import System
@@ -45,13 +44,13 @@ class MISPDownloader(object):
             proxies=proxies)
 
         if resp.status_code == 404:
-            print 'No events'
+            print('No events')
             return None
 
         if resp.status_code != 200:
-            print 'http_response_status is ' + str(resp.status_code)
-            print 'message :' + str(resp.text)
-            print 'Exit.'
+            print('http_response_status is ' + str(resp.status_code))
+            print('message :' + str(resp.text))
+            print('Exit.')
             return None
         return resp.text
 

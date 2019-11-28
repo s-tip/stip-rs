@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytz
 import datetime
 from mongoengine.errors import DoesNotExist

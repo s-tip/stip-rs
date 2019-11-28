@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from ctirs.configuration.taxii_server.views import restart_taxii_server

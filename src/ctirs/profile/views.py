@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from ctirs.core.common import get_text_field_value, get_common_replace_dict
 from ctirs.error.views import error_page, error_page_inactive

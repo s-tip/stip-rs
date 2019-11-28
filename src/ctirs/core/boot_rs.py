@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.apps import AppConfig
 from django.core.management import call_command
 from mongoengine import connect
@@ -12,8 +11,8 @@ class StipRsBoot(AppConfig):
 
         is_skip_sequnece = is_skip_sequence()
         if is_skip_sequnece == False:
-            print '>>> Start Auto Deploy'
-            print '>>> Start collcect static --noinput'
+            print('>>> Start Auto Deploy')
+            print('>>> Start collcect static --noinput')
             #collectstatic
             call_command('collectstatic','--noinput')
             
@@ -23,33 +22,33 @@ class StipRsBoot(AppConfig):
 
             #create_user_user は loaddata でデータ注入できると思われる
             stip_user_count = STIPUser.objects.count()
-            print '>>> users record count: ' + str(stip_user_count)
+            print('>>> users record count: ' + str(stip_user_count))
             if stip_user_count == 0:
-                print '>>> Start loaddata users'
+                print('>>> Start loaddata users')
                 call_command('loaddata','users')
-                print '>>> users record count: ' + str(STIPUser.objects.count())
+                print('>>> users record count: ' + str(STIPUser.objects.count()))
             else:
-                print '>>> Skip loaddata users'
+                print('>>> Skip loaddata users')
 
             #loaddata (mongo)
             mongo_config_count = MongoConfig.objects.count()
-            print '>>> mongo record count: ' + str(mongo_config_count)
+            print('>>> mongo record count: ' + str(mongo_config_count))
             if mongo_config_count == 0:
-                print '>>> Start loaddata mongo'
+                print('>>> Start loaddata mongo')
                 call_command('loaddata','mongo')
-                print '>>> mongo record count: ' + str(MongoConfig.objects.count())
+                print('>>> mongo record count: ' + str(MongoConfig.objects.count()))
             else:
-                print '>>> Skip loaddata mongo'
+                print('>>> Skip loaddata mongo')
 
             #loaddata (rs_system)
             system_count = System.objects.count()
-            print '>>> rs_system record count: ' + str(System.objects.count())
+            print('>>> rs_system record count: ' + str(System.objects.count()))
             if system_count == 0:
-                print '>>> Start loaddata rs_system'
+                print('>>> Start loaddata rs_system')
                 call_command('loaddata','rs_system')
-                print '>>> rs_system record count: ' + str(System.objects.count())
+                print('>>> rs_system record count: ' + str(System.objects.count()))
             else:
-                print '>>> Skip loaddata rs_system'
+                print('>>> Skip loaddata rs_system')
 
         #mongo を初期化する
         self.init_mongo()

@@ -120,7 +120,7 @@ class iSightAdapterControl(object):
             if schedule_job.status == ScheduleJobs.STATUS_STOP:
                 pass
             else:
-                print 'already working.'
+                print('already working.')
                 return
         else:
             raise Exception('invalid job_id')
@@ -143,7 +143,7 @@ class iSightAdapterControl(object):
             if schedule_job.status == ScheduleJobs.STATUS_IN_OPERATION:
                 pass
             else:
-                print 'not yet start.'
+                print('not yet start.')
                 return
         else:
             raise Exception('invalid job_id')
@@ -187,16 +187,16 @@ class iSightAdapterControl(object):
             
         headers = self._get_headers(query,accept=self.ACCEPT_JSON)
         resp = self._load_data(query,headers)
-        print resp.json()
+        print(resp.json())
         if resp.status_code != 200:
             return []
         else:
             j = resp.json()
             ret = []
-            if j[u'success'] != True:
+            if j['success'] != True:
                 return []
-            for message in j[u'message']:
-                ret.append(message[u'reportId'])
+            for message in j['message']:
+                ret.append(message['reportId'])
             return ret
     
     #API通信

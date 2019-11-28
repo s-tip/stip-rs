@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 import hmac
 import uuid
@@ -109,24 +108,24 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
         if self.screen_name is not None:
             if len(self.screen_name) != 0:
                 v = self.screen_name
-        if isinstance(v, unicode) == True:
+        if isinstance(v, str) == True:
             return v
         return v.decode('utf-8')
     
     def get_url(self):
         if self.url is None:
             return ''
-        url = self.url.encode('utf-8')
+        url = self.url
         if "http://" not in self.url and "https://" not in self.url and len(self.url) > 0:  # noqa: E501
             #url = "http://" + str(self.url)
             url = "http://" + self.url
         return url
 
     def get_picture_location(self,prefix):
-        return prefix.encode('utf-8') + u'/profile_pictures/' + self.username + u'.jpg'
+        return prefix + '/profile_pictures/' + self.username + '.jpg'
 
     def get_picture(self):
-        no_picture_url = u'/static/img/user.png'
+        no_picture_url = '/static/img/user.png'
         try:
             filename = self.get_picture_location(const.MEDIA_ROOT)
             picture_url = self.get_picture_location(const.MEDIA_URL)

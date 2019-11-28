@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 import sys
 import json
@@ -40,8 +39,8 @@ if __name__ == '__main__':
     # response 解析
     b = json.loads(r.text)
     if r.status_code != 200:
-        print 'Request Failed (%s).' % (r.status_code)
+        print('Request Failed (%s).' % (r.status_code))
         sys.exit(os.EX_UNAVAILABLE)
     else:
-        print 'Success!'
+        print('Success!')
         sys.exit(os.EX_OK)

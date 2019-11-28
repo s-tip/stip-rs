@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #import os
 from django.shortcuts import render, redirect
 from ctirs.core.common import get_text_field_value, get_common_replace_dict

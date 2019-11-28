@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import traceback
 from mongoengine import DoesNotExist
 from ctirs.core.adapter.otx.vendor.StixExport import StixExport
@@ -118,7 +117,7 @@ class OtxAdapterControl(object):
             if schedule_job.status == ScheduleJobs.STATUS_STOP:
                 pass
             else:
-                print 'already working.'
+                print('already working.')
                 return
         else:
             raise Exception('invalid job_id')
@@ -131,7 +130,7 @@ class OtxAdapterControl(object):
             if schedule_job.status == ScheduleJobs.STATUS_IN_OPERATION:
                 pass
             else:
-                print 'not yet start.'
+                print('not yet start.')
                 return
         else:
             raise Exception('invalid job_id')

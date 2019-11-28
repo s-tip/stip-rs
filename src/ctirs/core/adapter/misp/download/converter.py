@@ -160,7 +160,7 @@ class Attribute(object):
         return o_
 
     def __str__(self):
-        return 'id:' + str(self.id_) + ' / value:' + self.value.encode('utf-8')
+        return 'id:' + str(self.id_) + ' / value:' + self.value
 
 class Org(object):
     def __init__(self):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import tempfile
 import traceback
@@ -102,7 +101,7 @@ def is_exist_objects(selector,o_):
         return o_[index]
     else:
         #dict
-        if o_.has_key(selector) == False:
+        if (selector in o_) == False:
             return None
         else:
             return o_[selector]
@@ -123,10 +122,10 @@ def post_language_contents(request,object_ref,ctirs_auth_user):
         if object_ is None:
             return error(Exception('No document. (object_ref=%s)' % (object_ref)))
             
-        for language_content in j[u'language_contents']:
-            selector_str = language_content[u'selector']
-            content_value = language_content[u'content']
-            language = language_content[u'language']
+        for language_content in j['language_contents']:
+            selector_str = language_content['selector']
+            content_value = language_content['content']
+            language = language_content['language']
             try:
                 selector_elems = selector_str.split('.')
                 last_elem = object_
@@ -167,7 +166,7 @@ def post_language_contents(request,object_ref,ctirs_auth_user):
             language_content = LanguageContent(
                 created_by_ref=stip_identity,
                 object_ref=object_ref,
-                object_modified=object_[u'modified'],
+                object_modified=object_['modified'],
                 contents = contents
             )
             bundle.objects.append(language_content)
@@ -178,7 +177,7 @@ def post_language_contents(request,object_ref,ctirs_auth_user):
         #stixファイルを一時ファイルに出力
         stix_file_path = tempfile.mktemp(suffix='.json')
         with open(stix_file_path,'wb+') as fp:
-            fp.write(bundle.serialize(indent=4,ensure_ascii=False).encode('utf-8'))
+            fp.write(bundle.serialize(indent=4,ensure_ascii=False))
         #登録処理
         regist(stix_file_path,community,via)
         resp = get_normal_response_json()

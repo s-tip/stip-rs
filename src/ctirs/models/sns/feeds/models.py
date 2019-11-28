@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import bleach
 import datetime
 import pytz
 import os
 import base64
-import rs
+from . import rs
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -219,7 +217,7 @@ class Feed(models.Model):
             raise e
 
         #ファイル保存
-        file_path = attachment_stix_dir + os.sep + file_name.encode('utf-8')
+        file_path = attachment_stix_dir + os.sep + file_name
         with open(file_path,'w') as fp:
             fp.write(content)
         attach_file = AttachFile()
@@ -475,9 +473,9 @@ class Feed(models.Model):
     #rs の API の復帰値の json から Feedを取得する
     @staticmethod
     def get_feeds_from_package_from_rs(api_user,package_from_rs):
-        package_id = package_from_rs[u'package_id']
-        uploader_id = package_from_rs[u'uploader']
-        produced_str = package_from_rs[u'produced']
+        package_id = package_from_rs['package_id']
+        uploader_id = package_from_rs['uploader']
+        produced_str = package_from_rs['produced']
 
         try:
             #cache にあれば採用する

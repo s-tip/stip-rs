@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Django settings for cti_repository_system project.
 
@@ -172,7 +171,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 #HTTP 上で動作させるかどうかのフラグ
 ENV_DEV_OVER_HTTP_KEY  = 'DEV_OVER_HTTP'
 dev_over_http = False
-if os.environ.has_key(ENV_DEV_OVER_HTTP_KEY) == True:
+if (ENV_DEV_OVER_HTTP_KEY in os.environ) == True:
     if os.environ[ENV_DEV_OVER_HTTP_KEY] == 'True':
         dev_over_http = True
 #http で動作させないときは SESSION_COOKIE_SECURE を立てる

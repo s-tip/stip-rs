@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import tempfile
 from ctirs.core.stix.regist import regist
 

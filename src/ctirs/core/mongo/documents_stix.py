@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import stix2
 import json
 import pytz
@@ -231,45 +230,45 @@ class StixFiles(Document):
         try:
             f = open(self.origin_path,'r')
             j = json.load(f)
-            objects = j[u'objects']
+            objects = j['objects']
             for object_ in objects:
-                type_ = object_[u'type']
+                type_ = object_['type']
                 #Attack Pattern
-                if type_ == u'attack-pattern':
+                if type_ == 'attack-pattern':
                     StixAttackPatterns.create(object_,self)
-                elif type_ == u'campaign':
+                elif type_ == 'campaign':
                     StixCampaignsV2.create(object_,self)
-                elif type_ == u'course-of-action':
+                elif type_ == 'course-of-action':
                     StixCoursesOfActionV2.create(object_,self)
-                elif type_ == u'identity':
+                elif type_ == 'identity':
                     StixIdentities.create(object_,self)
-                elif type_ == u'indicator':
+                elif type_ == 'indicator':
                     StixIndicators.create_2_x(object_,self)
-                elif type_ == u'intrusion-set':
+                elif type_ == 'intrusion-set':
                     StixIntrusionSets.create(object_,self)
-                elif type_ == u'location':
+                elif type_ == 'location':
                     StixLocations.create(object_,self)
-                elif type_ == u'malware':
+                elif type_ == 'malware':
                     StixMalwares.create(object_,self)
-                elif type_ == u'note':
+                elif type_ == 'note':
                     StixNotes.create(object_,self)
-                elif type_ == u'observed-data':
+                elif type_ == 'observed-data':
                     StixObservables.create_2_x(object_,self)
-                elif type_ == u'opinion':
+                elif type_ == 'opinion':
                     StixOpinions.create(object_,self)
-                elif type_ == u'report':
+                elif type_ == 'report':
                     StixReports.create(object_,self)
-                elif type_ == u'threat-actor':
+                elif type_ == 'threat-actor':
                     StixThreatActorsV2.create(object_,self)
-                elif type_ == u'tool':
+                elif type_ == 'tool':
                     StixTools.create(object_,self)
-                elif type_ == u'vulnerability':
+                elif type_ == 'vulnerability':
                     StixVulnerabilities.create(object_,self)
-                elif type_ == u'relationship':
+                elif type_ == 'relationship':
                     StixRelationships.create(object_,self)
-                elif type_ == u'sighting':
+                elif type_ == 'sighting':
                     StixSightings.create(object_,self)
-                elif type_ == u'language-content':
+                elif type_ == 'language-content':
                     StixLanguageContents.create(object_,self)
                 else:
                     StixOthers.create(object_,self)
@@ -470,13 +469,13 @@ class IndicatorV2Caches(Document):
         if indicator is None:
             return
         document = IndicatorV2Caches()
-        if indicator.has_key('id') == True:
+        if ('id' in indicator) == True:
             document.indicator_id = indicator['id']
-        if indicator.has_key('name') == True:
+        if ('name' in indicator) == True:
             document.title = indicator['name']
-        if indicator.has_key('description') == True:
+        if ('description' in indicator) == True:
             document.description = indicator['description']
-        if indicator.has_key('pattern') == True:
+        if ('pattern' in indicator) == True:
             document.pattern = indicator['pattern']
         document.object_ = indicator
         document.stix_file = stix_file
@@ -529,29 +528,29 @@ class Stix2Base(Document):
 
     @classmethod
     def create(cls,document,object_,stix_file):
-        if object_.has_key('id') == True:
+        if ('id' in object_) == True:
             document.object_id_ = object_['id']
-        if object_.has_key('spec_version') == True:
+        if ('spec_version' in object_) == True:
             document.spec_version = object_['spec_version']
-        if object_.has_key('created_by_ref') == True:
+        if ('created_by_ref' in object_) == True:
             document.created_by_ref = object_['created_by_ref']
-        if object_.has_key('created') == True:
+        if ('created' in object_) == True:
             document.created = stix2_str_to_datetime(object_['created'])
-        if object_.has_key('modified') == True:
+        if ('modified' in object_) == True:
             document.modified = stix2_str_to_datetime(object_['modified'])
-        if object_.has_key('revoked') == True:
+        if ('revoked' in object_) == True:
             document.revoked = object_['revoked']
-        if object_.has_key('labels') == True:
+        if ('labels' in object_) == True:
             document.labels = Stix2Base.get_lists_or_string(object_['labels'])
-        if object_.has_key('confidence') == True:
+        if ('confidence' in object_) == True:
             document.confidence = object_['confidence']
-        if object_.has_key('lang') == True:
+        if ('lang' in object_) == True:
             document.lang = object_['lang']
-        if object_.has_key('external_references') == True:
+        if ('external_references' in object_) == True:
             document.external_references = Stix2Base.get_lists_or_string(object_['external_references'])
-        if object_.has_key('object_marking_refs') == True:
+        if ('object_marking_refs' in object_) == True:
             document.object_marking_refs = Stix2Base.get_lists_or_string(object_['object_marking_refs'])
-        if object_.has_key('granular_markings') == True:
+        if ('granular_markings' in object_) == True:
             document.granular_markings = Stix2Base.get_lists_or_string(object_['granular_markings'])
         document.object_ = object_
         document.stix_file = stix_file
@@ -576,11 +575,11 @@ class StixAttackPatterns(Stix2Base):
             return None
         document = StixAttackPatterns()
         document = super(StixAttackPatterns,cls).create(document,object_,stix_file)
-        if object_.has_key('name') == True:
+        if ('name' in object_) == True:
             document.name = object_['name']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
-        if object_.has_key('kill_chain_phases') == True:
+        if ('kill_chain_phases' in object_) == True:
             document.kill_chain_phases = Stix2Base.get_lists_or_string(object_['kill_chain_phases'])
         document.save()
         return document
@@ -605,17 +604,17 @@ class StixCampaignsV2(Stix2Base):
             return None
         document = StixCampaignsV2()
         document = super(StixCampaignsV2,cls).create(document,object_,stix_file)
-        if object_.has_key('name') == True:
+        if ('name' in object_) == True:
             document.name = object_['name']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
-        if object_.has_key('aliases') == True:
+        if ('aliases' in object_) == True:
             document.aliases = Stix2Base.get_lists_or_string(object_['aliases'])
-        if object_.has_key('first_seen') == True:
+        if ('first_seen' in object_) == True:
             document.first_seen = stix2_str_to_datetime(object_['first_seen'])
-        if object_.has_key('last_seen') == True:
+        if ('last_seen' in object_) == True:
             document.last_seen = stix2_str_to_datetime(object_['last_seen'])
-        if object_.has_key('objective') == True:
+        if ('objective' in object_) == True:
             document.objective = object_['objective']
         document.save()
         return document
@@ -638,9 +637,9 @@ class StixCoursesOfActionV2(Stix2Base):
             return None
         document = StixCoursesOfActionV2()
         document = super(StixCoursesOfActionV2,cls).create(document,object_,stix_file)
-        if object_.has_key('name') == True:
+        if ('name' in object_) == True:
             document.name = object_['name']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
         document.save()
         return document
@@ -664,15 +663,15 @@ class StixIdentities(Stix2Base):
             return None
         document = StixIdentities()
         document = super(StixIdentities,cls).create(document,object_,stix_file)
-        if object_.has_key('name') == True:
+        if ('name' in object_) == True:
             document.name = object_['name']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
-        if object_.has_key('identity_class') == True:
+        if ('identity_class' in object_) == True:
             document.identity_class = object_['identity_class']
-        if object_.has_key('contact_information') == True:
+        if ('contact_information' in object_) == True:
             document.contact_information = object_['contact_information']
-        if object_.has_key('sectors') == True:
+        if ('sectors' in object_) == True:
             document.sectors = Stix2Base.get_lists_or_string(object_['sectors'])
         document.save()
         return document
@@ -697,17 +696,17 @@ class StixIndicatorsV2(Stix2Base):
             return None
         document = StixIndicatorsV2()
         document = super(StixIndicatorsV2,cls).create(document,object_,stix_file)
-        if object_.has_key('name') == True:
+        if ('name' in object_) == True:
             document.name = object_['name']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
-        if object_.has_key('pattern') == True:
+        if ('pattern' in object_) == True:
             document.pattern = object_['pattern']
-        if object_.has_key('valid_from') == True:
+        if ('valid_from' in object_) == True:
             document.valid_from = stix2_str_to_datetime(object_['valid_from'])
-        if object_.has_key('valid_until') == True:
+        if ('valid_until' in object_) == True:
             document.valid_until = stix2_str_to_datetime(object_['valid_until'])
-        if object_.has_key('kill_chain_phases') == True:
+        if ('kill_chain_phases' in object_) == True:
             document.kill_chain_phases = Stix2Base.get_lists_or_string(object_['kill_chain_phases'])
         document.save()
         return document
@@ -735,23 +734,23 @@ class StixIntrusionSets(Stix2Base):
             return None
         document = StixIntrusionSets()
         document = super(StixIntrusionSets,cls).create(document,object_,stix_file)
-        if object_.has_key('name') == True:
+        if ('name' in object_) == True:
             document.name = object_['name']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
-        if object_.has_key('aliases') == True:
+        if ('aliases' in object_) == True:
             document.aliases = Stix2Base.get_lists_or_string(object_['aliases'])
-        if object_.has_key('first_seen') == True:
+        if ('first_seen' in object_) == True:
             document.first_seen = stix2_str_to_datetime(object_['first_seen'])
-        if object_.has_key('last_seen') == True:
+        if ('last_seen' in object_) == True:
             document.last_seen = stix2_str_to_datetime(object_['last_seen'])
-        if object_.has_key('goals') == True:
+        if ('goals' in object_) == True:
             document.goals = Stix2Base.get_lists_or_string(object_['goals'])
-        if object_.has_key('resource_level') == True:
+        if ('resource_level' in object_) == True:
             document.resource_level = object_['resource_level']
-        if object_.has_key('primary_motivation') == True:
+        if ('primary_motivation' in object_) == True:
             document.primary_motivation = object_['primary_motivation']
-        if object_.has_key('secondary_motivations') == True:
+        if ('secondary_motivations' in object_) == True:
             document.secondary_motivations = Stix2Base.get_lists_or_string(object_['secondary_motivations'])
         document.save()
         return document
@@ -780,25 +779,25 @@ class StixLocations(Stix2Base):
             return None
         document = StixLocations()
         document = super(StixLocations,cls).create(document,object_,stix_file)
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
-        if object_.has_key('latitude') == True:
+        if ('latitude' in object_) == True:
             document.latitude = float(object_['latitude'])
-        if object_.has_key('longitude') == True:
+        if ('longitude' in object_) == True:
             document.longitude = float(object_['longitude'])
-        if object_.has_key('precision') == True:
+        if ('precision' in object_) == True:
             document.precision = float(object_['precision'])
-        if object_.has_key('region') == True:
+        if ('region' in object_) == True:
             document.region = object_['region']
-        if object_.has_key('country') == True:
+        if ('country' in object_) == True:
             document.country = object_['country']
-        if object_.has_key('administrative_area') == True:
+        if ('administrative_area' in object_) == True:
             document.administrative_area = object_['administrative_area']
-        if object_.has_key('city') == True:
+        if ('city' in object_) == True:
             document.city = object_['city']
-        if object_.has_key('code') == True:
+        if ('code' in object_) == True:
             document.code = object_['code']
-        if object_.has_key('postal_code') == True:
+        if ('postal_code' in object_) == True:
             document.postal_code = object_['postal_code']
         document.save()
         return document
@@ -820,11 +819,11 @@ class StixMalwares(Stix2Base):
             return None
         document = StixMalwares()
         document = super(StixMalwares,cls).create(document,object_,stix_file)
-        if object_.has_key('name') == True:
+        if ('name' in object_) == True:
             document.name = object_['name']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
-        if object_.has_key('kill_chain_phases') == True:
+        if ('kill_chain_phases' in object_) == True:
             document.kill_chain_phases = Stix2Base.get_lists_or_string(object_['kill_chain_phases'])
         document.save()
         return document
@@ -847,13 +846,13 @@ class StixNotes(Stix2Base):
             return None
         document = StixNotes()
         document = super(StixNotes,cls).create(document,object_,stix_file)
-        if object_.has_key('abstract') == True:
+        if ('abstract' in object_) == True:
             document.abstract = object_['abstract']
-        if object_.has_key('content') == True:
+        if ('content' in object_) == True:
             document.content = object_['content']
-        if object_.has_key('authors') == True:
+        if ('authors' in object_) == True:
             document.authors = Stix2Base.get_lists_or_string(object_['authors'])
-        if object_.has_key('object_refs') == True:
+        if ('object_refs' in object_) == True:
             document.object_refs = Stix2Base.get_lists_or_string(object_['object_refs'])
         document.save()
         return document
@@ -876,13 +875,13 @@ class StixObservedData(Stix2Base):
             return None
         document = StixObservedData()
         document = super(StixObservedData,cls).create(document,object_,stix_file)
-        if object_.has_key('first_observed') == True:
+        if ('first_observed' in object_) == True:
             document.first_observed = stix2_str_to_datetime(object_['first_observed'])
-        if object_.has_key('last_observed') == True:
+        if ('last_observed' in object_) == True:
             document.last_observed = stix2_str_to_datetime(object_['last_observed'])
-        if object_.has_key('number_observed') == True:
+        if ('number_observed' in object_) == True:
             document.number_observed = object_['number_observed']
-        if object_.has_key('objects') == True:
+        if ('objects' in object_) == True:
             document.objects_ = object_['objects']
         document.save()
         return document
@@ -905,13 +904,13 @@ class StixOpinions(Stix2Base):
             return None
         document = StixOpinions()
         document = super(StixOpinions,cls).create(document,object_,stix_file)
-        if object_.has_key('explanation') == True:
+        if ('explanation' in object_) == True:
             document.explanation = object_['explanation']
-        if object_.has_key('authors') == True:
+        if ('authors' in object_) == True:
             document.authors = Stix2Base.get_lists_or_string(object_['authors'])
-        if object_.has_key('object_refs') == True:
+        if ('object_refs' in object_) == True:
             document.object_refs = Stix2Base.get_lists_or_string(object_['object_refs'])
-        if object_.has_key('opinion') == True:
+        if ('opinion' in object_) == True:
             document.opinion = object_['opinion']
         document.save()
         return document
@@ -934,13 +933,13 @@ class StixReports(Stix2Base):
             return None
         document = StixReports()
         document = super(StixReports,cls).create(document,object_,stix_file)
-        if object_.has_key('name') == True:
+        if ('name' in object_) == True:
             document.name = object_['name']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
-        if object_.has_key('published') == True:
+        if ('published' in object_) == True:
             document.published = stix2_str_to_datetime(object_['published'])
-        if object_.has_key('object_refs') == True:
+        if ('object_refs' in object_) == True:
             document.object_refs = Stix2Base.get_lists_or_string(object_['object_refs'])
         document.save()
         return document
@@ -969,25 +968,25 @@ class StixThreatActorsV2(Stix2Base):
             return None
         document = StixThreatActorsV2()
         document = super(StixThreatActorsV2,cls).create(document,object_,stix_file)
-        if object_.has_key('name') == True:
+        if ('name' in object_) == True:
             document.name = object_['name']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
-        if object_.has_key('aliases') == True:
+        if ('aliases' in object_) == True:
             document.aliases = Stix2Base.get_lists_or_string(object_['aliases'])
-        if object_.has_key('roles') == True:
+        if ('roles' in object_) == True:
             document.roles = Stix2Base.get_lists_or_string(object_['roles'])
-        if object_.has_key('goals') == True:
+        if ('goals' in object_) == True:
             document.goals = Stix2Base.get_lists_or_string(object_['goals'])
-        if object_.has_key('sophistication') == True:
+        if ('sophistication' in object_) == True:
             document.sophistication = object_['sophistication']
-        if object_.has_key('resource_level') == True:
+        if ('resource_level' in object_) == True:
             document.resource_level = object_['resource_level']
-        if object_.has_key('primary_motivation') == True:
+        if ('primary_motivation' in object_) == True:
             document.primary_motivation = object_['primary_motivation']
-        if object_.has_key('secondary_motivations') == True:
+        if ('secondary_motivations' in object_) == True:
             document.secondary_motivations = Stix2Base.get_lists_or_string(object_['secondary_motivations'])
-        if object_.has_key('personal_motivations') == True:
+        if ('personal_motivations' in object_) == True:
             document.personal_motivations = Stix2Base.get_lists_or_string(object_['personal_motivations'])
         document.save()
         return document
@@ -1010,13 +1009,13 @@ class StixTools(Stix2Base):
             return None
         document = StixTools()
         document = super(StixTools,cls).create(document,object_,stix_file)
-        if object_.has_key('name') == True:
+        if ('name' in object_) == True:
             document.name = object_['name']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
-        if object_.has_key('kill_chain_phases') == True:
+        if ('kill_chain_phases' in object_) == True:
             document.kill_chain_phases = Stix2Base.get_lists_or_string(object_['kill_chain_phases'])
-        if object_.has_key('tool_version') == True:
+        if ('tool_version' in object_) == True:
             document.tool_version = object_['tool_version']
         document.save()
         return document
@@ -1041,17 +1040,17 @@ class StixVulnerabilities(Stix2Base):
             return None
         document = StixVulnerabilities()
         document = super(StixVulnerabilities,cls).create(document,object_,stix_file)
-        if object_.has_key('name') == True:
+        if ('name' in object_) == True:
             document.name = object_['name']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
         #external_references の中から CVE 情報を抽出
-        if object_.has_key('external_references') == True:
+        if ('external_references' in object_) == True:
             cves = []
             for external_reference in object_['external_references']:
-                if external_reference.has_key('source_name'):
-                    if external_reference['source_name'] == u'cve':
-                        if external_reference.has_key('external_id') == True:
+                if 'source_name' in external_reference:
+                    if external_reference['source_name'] == 'cve':
+                        if ('external_id' in external_reference) == True:
                             cves.append(external_reference['external_id'])
             document.cves = cves
         document.save()
@@ -1077,13 +1076,13 @@ class StixRelationships(Stix2Base):
             return None
         document = StixRelationships()
         document = super(StixRelationships,cls).create(document,object_,stix_file)
-        if object_.has_key('relationship_type') == True:
+        if ('relationship_type' in object_) == True:
             document.relationship_type = object_['relationship_type']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
-        if object_.has_key('source_ref') == True:
+        if ('source_ref' in object_) == True:
             document.source_ref = object_['source_ref']
-        if object_.has_key('target_ref') == True:
+        if ('target_ref' in object_) == True:
             document.target_ref = object_['target_ref']
         document.save()
         return document
@@ -1129,7 +1128,7 @@ class StixSightings(Stix2Base):
                     created_by_ref = sighting_identity,
                     sighting_of_ref=observed_data_id)
             #指定の obserbed_data_id から observable-data,最新の一つを取得する
-            observed_data_document = StixObservedData.objects.filter(object_id_=observed_data_id).order_by('modified').limit(1).next()
+            observed_data_document = next(StixObservedData.objects.filter(object_id_=observed_data_id).order_by('modified').limit(1))
             observed_data = stix2.parse(json.dumps(observed_data_document.object_))
             
             #observed_data に created_by_ref があれば追加する
@@ -1137,7 +1136,7 @@ class StixSightings(Stix2Base):
             if hasattr(observed_data,'created_by_ref'):
                 try:
                     #最新の一つを取得する
-                    identity_document = StixIdentities.objects.filter(identity_id=observed_data.created_by_ref).order_by('modified').limit(1).next()
+                    identity_document = next(StixIdentities.objects.filter(identity_id=observed_data.created_by_ref).order_by('modified').limit(1))
                     observed_data_identity = stix2.parse(json.dumps(identity_document.object_))
                 except:
                     #identity が見つからない場合はパスする　
@@ -1174,19 +1173,19 @@ class StixSightings(Stix2Base):
             return None
         document = StixSightings()
         document = super(StixSightings,cls).create(document,object_,stix_file)
-        if object_.has_key('first_seen') == True:
+        if ('first_seen' in object_) == True:
             document.first_seen = object_['first_seen']
-        if object_.has_key('last_seen') == True:
+        if ('last_seen' in object_) == True:
             document.last_seen = object_['last_seen']
-        if object_.has_key('count') == True:
+        if ('count' in object_) == True:
             document.count = object_['count']
-        if object_.has_key('summary') == True:
+        if ('summary' in object_) == True:
             document.summary = object_['summary']
-        if object_.has_key('sighting_of_ref') == True:
+        if ('sighting_of_ref' in object_) == True:
             document.sighting_of_ref = object_['sighting_of_ref']
-        if object_.has_key('where_sighted_refs') == True:
+        if ('where_sighted_refs' in object_) == True:
             document.where_sighted_refs = object_['where_sighted_refs']
-        if object_.has_key('observed_data_refs') == True:
+        if ('observed_data_refs' in object_) == True:
             document.observed_data_refs = object_['observed_data_refs']
         document.save()
         return document
@@ -1206,11 +1205,11 @@ class StixLanguageContents(Stix2Base):
             return None
         document = StixLanguageContents()
         document = super(StixLanguageContents,cls).create(document,object_,stix_file)
-        if object_.has_key('object_ref') == True:
+        if ('object_ref' in object_) == True:
             document.object_ref = object_['object_ref']
-        if object_.has_key('object_modified') == True:
+        if ('object_modified' in object_) == True:
             document.object_modified = stix2_str_to_datetime(object_['object_modified'])
-        if object_.has_key('contents') == True:
+        if ('contents' in object_) == True:
             document.contents = object_['contents']
         document.save()
         return document
@@ -1228,9 +1227,9 @@ class StixOthers(Stix2Base):
             return None
         document = StixOthers()
         document = super(StixOthers,cls).create(document,object_,stix_file)
-        if object_.has_key('name') == True:
+        if ('name' in object_) == True:
             document.name = object_['name']
-        if object_.has_key('description') == True:
+        if ('description' in object_) == True:
             document.description = object_['description']
         document.save()
         return document
@@ -1276,19 +1275,19 @@ class StixIndicators(Document):
     def create_2_x(cls,indicator,stix_file):
         v2_indicator = StixIndicatorsV2.create(indicator,stix_file)
         document = StixIndicators()
-        if indicator.has_key('id') == True:
+        if ('id' in indicator) == True:
             document.indicator_id = indicator['id']
-        if indicator.has_key('name') == True:
+        if ('name' in indicator) == True:
             document.title = indicator['name']
-        if indicator.has_key('description') == True:
+        if ('description' in indicator) == True:
             document.description = indicator['description']
-        if indicator.has_key('created') == True:
+        if ('created' in indicator) == True:
             try:
                 d = stix2_str_to_datetime(indicator['created'])
                 document.created = d
             except:
                 None
-        if indicator.has_key('modified') == True:
+        if ('modified' in indicator) == True:
             try:
                 d = stix2_str_to_datetime(indicator['modified'])
                 document.modified = d
@@ -1299,7 +1298,7 @@ class StixIndicators(Document):
         document.v2_indicator = v2_indicator
         document.save()
         #IndicatorCaches作成
-        IndicatorV2Caches.create(indicator,stix_file,indicator[u'id'])
+        IndicatorV2Caches.create(indicator,stix_file,indicator['id'])
         return
     
 #StixObservables
@@ -1342,20 +1341,20 @@ class StixObservables(Document):
     def create_2_x(cls,observable,stix_file):
         v2_observed_data = StixObservedData.create(observable,stix_file)
         document = StixObservables()
-        if observable.has_key('id') == True:
+        if ('id' in observable) == True:
             document.observable_id = observable['id']
             #document.v2_observable_id = observable['id']
             #STIX 2.x の observed-data には title, descriptionがないので id をいれる
             document.title = observable['id']
             document.description = observable['id']
         document.object_ = observable
-        if observable.has_key('created') == True:
+        if ('created' in observable) == True:
             try:
                 d = stix2_str_to_datetime(observable['created'])
                 document.created = d
             except:
                 None
-        if observable.has_key('modified') == True:
+        if ('modified' in observable) == True:
             try:
                 d = stix2_str_to_datetime(observable['modified'])
                 document.modified = d
@@ -1610,7 +1609,7 @@ class ExploitTargetCaches(Document):
         #cves の要素だけ cache 作成する
         for cve in stix_vulnerability.cves:
             #node_id = u'%s-%s' % (stix_vulnerability.vulnerability_id,cve)
-            node_id = u'%s-%s' % (stix_vulnerability.object_id_,cve)
+            node_id = '%s-%s' % (stix_vulnerability.object_id_,cve)
             document = ExploitTargetCaches()
             document.type = 'cve_id'
             document.et_id = node_id
@@ -1684,19 +1683,19 @@ class ObservableCaches(Document):
     def create_2_x(cls,observable,stix_file,node_id):
         if observable is None:
             return
-        for object_key, object_value in observable['objects'].iteritems():
+        for object_key, object_value in observable['objects'].items():
             #種別ごとにチェック
             object_type = object_value['type']
             if object_type == 'file':
-                if object_value.has_key('hashes') == True:
+                if ('hashes' in object_value) == True:
                     hashes = object_value['hashes']
-                    if hashes.has_key('MD5') == True:
+                    if ('MD5' in hashes) == True:
                         ObservableCaches.create_2_x_per_data(observable,object_value,stix_file,node_id,object_key,'md5',hashes['MD5'])
-                    if hashes.has_key('SHA-1') == True:
+                    if ('SHA-1' in hashes) == True:
                         ObservableCaches.create_2_x_per_data(observable,object_value,stix_file,node_id,object_key,'sha1',hashes['SHA-1'])
-                    if hashes.has_key('SHA-256') == True:
+                    if ('SHA-256' in hashes) == True:
                         ObservableCaches.create_2_x_per_data(observable,object_value,stix_file,node_id,object_key,'sha256',hashes['SHA-256'])
-                    if hashes.has_key('SHA-512') == True:
+                    if ('SHA-512' in hashes) == True:
                         ObservableCaches.create_2_x_per_data(observable,object_value,stix_file,node_id,object_key,'sha512',hashes['SHA-512'])
             elif object_type == 'ipv4-addr':
                 ObservableCaches.create_2_x_per_data(observable,object_value,stix_file,node_id,object_key,'ipv4',object_value['value'])
@@ -1716,7 +1715,7 @@ class ObservableCaches(Document):
         document = ObservableCaches()
         #1 つの Observed-Data に複数の object が入ることがある
         #個々の object_node_id の命名規約は {node_id}_{object_key}
-        object_node_id = u'%s_%s' % (node_id,object_key)
+        object_node_id = '%s_%s' % (node_id,object_key)
         document.observable_id = node_id
         #title は node_id と object_key の連結
         document.title = object_node_id
@@ -1774,17 +1773,17 @@ class ObservableCaches(Document):
                         document.type = 'sha512'
                         document.value = str(properties.sha512)
                     else:
-                        print 'File else'
+                        print('File else')
                         return
                     #値が None の場合は対象外
                     if document.value is None:
-                        print 'Hashvalue is None'
+                        print('Hashvalue is None')
                         return
                 elif isinstance(properties,DomainName) == True:
                     document.type = 'domain_name'
                     document.value = properties.value.value
                     if document.value is None:
-                        print 'Domain is None'
+                        print('Domain is None')
                         return
                     #ドメイン名を分割して保存
                     rs_system = System.objects.get()
@@ -1803,27 +1802,27 @@ class ObservableCaches(Document):
                         document.type = 'uri'
                         document.value = properties.value.value
                     else:
-                        print 'URI else'
+                        print('URI else')
                         return
                     #値が None の場合は対象外
                     if document.value is None:
-                        print 'URI is None'
+                        print('URI is None')
                         return
                     #値が list の場合は対象外
                     if isinstance(document.value,list) == True:
-                        print 'URI is list'
+                        print('URI is list')
                         return
                 elif isinstance(properties,Address) == True:
                     #Address Objectから取得する
                     type_,value = cls.create_address_object(properties)
                     if type_ is None:
-                        print 'Address else'
+                        print('Address else')
                         return
                     document.type = type_
                     document.value = value
                     #値が None の場合は対象外
                     if document.value is None:
-                        print 'Address is None'
+                        print('Address is None')
                         return
                     #ipアドレスを分割して保存
                     if type_ == 'ipv4':
@@ -1837,7 +1836,7 @@ class ObservableCaches(Document):
                     document.value = properties.name.value
                     #値が None の場合は対象外
                     if document.value is None:
-                        print 'Mutex is None'
+                        print('Mutex is None')
                         return
                 elif isinstance(properties,NetworkConnection) == True:
                     socket = properties.destination_socket_address
@@ -1846,7 +1845,7 @@ class ObservableCaches(Document):
                     document.value = value
                     #値が None の場合は対象外
                     if document.value is None:
-                        print 'IPAddress is None'
+                        print('IPAddress is None')
                         return
                     #ipアドレスを分割して保存
                     if type_ == 'ipv4':
@@ -1901,7 +1900,7 @@ class ObservableCaches(Document):
             type_ = 'email'
             value = address.address_value.value
         else:
-            print 'Address else'
+            print('Address else')
         return (type_,value)
 
     @classmethod
@@ -1973,7 +1972,7 @@ for stix_file in StixFiles.objects.all():
     if stix_file.post is None:
         if package_bean is None:
             package_bean = get_package_bean(stix_file.origin_path)
-        stix_file.post = package_bean.description.encode('utf-8')
+        stix_file.post = package_bean.description
         stix_file.save()
     #sns_user_name が未定義
     if len(stix_file.sns_user_name) == 0:

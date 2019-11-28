@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import mongoengine
 from subprocess import Popen
 from django.shortcuts import render

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.http.response import JsonResponse
 from django.contrib.auth.decorators import login_required
 

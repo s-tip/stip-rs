@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import datetime
 import pytz
 from mongoengine import DoesNotExist
@@ -84,7 +83,7 @@ def modify(request):
         url = get_adapter_misp_modify_url(request)
         apikey = get_adapter_misp_modify_apikey(request)
         stix_id_prefix = get_adapter_misp_modify_stix_id_prefix(request)
-        print 'stix_id_prefix'
+        print('stix_id_prefix')
         identity = get_adapter_misp_modify_identity(request)
         community_id = get_adapter_misp_modify_community_id(request)
         uploader_id = int(get_adapter_misp_modify_uploader_id(request))

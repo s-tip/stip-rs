@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import tempfile
 from django.shortcuts import render
 from django.utils.datastructures import MultiValueDictKeyError

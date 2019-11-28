@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 from pytz import timezone
 import stip.common.const as const
@@ -49,7 +48,7 @@ def _get_ctirs_api_http_headers(api_user):
     #username,api_key は api_userごとの値を使用する
     return {
         'apikey': api_user.api_key,
-        'username': api_user.username.encode('utf-8'),
+        'username': api_user.username,
         }
 
 #package_idからファイル名に変更
@@ -74,7 +73,7 @@ def get_stix_file_path(api_user,package_id):
         content = get_content_from_rs(api_user,package_id)
         try:
             with open(file_path,'w') as fp:
-                fp.write(content.encode('utf-8'))
+                fp.write(content)
         except:
             try:
                 #エラー時は削除する

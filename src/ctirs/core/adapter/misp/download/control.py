@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import traceback
 from mongoengine import DoesNotExist
 from ctirs.core.mongo.documents import MispAdapter,Vias,ScheduleJobs
@@ -86,7 +85,7 @@ class MispAdapterDownloadControl(object):
             text = md.get(from_dt=from_dt,to_dt=to_dt)
             if text is None:
                 return 0
-            stix_packages = self.mc.convert(text=text.encode('utf-8'),published_only=published_only,stix_id_prefix=stix_id_prefix)
+            stix_packages = self.mc.convert(text=text,published_only=published_only,stix_id_prefix=stix_id_prefix)
         except Exception as e:
             traceback.print_exc()
             raise e
@@ -117,7 +116,7 @@ class MispAdapterDownloadControl(object):
     def _get_misp_stix_job(self):
         misp = MispAdapter.objects.get()
         start_time_dt = misp.last_requested
-        print start_time_dt
+        print(start_time_dt)
         self.get_misp_stix(from_dt=start_time_dt)
     
     #add job
@@ -142,7 +141,7 @@ class MispAdapterDownloadControl(object):
             if schedule_job.status == ScheduleJobs.STATUS_STOP:
                 pass
             else:
-                print 'already working.'
+                print('already working.')
                 return
         else:
             raise Exception('invalid job_id')
@@ -155,7 +154,7 @@ class MispAdapterDownloadControl(object):
             if schedule_job.status == ScheduleJobs.STATUS_IN_OPERATION:
                 pass
             else:
-                print 'not yet start.'
+                print('not yet start.')
                 return
         else:
             raise Exception('invalid job_id')

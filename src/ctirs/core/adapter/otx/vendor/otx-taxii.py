@@ -1,7 +1,7 @@
-from StixExport import StixExport
-from OTXv2 import OTXv2
-from taxii_client import Client
-import ConfigParser
+from .StixExport import StixExport
+from .OTXv2 import OTXv2
+from .taxii_client import Client
+import configparser
 import datetime
 import sys
 
@@ -18,7 +18,7 @@ def saveTimestamp(mtimestamp=None):
         return mtimestamp
 
     except:
-        print 'Unable to find/open %s' % OTX_FILE
+        print('Unable to find/open %s' % OTX_FILE)
 
 
 def readTimestamp():
@@ -28,12 +28,12 @@ def readTimestamp():
         return mtimestamp
 
     except:
-        print "No %s found:\n\tIt appears 'otx-taxii.py first_run' has not been run" % OTX_FILE
+        print("No %s found:\n\tIt appears 'otx-taxii.py first_run' has not been run" % OTX_FILE)
 
 
 def sendTAXII(first=True):
 
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read('config.cfg')
     otx = OTXv2(config.get('otx', 'key'))
 
@@ -53,17 +53,17 @@ def sendTAXII(first=True):
                 mtimestamp = pulse["modified"]
             st = StixExport(pulse)
             st.build()
-            print "Sending %s" % pulse["name"]
+            print("Sending %s" % pulse["name"])
 
             if not client.snd_post('inbox', st.to_xml()):
-                print '######---[ Unable to Send Post ]---######'
+                print('######---[ Unable to Send Post ]---######')
 
         saveTimestamp(mtimestamp)
-        print "%d new pulses" % len(pulses)
+        print("%d new pulses" % len(pulses))
 
 
 def usage():
-    print "Usage:\n\totx-taxii.py [first_run|check_new]"
+    print("Usage:\n\totx-taxii.py [first_run|check_new]")
     sys.exit(0)
 
 

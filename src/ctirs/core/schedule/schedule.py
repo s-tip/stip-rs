@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from ctirs.core.mongo.documents import ScheduleJobs
 from apscheduler.schedulers.background import BackgroundScheduler
 

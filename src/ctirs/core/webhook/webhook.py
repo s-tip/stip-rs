@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import traceback
 import requests
@@ -36,5 +35,5 @@ def webhook_post(webhook,webhook_json):
         headers={'Content-Type': 'application/json'},
         verify=False)
     if rsp.status_code != 200:
-        print 'Can\'t send webhook(%s)' % (webhook.url)
+        print('Can\'t send webhook(%s)' % (webhook.url))
     return

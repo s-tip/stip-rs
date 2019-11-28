@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
 import traceback
-import StringIO
+import io
 from ctirs.core.common import get_common_replace_dict
 from django.shortcuts import render
 
 #tracebackよりメッセージを取得し返却
 def get_error_msg():
     #error情報取得
-    err_io = StringIO.StringIO()
+    err_io = io.StringIO()
     traceback.print_exc(None,err_io)
     err_msg = err_io.getvalue()
     err_io.close()

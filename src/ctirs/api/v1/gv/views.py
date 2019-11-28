@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 import json
 import traceback
@@ -18,7 +17,7 @@ StixCampaigns, StixIncidents, StixIndicators, StixObservables,StixThreatActors, 
 StixExploitTargets, StixCoursesOfAction, StixTTPs, ExploitTargetCaches ,IndicatorV2Caches, StixLanguageContents
 from stip.common.tld import TLD
 from mongoengine import DoesNotExist
-from stix2_indicator import _get_observed_data
+from .stix2_indicator import _get_observed_data
 from ctirs.models.rs.models import System
 
 #EDGE 文字列
@@ -35,7 +34,7 @@ SIMILARTY_8_EDGE_TYPE = 'Similarity: 8'
 #共通
 #REST API から boolean の値を取得する
 def get_boolean_value(d,key,default_value):
-    if d.has_key(key) == False:
+    if (key in d) == False:
         return default_value
     v = d[key]
     if default_value == True:
@@ -182,7 +181,7 @@ def package_list(request):
             return error(Exception('You have no permission for this operation.'))
 
         required_comment = False
-        if request.GET.has_key(REQUIRED_COMMENT_KEY) == True:
+        if (REQUIRED_COMMENT_KEY in request.GET) == True:
             if request.GET[REQUIRED_COMMENT_KEY].lower() == 'true':
                 required_comment = True
                 
@@ -190,7 +189,7 @@ def package_list(request):
         stix_files = StixFiles.objects.filter()
         #order_by指定があればソートする
         #それ以外に場合はpackage_nameを辞書順でソートする
-        if request.GET.has_key(ORDER_BY_KEY) == True:
+        if (ORDER_BY_KEY in request.GET) == True:
             try:
                 stix_files = stix_files.order_by(request.GET[ORDER_BY_KEY])
             except:
@@ -524,7 +523,7 @@ def get_matched_packages(package_id,exact=True,similar_ipv4=False,similar_domain
         for info in infos:
             key = info.package_id
             package_id_list.append(key)
-            if exact_dict.has_key(key) == False:
+            if (key in exact_dict) == False:
                 exact_dict[key] = 1
             else:
                 exact_dict[key] += 1
@@ -536,7 +535,7 @@ def get_matched_packages(package_id,exact=True,similar_ipv4=False,similar_domain
             cache = info['cache']
             key = cache.package_id
             package_id_list.append(key)
-            if similar_ipv4_dict.has_key(key) == False:
+            if (key in similar_ipv4_dict) == False:
                 similar_ipv4_dict[key] = 1
             else:
                 similar_ipv4_dict[key] += 1
@@ -548,7 +547,7 @@ def get_matched_packages(package_id,exact=True,similar_ipv4=False,similar_domain
             cache = info['cache']
             key = cache.package_id
             package_id_list.append(key)
-            if similar_domain_dict.has_key(key) == False:
+            if (key in similar_domain_dict) == False:
                 similar_domain_dict[key] = 1
             else:
                 similar_domain_dict[key] += 1
@@ -563,11 +562,11 @@ def get_matched_packages(package_id,exact=True,similar_ipv4=False,similar_domain
         d['package_id'] = p_id 
         d['package_name'] = StixFiles.objects.get(package_id = p_id).package_name
         if exact == True:
-            d['exact'] = 0 if exact_dict.has_key(p_id)== False else exact_dict[p_id]
+            d['exact'] = 0 if (p_id in exact_dict)== False else exact_dict[p_id]
         if ((similar_ipv4 == True) or (similar_domain == True)):
             s_dict = {
-                'ipv4' : 0 if similar_ipv4_dict.has_key(p_id)== False else similar_ipv4_dict[p_id],
-                'domain': 0 if similar_domain_dict.has_key(p_id)== False else similar_domain_dict[p_id]}
+                'ipv4' : 0 if (p_id in similar_ipv4_dict)== False else similar_ipv4_dict[p_id],
+                'domain': 0 if (p_id in similar_domain_dict)== False else similar_domain_dict[p_id]}
             d['similar'] = s_dict
         ret.append(d)
     return ret
@@ -895,7 +894,7 @@ def stix_file_comment(request,package_id):
         user = authentication(request)
         if user is None:
             return error(Exception('You have no permission for this operation.'))
-        if request.GET.has_key('comment') == False:
+        if ('comment' in request.GET) == False:
             return error(Exception('No input comment.'))
         comment = request.GET['comment']
         #検索してコメント保存
@@ -1055,7 +1054,7 @@ def count_by_community(community,latest_days):
     date_count = {}
     for item in objects:
         date_string = item.produced.strftime('%Y-%m-%d')
-        if date_count.has_key(date_string) == True:
+        if (date_string in date_count) == True:
             date_count[date_string] += 1
         else:
             date_count[date_string] = 1
@@ -1067,7 +1066,7 @@ def count_by_community(community,latest_days):
         past_day = _get_past_day(today,i)
         #1日幅で指定のコミュニティの件数をカウントする
         date_string = past_day.strftime('%Y-%m-%d')
-        if date_count.has_key(date_string) == True:
+        if (date_string in date_count) == True:
             num = date_count[date_string]
         else:
             num = 0

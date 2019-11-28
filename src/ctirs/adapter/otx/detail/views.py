@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from ctirs.core.common import get_text_field_value, get_common_replace_dict
@@ -56,7 +55,7 @@ def interval(request):
         return error_page_no_view_permission(request)
     try:
         interval = get_adapter_otx_detail_interval_interval(request)
-        print interval
+        print(interval)
         #schedular からジョブを削除
         otx.remove_interval_job()
         #mongo 格納の設定からジョブを削除

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-import urlparse
+import urllib.parse
 from pymisp.api import PyMISP
 from pymisp.tools.stix import load_stix
 from stix.core.stix_package import STIXPackage
@@ -19,8 +18,8 @@ class MispUploadAdapterControl(object):
     def __init__(self):
         misp_conf = MispAdapter.get()
         url = misp_conf.url
-        scheme = urlparse.urlparse(url).scheme
-        host = urlparse.urlparse(url).hostname
+        scheme = urllib.parse.urlparse(url).scheme
+        host = urllib.parse.urlparse(url).hostname
         url = '%s://%s/%s' % (scheme,host,'events')
         self.py_misp = PyMISP(url=url,key=misp_conf.apikey,ssl=False,proxies=System.get_request_proxies())
         return
@@ -34,7 +33,7 @@ class MispUploadAdapterControl(object):
         if tag is not None:
             misp_event.add_tag(tag)
         resp = self.py_misp.add_event(misp_event)
-        if resp.has_key('Event') == True:
+        if ('Event' in resp) == True:
             return resp
         else:
             raise Exception(str(resp['errors']))

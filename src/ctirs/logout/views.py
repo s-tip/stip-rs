@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import django.contrib.auth
 from django.http.response import HttpResponseRedirect
 

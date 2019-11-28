@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import login_required
 from django.http.response import JsonResponse
 from ctirs.core.mongo.documents import  Communities
@@ -27,7 +26,7 @@ def get_stix_counts(request):
         labels = []
         datasets = []
         #値を降順ソート
-        list_=  sorted(count_by_community.items(),key=lambda x:x[1],reverse=True)
+        list_=  sorted(list(count_by_community.items()),key=lambda x:x[1],reverse=True)
         #キーと値をそれぞれリスト格納
         for l in list_:
             k,v = l

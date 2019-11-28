@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from ctirs.core.common import get_common_replace_dict
 

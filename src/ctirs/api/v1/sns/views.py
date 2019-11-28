@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytz
 import datetime
 from mongoengine.errors import DoesNotExist
@@ -114,7 +113,7 @@ def get_feeds_content(request):
 #user_id の 引数を返却 (longで)
 def get_feeds_user_id(request):
     try:
-        return long(request.GET['user_id'])
+        return int(request.GET['user_id'])
     except KeyError:
         return None 
     except ValueError:
@@ -303,7 +302,7 @@ def attaches(request):
         #引数取得
         package_id = get_attaches_package_id(request)
         if package_id is None:
-            print '/api/v1/sns/attaches package_id is None.'
+            print('/api/v1/sns/attaches package_id is None.')
             return HttpResponseNotFound()
         try:
             stix_file = StixFiles.objects.get(package_id=package_id)
@@ -311,7 +310,7 @@ def attaches(request):
             return JsonResponse(d,safe=False)
         except DoesNotExist:
             #該当レコードがなかった
-            print '/api/v1/sns/attaches DoesNotExist (%s)' % (str(package_id))
+            print('/api/v1/sns/attaches DoesNotExist (%s)' % (str(package_id)))
             return HttpResponseNotFound()
     except Exception as e:
         import traceback
@@ -328,7 +327,7 @@ def related_packages(request):
         #引数取得
         original_package_id = get_comments_original_package_id(request)
         if original_package_id is None:
-            print '/api/v1/sns/related_packages package_id is None.'
+            print('/api/v1/sns/related_packages package_id is None.')
             return HttpResponseNotFound()
         l = []
         #original_package_id を related_packages リスト要素に含む stix_fileを返却
@@ -350,7 +349,7 @@ def content(request):
         #引数取得
         package_id = get_content_original_package_id(request)
         if package_id is None:
-            print '/api/v1/sns/content package_id is None.'
+            print('/api/v1/sns/content package_id is None.')
             return HttpResponseNotFound()
         stix_file = StixFiles.objects.get(package_id=package_id)
         return JsonResponse(get_return_dictionary_from_stix_file_document(stix_file,content=True),safe=False)
@@ -369,7 +368,7 @@ def comments(request):
         #引数取得
         original_package_id = get_comments_original_package_id(request)
         if original_package_id is None:
-            print '/api/v1/sns/comments package_id is None.'
+            print('/api/v1/sns/comments package_id is None.')
             return HttpResponseNotFound()
         l = []
         #original_package_id を related_packages リスト要素に含み sns_type が comment の stix_fileを返却
@@ -391,14 +390,14 @@ def likers(request):
         #引数取得
         original_package_id = get_comments_original_package_id(request)
         if original_package_id is None:
-            print '/api/v1/sns/likers package_id is None.'
+            print('/api/v1/sns/likers package_id is None.')
             return HttpResponseNotFound()
         liker_dict = {}
         #original_package_id を related_packages リスト要素に含む stix_fileを返却
         for stix_file in StixFiles.objects(Q(related_packages=original_package_id) & Q(sns_type=StixFiles.STIP_SNS_TYPE_LIKE)):
             liker = stix_file.get_unique_name()
             if liker is not None:
-                if liker_dict.has_key(liker):
+                if liker in liker_dict:
                     liker_dict[liker] += 1
                 else:
                     liker_dict[liker] = 1
@@ -407,12 +406,12 @@ def likers(request):
         for stix_file in StixFiles.objects(Q(related_packages=original_package_id) & Q(sns_type=StixFiles.STIP_SNS_TYPE_UNLIKE)):
             unliker = stix_file.get_unique_name()
             if unliker is not None:
-                if liker_dict.has_key(unliker):
+                if unliker in liker_dict:
                     liker_dict[unliker] -= 1
                 else:
                     liker_dict[unliker] = -1
         likers = []
-        for liker,value in liker_dict.iteritems():
+        for liker,value in liker_dict.items():
             if value == 1:
                 likers.append(liker)
         return JsonResponse(likers,safe=False)
@@ -432,14 +431,14 @@ def share_misp(request):
         package_id = get_package_id_from_get_argument(request)
         mc = MispUploadAdapterControl()
         j = mc.upload_misp(package_id)
-        event_id = j[u'Event'][u'id']
+        event_id = j['Event']['id']
         misp_conf = MispAdapter.get()
         tmp_url = misp_conf.url
         if tmp_url[-1] != '/':
             tmp_url += '/'
         url = '%sevents/view/%s' % (tmp_url,event_id)
         r = {}
-        r[u'url'] = url
+        r['url'] = url
         return JsonResponse(r,safe=False)
     except Exception as e:
         import traceback

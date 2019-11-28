@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*- 
 import datetime
 import pytz
 import json
@@ -93,7 +92,7 @@ def check_http_accept(request,expect_content_type=HTTP_ACCEPT_CONTENT_TYPE,expec
 #HTTP_AUTHORIZATION チェック
 def check_common_authorization(request):
     #credential check
-    if request.META.has_key('HTTP_AUTHORIZATION') != True:
+    if ('HTTP_AUTHORIZATION' in request.META) != True:
         debug_print ('>>> no HTTP_AUTHORIZATION')
         r = HttpResponse(content_type=RESPONSE_COMMON_CONTENT_TYPE_TAXII_JSON)
         r['WWW-Authenticate'] = 'Basic realm="taxii", type=1, title="Login to \"apps\"", Basic realm="simple"'
@@ -111,7 +110,7 @@ def check_common_authorization(request):
     return None
 
 def debug_print(msg):
-    print msg
+    print(msg)
 
 #/taxii/
 @csrf_exempt
@@ -126,9 +125,9 @@ def top_taxii(request):
         return r
 
     #Accept check
-    debug_print('>>>request.META.has_key(HTTP_ACCEPT):' + str(request.META.has_key('HTTP_ACCEPT')))
-    if request.META.has_key('HTTP_ACCEPT') == False:
-        print '>>>no HTTP_ACCEPT'
+    debug_print('>>>request.META.has_key(HTTP_ACCEPT):' + str('HTTP_ACCEPT' in request.META))
+    if ('HTTP_ACCEPT' in request.META) == False:
+        print('>>>no HTTP_ACCEPT')
         data = get_no_accept_json_data('No Accept')
         r = JsonResponse(data,safe=False,content_type=RESPONSE_COMMON_CONTENT_TYPE_TAXII_JSON)
         r.status_code = 406
@@ -170,9 +169,9 @@ def top(request):
         return r
 
     #Accept check
-    debug_print('>>>request.META.has_key(HTTP_ACCEPT):' + str(request.META.has_key('HTTP_ACCEPT')))
-    if request.META.has_key('HTTP_ACCEPT') == False:
-        print '>>>no HTTP_ACCEPT'
+    debug_print('>>>request.META.has_key(HTTP_ACCEPT):' + str('HTTP_ACCEPT' in request.META))
+    if ('HTTP_ACCEPT' in request.META) == False:
+        print('>>>no HTTP_ACCEPT')
         data = get_no_accept_json_data('No Accept')
         r = JsonResponse(data,safe=False,content_type=RESPONSE_COMMON_CONTENT_TYPE_TAXII_JSON)
         r.status_code = 406
@@ -218,7 +217,7 @@ def collections_root(request):
         return r
 
     #Accept check
-    if request.META.has_key('HTTP_ACCEPT') == False:
+    if ('HTTP_ACCEPT' in request.META) == False:
         debug_print('>>>No HTTP_ACCEPT.')
         data = get_no_accept_json_data('No Accept')
         r = JsonResponse(data,safe=False,content_type=RESPONSE_CONTENT_TYPE_STIX_JSON)
@@ -291,7 +290,7 @@ def collections(request,id_):
         return r
 
     #Accept check
-    if request.META.has_key('HTTP_ACCEPT') == False:
+    if ('HTTP_ACCEPT' in request.META) == False:
         debug_print('>>>No HTTP_ACCEPT.')
         data = get_no_accept_json_data('No Accept')
         r = JsonResponse(data,safe=False,content_type=RESPONSE_CONTENT_TYPE_STIX_JSON)
@@ -379,7 +378,7 @@ def collections_objects(request,id_):
             r.status_code = 406
             return r
         #Accept check
-        if request.META.has_key('HTTP_ACCEPT') == False:
+        if ('HTTP_ACCEPT' in request.META) == False:
             debug_print('>>>No HTTP_ACCEPT.')
             data = get_no_accept_json_data('No Accept')
             r = JsonResponse(data,safe=False,content_type=RESPONSE_CONTENT_TYPE_STIX_JSON)
@@ -413,7 +412,7 @@ def collections_objects(request,id_):
             return r
 
         #Accept check
-        if request.META.has_key('HTTP_ACCEPT') == False:
+        if ('HTTP_ACCEPT' in request.META) == False:
             debug_print('>>>No HTTP_ACCEPT.')
             data = get_no_accept_json_data('No Accept')
             r = JsonResponse(data,safe=False,content_type=RESPONSE_CONTENT_TYPE_STIX_JSON)
@@ -494,16 +493,16 @@ def post_write_collection(content):
     _,stix_file_path = tempfile.mkstemp(suffix='.json')
     with open(stix_file_path,'wb+') as fp:
         fp.write(content)
-    print '>>>stix_file_path: ' + str(stix_file_path)
+    print('>>>stix_file_path: ' + str(stix_file_path))
 
     #RSに登録
     try:
         from ctirs.core.stix.regist import regist
         if _community is not None:
             regist(stix_file_path,_community,_via)
-        print '>>>regist success:'
-        print '>>>regist _community: ' + str(_community)
-        print '>>>regist _via: ' + str(_via)
+        print('>>>regist success:')
+        print('>>>regist _community: ' + str(_community))
+        print('>>>regist _via: ' + str(_via))
     except Exception as e:
         traceback.print_exc()
         raise e

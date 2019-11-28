@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 import json
 import codecs
@@ -287,7 +286,7 @@ def get_package_bean(stix_file_path):
                 package_bean.package_name = d['name']
                 produced_str = d['created']
         package_bean.package_id = doc['id']
-        if doc.has_key('spec_version') == True:
+        if ('spec_version' in doc) == True:
             package_bean.version = doc['spec_version']
         else:
             #STIX 2.1 には spec_version がない

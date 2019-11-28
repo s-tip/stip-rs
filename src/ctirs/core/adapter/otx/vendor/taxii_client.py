@@ -1,6 +1,6 @@
 
 import sys
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import libtaxii
 import libtaxii.clients as tc
 import libtaxii.messages_11 as tm11
@@ -93,16 +93,16 @@ class Client:
         except ValueError as err:
             msg = "CRITICAL: ValueError_Post: %s" % err
 
-        except urllib2.HTTPError as err:
+        except urllib.error.HTTPError as err:
             msg = "CRITICAL: urllib2.HTTPError: %s , %s, " % err
 
-        except urllib2.URLError as err:
+        except urllib.error.URLError as err:
             msg = "CRITICAL: urllib2.URLError: %s" % err
 
         except:
             msg = "UNKNOWN: %s :: \r \-> Response %s" % (str(sys.exc_info()[0]), None)
 
-        print '%s | %s | %s' % (sys._getframe(), 'except', msg)
+        print('%s | %s | %s' % (sys._getframe(), 'except', msg))
 
     def from_dict(self, d):
         if isinstance(d, dict):
@@ -154,7 +154,7 @@ class Client:
             #self._gen_client()
 
         else:
-            print 'parameter passed: not dict() type'
+            print('parameter passed: not dict() type')
 
     def push(self, xml, bind, collection_names, uri):
         # ### backward support of original script

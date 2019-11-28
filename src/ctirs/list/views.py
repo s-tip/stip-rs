@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 import traceback
 from django.shortcuts import render
