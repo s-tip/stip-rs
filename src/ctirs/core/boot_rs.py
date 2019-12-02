@@ -31,7 +31,7 @@ class StipRsBoot(AppConfig):
             else:
                 print('>>> Skip loaddata users')
 
-            #loaddata (mongo)
+            # loaddata (mongo)
             mongo_config_count = MongoConfig.objects.count()
             print('>>> mongo record count: ' + str(mongo_config_count))
             if mongo_config_count == 0:
@@ -41,7 +41,7 @@ class StipRsBoot(AppConfig):
             else:
                 print('>>> Skip loaddata mongo')
 
-            #loaddata (rs_system)
+            # loaddata (rs_system)
             system_count = System.objects.count()
             print('>>> rs_system record count: ' + str(System.objects.count()))
             if system_count == 0:

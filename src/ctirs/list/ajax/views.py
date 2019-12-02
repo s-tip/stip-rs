@@ -52,11 +52,11 @@ def get_table_info(request):
     # 検索する
     objects = StixFiles.objects \
         .filter(
-            Q(package_name__icontains=sSearch) |
-            Q(package_id__icontains=sSearch) |
-            Q(version__icontains=sSearch) |
-            Q(input_community__in=s_input_communities) |
-            Q(via__in=s_vias)
+            Q(package_name__icontains=sSearch)
+            | Q(package_id__icontains=sSearch)
+            | Q(version__icontains=sSearch)
+            | Q(input_community__in=s_input_communities)
+            | Q(via__in=s_vias)
         )\
         .order_by(order_query)
 

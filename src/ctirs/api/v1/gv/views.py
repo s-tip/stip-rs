@@ -35,12 +35,12 @@ SIMILARTY_8_EDGE_TYPE = 'Similarity: 8'
 # 共通
 # REST API から boolean の値を取得する
 def get_boolean_value(d, key, default_value):
-    if (key in d) == False:
+    if key not in d:
         return default_value
     v = d[key]
     if default_value:
         return False if v.lower() == 'false' else True
-    elif default_value == False:
+    elif not default_value:
         return True if v.lower() == 'true' else False
     return None
 
@@ -64,7 +64,7 @@ def l1_info_for_l1table(request):
         sSearch = request.GET['sSearch']
         # ソートする列
         sort_col = int(request.GET['iSortCol'])
-        #ソート順番 (desc指定で降順)
+        # ソート順番 (desc指定で降順)
         sort_dir = request.GET['sSortDir']
         # alias情報
         # 存在しない場合は空としてあつかつ
@@ -274,9 +274,9 @@ def _get_exact_matched_info(package_id):
             if cache.value is None:
                 continue
             exacts = cache_collection.objects.filter(
-                Q(type__exact=cache.type) &
-                Q(value__exact=cache.value) &
-                Q(package_id__ne=package_id))
+                Q(type__exact=cache.type)
+                & Q(value__exact=cache.value)
+                & Q(package_id__ne=package_id))
             ret_observable_cashes.extend(exacts)
 
             # ObservableCaches の検索の場合はさらに その Observable が STIX v2 の indicator pattern 文字列にヒットするか判定する
@@ -312,8 +312,8 @@ def _get_exact_matched_info(package_id):
 
         # 自分以外の PackageID で STIX2 indicator pattern を検索する
         exacts = IndicatorV2Caches.objects.filter(
-            Q(pattern__exact=indicator_v2_cache.pattern) &
-            Q(package_id__ne=package_id))
+            Q(pattern__exact=indicator_v2_cache.pattern)
+            & Q(package_id__ne=package_id))
         for exact in exacts:
             exact.cache_list = IndicatorV2Caches
             # start_node の検索先は ObservableCaches or ExploitTargetCaches
@@ -381,10 +381,10 @@ def _get_similar_ipv4(package_id):
         # ipv4 で 第3オクテットまで同一で,第4オクテットが異なり
         # 検索 package_idと異なる Observable Cache を検索
         similar_ipv4_observable_caches = ObservableCaches.objects.filter(
-            Q(type__exact=CACHE_TYPE) &
-            Q(ipv4_1_3__exact=ipv4_1_3) &
-            Q(ipv4_4__ne=ipv4_4) &
-            Q(package_id__ne=package_id)
+            Q(type__exact=CACHE_TYPE)
+            & Q(ipv4_1_3__exact=ipv4_1_3)
+            & Q(ipv4_4__ne=ipv4_4)
+            & Q(package_id__ne=package_id)
         )
         for info in similar_ipv4_observable_caches:
             v = {
@@ -414,10 +414,10 @@ def _get_similar_domain(package_id):
         # かつ、 TLD の直前のサーバー名(domain_last)が同じ
         # 検索 package_idと異なる Observable Cache を検索
         similar_domain_observable_caches = ObservableCaches.objects.filter(
-            Q(type__exact=CACHE_TYPE) &
-            Q(domain_tld=domain_tld) &
-            Q(domain_last=domain_last) &
-            Q(package_id__ne=package_id)
+            Q(type__exact=CACHE_TYPE)
+            & Q(domain_tld=domain_tld)
+            & Q(domain_last=domain_last)
+            & Q(package_id__ne=package_id)
         )
         for end_cache in similar_domain_observable_caches:
             edge_type = _get_domain_similarity_type(start_cache, end_cache)
@@ -435,9 +435,9 @@ def _get_similar_domain(package_id):
 def _get_domain_similarity_type(start_cache, end_cache):
     try:
         score_cache = SimilarScoreCache.objects.get(
-            Q(type=SimilarScoreCache.DOMAIN_SCORE_CACHE_TYPE) &
-            Q(start_cache=start_cache) &
-            Q(end_cache=end_cache)
+            Q(type=SimilarScoreCache.DOMAIN_SCORE_CACHE_TYPE)
+            & Q(start_cache=start_cache)
+            & Q(end_cache=end_cache)
         )
         return score_cache.edge_type
     except DoesNotExist:
@@ -487,9 +487,9 @@ def _get_domain_similarity_type(start_cache, end_cache):
 def _get_ipv4_similarity_type(start_cache, end_cache):
     try:
         score_cache = SimilarScoreCache.objects.get(
-            Q(type=SimilarScoreCache.IPV4_SCORE_CACHE_TYPE) &
-            Q(start_cache=start_cache) &
-            Q(end_cache=end_cache)
+            Q(type=SimilarScoreCache.IPV4_SCORE_CACHE_TYPE)
+            & Q(start_cache=start_cache)
+            & Q(end_cache=end_cache)
         )
         return score_cache.edge_type
     except DoesNotExist:
@@ -536,7 +536,7 @@ def get_matched_packages(package_id, exact=True, similar_ipv4=False, similar_dom
         for info in infos:
             key = info.package_id
             package_id_list.append(key)
-            if (key in exact_dict) == False:
+            if key not in exact_dict:
                 exact_dict[key] = 1
             else:
                 exact_dict[key] += 1
@@ -548,7 +548,7 @@ def get_matched_packages(package_id, exact=True, similar_ipv4=False, similar_dom
             cache = info['cache']
             key = cache.package_id
             package_id_list.append(key)
-            if (key in similar_ipv4_dict) == False:
+            if key not in similar_ipv4_dict:
                 similar_ipv4_dict[key] = 1
             else:
                 similar_ipv4_dict[key] += 1
@@ -560,7 +560,7 @@ def get_matched_packages(package_id, exact=True, similar_ipv4=False, similar_dom
             cache = info['cache']
             key = cache.package_id
             package_id_list.append(key)
-            if (key in similar_domain_dict) == False:
+            if key not in similar_domain_dict:
                 similar_domain_dict[key] = 1
             else:
                 similar_domain_dict[key] += 1
@@ -575,11 +575,11 @@ def get_matched_packages(package_id, exact=True, similar_ipv4=False, similar_dom
         d['package_id'] = p_id
         d['package_name'] = StixFiles.objects.get(package_id=p_id).package_name
         if exact:
-            d['exact'] = 0 if (p_id in exact_dict) == False else exact_dict[p_id]
+            d['exact'] = 0 if (p_id in exact_dict) is False else exact_dict[p_id]
         if ((similar_ipv4) or (similar_domain)):
             s_dict = {
-                'ipv4': 0 if (p_id in similar_ipv4_dict) == False else similar_ipv4_dict[p_id],
-                'domain': 0 if (p_id in similar_domain_dict) == False else similar_domain_dict[p_id]}
+                'ipv4': 0 if (p_id in similar_ipv4_dict) is False else similar_ipv4_dict[p_id],
+                'domain': 0 if (p_id in similar_domain_dict) is False else similar_domain_dict[p_id]}
             d['similar'] = s_dict
         ret.append(d)
     return ret
@@ -794,7 +794,7 @@ def package_list_for_sharing_table(request):
         sSearch = request.GET['sSearch']
         # ソートする列
         sort_col = int(request.GET['iSortCol'])
-        #ソート順番 (desc指定で降順)
+        # ソート順番 (desc指定で降順)
         sort_dir = request.GET['sSortDir']
 
         order_query = None
@@ -814,8 +814,8 @@ def package_list_for_sharing_table(request):
         community_objects = Communities.objects.filter(name__icontains=sSearch)
         # 検索
         objects = StixFiles.objects.filter(
-            Q(package_name__icontains=sSearch) |
-            Q(input_community__in=community_objects)) \
+            Q(package_name__icontains=sSearch)
+            | Q(input_community__in=community_objects)) \
             .order_by(order_query)
         objects = objects.filter(Q(is_post_sns__ne=False))
 
@@ -910,7 +910,7 @@ def stix_file_comment(request, package_id):
         user = authentication(request)
         if user is None:
             return error(Exception('You have no permission for this operation.'))
-        if ('comment' in request.GET) == False:
+        if 'comment' not in request.GET:
             return error(Exception('No input comment.'))
         comment = request.GET['comment']
         # 検索してコメント保存
@@ -1069,8 +1069,8 @@ def count_by_community(community, latest_days):
     today = datetime.datetime.now(pytz.utc)
     past_day = _get_past_day(today, latest_days - 1)
     objects = StixFiles.objects.filter(
-        Q(input_community=community) &
-        Q(produced__gte=past_day))
+        Q(input_community=community)
+        & Q(produced__gte=past_day))
 
     # 取得した document を日付ごとにカウント
     date_count = {}
@@ -1155,8 +1155,8 @@ def language_contents(request):
         object_ref = request.GET['object_ref']
         object_modified = request.GET['object_modified']
         objects = StixLanguageContents.objects.filter(
-            Q(object_ref=object_ref) &
-            Q(object_modified=object_modified)).order_by('-modified')
+            Q(object_ref=object_ref)
+            & Q(object_modified=object_modified)).order_by('-modified')
         language_contents = []
         for o_ in objects:
             language_contents.append(o_.object_)

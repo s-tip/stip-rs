@@ -174,7 +174,7 @@ class SNSConfig(models.Model):
             rs_host = SNSConfig.DEFAULT_RS_HOST
         else:
             rs_host = sns_config.rs_host
-        #最後が / なら除去
+        # 最後が / なら除去
         if rs_host.endswith('/'):
             return rs_host[:-1]
         return rs_host

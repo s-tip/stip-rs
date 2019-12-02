@@ -56,7 +56,7 @@ def get_feeds_start_time(request):
 # GET /api/v1/sns/feeds
 # last_feed の 引数を返却
 def get_feeds_last_feed(request):
-    #last_feed : この時間より新しいフィードを取得する
+    # last_feed : この時間より新しいフィードを取得する
     try:
         last_feed_str = request.GET['last_feed']
     except KeyError:
@@ -278,9 +278,9 @@ def feeds(request):
             stip_user = STIPUser.objects.get(id=user_id)
             QQ &= (
                 # SNS 産 STIX なら instance 名とユーザ名が一致した
-                (Q(is_created_by_sns=True) & Q(sns_user_name=stip_user.username) & Q(sns_instance=instance)) |
+                (Q(is_created_by_sns=True) & Q(sns_user_name=stip_user.username) & Q(sns_instance=instance))
                 # SNS 産以外の STIX なら ユーザ名が一致した
-                (Q(is_created_by_sns__ne=True) & Q(sns_user_name=stip_user.username))
+                | (Q(is_created_by_sns__ne=True) & Q(sns_user_name=stip_user.username))
             )
 
         else:
@@ -292,7 +292,7 @@ def feeds(request):
             stip_users_vias = Vias.objects.filter(uploader__in=stip_user_list)
             QQ & Q(via__in=stip_users_vias)
 
-        #count = 0
+        # count = 0
         l = []
         stix_files = StixFiles.objects(QQ).order_by('-produced').skip(index).timeout(False)
         # サイズ指定がある場合は limit 設定
@@ -310,7 +310,7 @@ def feeds(request):
         traceback.print_exc()
         return error(e)
 
-#GET /api/v1/sns/attaches
+# GET /api/v1/sns/attaches
 @csrf_exempt
 def attaches(request):
     try:
@@ -528,10 +528,10 @@ def get_stip_sns_username(stix_package):
 # S-TIP SNS の Like STIX であれば Liker アカウントを返却
 # 未対象時は None 返却
 def get_liker(stix_package):
-    if is_stip_sns_stix(stix_package) == False:
+    if not is_stip_sns_stix(stix_package):
         return None
     # Titile が Like to で始まっているもの
-    if stix_package.stix_header.title.startswith(STIP_SNS_LIKE_TITLE_PREFIX) == False:
+    if not stix_package.stix_header.title.startswith(STIP_SNS_LIKE_TITLE_PREFIX):
         return None
     return get_stip_sns_username(stix_package)
 
@@ -539,16 +539,16 @@ def get_liker(stix_package):
 # S-TIP SNS の Like STIX であれば Unliker アカウントを返却
 # 未対象時は None 返却
 def get_unliker(stix_package):
-    if is_stip_sns_stix(stix_package) == False:
+    if not is_stip_sns_stix(stix_package):
         return False
-    if stix_package.stix_header.title.startswith(STIP_SNS_UNLIKE_TITLE_PREFIX) == False:
+    if not stix_package.stix_header.title.startswith(STIP_SNS_UNLIKE_TITLE_PREFIX):
         return None
     return get_stip_sns_username(stix_package)
 
 
 # S-TIP SNS の Comment STIX か
 def is_stip_sns_comment_stix(stix_package):
-    if is_stip_sns_stix(stix_package) == False:
+    if not is_stip_sns_stix(stix_package):
         return False
     # Titile が Comment to で始まっているもの
     return stix_package.stix_header.title.startswith(STIP_SNS_COMMENT_TITLE_PREFIX)

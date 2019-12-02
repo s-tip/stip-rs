@@ -452,7 +452,7 @@ class Feed(models.Model):
             feed.sharing_group = sharing_range_info
         else:
             feed.sharing_range_type = const.SHARING_RANGE_TYPE_KEY_ALL
-        #feed.package_id = package_id
+        # feed.package_id = package_id
         if bean.region_code is not None:
             feed.region_code = bean.region_code
         else:
@@ -601,7 +601,7 @@ class Feed(models.Model):
                 marking_structure = marking.marking_structures[0]
                 if isinstance(marking_structure, SimpleMarkingStructure):
                     statement = marking_structure.statement
-                    if statement.startswith(SHARING_RANGE_PREFIX) == False:
+                    if not statement.startswith(SHARING_RANGE_PREFIX):
                         continue
                     if statement == SHARING_RANGE_ALL_VALUE:
                         # Sharing Range指定 が ALL
