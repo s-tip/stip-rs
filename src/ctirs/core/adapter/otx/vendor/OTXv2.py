@@ -43,7 +43,7 @@ class OTXv2(object):
         self.proxies = proxies
 
     def get(self, url):
-        #request = build_opener()
+        # request = build_opener()
         if self.proxies is not None:
             proxy_support = ProxyHandler(self.proxies)
             request = build_opener(proxy_support)

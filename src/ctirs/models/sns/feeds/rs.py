@@ -71,10 +71,10 @@ def convert_filename_to_package_id(filename):
 def get_stix_file_path(api_user, package_id):
     # cache のファイルパスを作成する
     file_name = convert_package_id_to_filename(package_id)
-    #file_path = django_settings.STIX_CACHE_DIR + file_name
+    # file_path = django_settings.STIX_CACHE_DIR + file_name
     file_path = const.STIX_CACHE_DIR + file_name
     # cache に存在するかチェックする
-    if os.path.exists(file_path) == False:
+    if not os.path.exists(file_path):
         # 存在しない場合は RS から 取得してファイルキャッシュに格納する
         content = get_content_from_rs(api_user, package_id)
         try:

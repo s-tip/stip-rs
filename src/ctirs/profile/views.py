@@ -45,7 +45,7 @@ def change_password(request):
         new_password = get_profile_change_password_new_password(request)
         user = request.user
         # 古いパスワードが正しいかチェック
-        if user.check_password(old_password) != True:
+        if not user.check_password(old_password):
             # 古いパスワードが間違っている
             replace_dict['error_change_password_msg'] = 'Old Password is wrong!!'
             return render(request, 'profile.html', replace_dict)

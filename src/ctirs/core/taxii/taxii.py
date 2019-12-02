@@ -10,7 +10,7 @@ import libtaxii.clients as clients
 import libtaxii.messages_11 as tm11
 import libtaxii.constants as const
 from urllib.parse import urlparse
-#from xml.dom.minidom import parseString
+# from xml.dom.minidom import parseString
 from ctirs.core.mongo.documents import TaxiiClients, Vias, ScheduleJobs
 from ctirs.core.schedule.schedule import CtirsScheduler
 from ctirs.models.rs.models import System
@@ -114,7 +114,6 @@ class Client(object):
                 os.remove(cert_file)
             if key_file is not None:
                 os.remove(key_file)
-
 
     # TAXII 2.0 用 GET request Header
     def get_taxii_20_get_request_header(self):
@@ -232,8 +231,8 @@ class Client(object):
         )
         last_requested = datetime.datetime.now(pytz.utc)
 
-        #from xml.dom.minidom import parseString
-        #print( parseString(poll_request.to_xml()).toprettyxml(encoding='utf-8'))
+        # from xml.dom.minidom import parseString
+        # print( parseString(poll_request.to_xml()).toprettyxml(encoding='utf-8'))
 
         # request
         http_resp = self._client.call_taxii_service2(
@@ -333,7 +332,6 @@ class Client(object):
         url = base_url + 'collections/' + self._collection_name + '/objects/'
         return url
 
-
     # poll(version 2.0) entry
     def poll_20(self):
         self.debug_print('>>> poll_20:enter')
@@ -356,11 +354,11 @@ class Client(object):
             proxies=self._proxies
         )
         self.debug_print('poll_20: response status_code:%s' % (resp.status_code))
-        #self.debug_print('poll_20: response headers')
+        # self.debug_print('poll_20: response headers')
         # for k,v in resp.headers.iteritems():
         #    self.debug_print('%s: %s' % (k,v))
         # self.debug_print('----')
-        #self.debug_print('poll_20: request resp.json():%s' % (json.dumps(resp.json(),indent=4)))
+        # self.debug_print('poll_20: request resp.json():%s' % (json.dumps(resp.json(),indent=4)))
 
         # stix のリストで返却される
         count = 0
@@ -429,12 +427,12 @@ class Client(object):
         try:
             # push
             self._address = '10.0.3.100'
-            #self.debug_print('>>> push_11: self._address:%s' %(self._address))
-            #self.debug_print('>>> push_11: self._path:%s' %(self._path))
-            #self.debug_print('>>> push_11: self._port:%d' %(self._port))
-            #self.debug_print('>>> push_11: self._collection_name:%s' %(self._collection_name))
-            #self.debug_print('>>> push_11: verify_server:%s' %(str(self._client.verify_server)))
-            #self.debug_print('>>> push_11: use_https:%s' %(str(self._client.use_https)))
+            # self.debug_print('>>> push_11: self._address:%s' %(self._address))
+            # self.debug_print('>>> push_11: self._path:%s' %(self._path))
+            # self.debug_print('>>> push_11: self._port:%d' %(self._port))
+            # self.debug_print('>>> push_11: self._collection_name:%s' %(self._collection_name))
+            # self.debug_print('>>> push_11: verify_server:%s' %(str(self._client.verify_server)))
+            # self.debug_print('>>> push_11: use_https:%s' %(str(self._client.use_https)))
             http_resp = self._client.call_taxii_service2(
                 self._address,
                 self._path,

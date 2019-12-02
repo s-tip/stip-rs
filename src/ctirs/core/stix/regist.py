@@ -115,7 +115,7 @@ def is_produced_by_stip_sns(doc):
         information_source = doc.stix_header.information_source
         identity_name = information_source.identity.name
         # identity が 's-tip-sns' で始まること
-        if identity_name.startswith(S_TIP_SNS_IDENTITY_NAME_PREFIX) != True:
+        if not identity_name.startswith(S_TIP_SNS_IDENTITY_NAME_PREFIX):
             return False
         # ToolInformation の name が 'S-TIP' であること
         tool_information = information_source.tools[0]
@@ -147,7 +147,7 @@ def get_stip_sns_type_from_marking(markings):
     for marking in markings:
         try:
             marking_structure = marking.marking_structures[0]
-            if isinstance(marking_structure, SimpleMarkingStructure) == False:
+            if not isinstance(marking_structure, SimpleMarkingStructure):
                 # SimpleMarkingStructure以外は判定材料としない
                 continue
             statement = marking.marking_structures[0].statement
@@ -183,7 +183,7 @@ def set_stix_bean_from_doc(package_bean, doc):
     for marking in markings:
         try:
             marking_structure = marking.marking_structures[0]
-            if isinstance(marking_structure, SimpleMarkingStructure) == False:
+            if not isinstance(marking_structure, SimpleMarkingStructure):
                 # SimpleMarkingStructure以外は判定材料としない
                 continue
             statement = marking.marking_structures[0].statement

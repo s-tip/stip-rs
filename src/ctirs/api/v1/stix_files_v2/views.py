@@ -108,7 +108,7 @@ def is_exist_objects(selector, o_):
         return o_[index]
     else:
         # dict
-        if (selector in o_) == False:
+        if selector not in o_:
             return None
         else:
             return o_[selector]
@@ -204,8 +204,8 @@ def get_language_contents(request, object_ref):
         # 表示する長さ
         object_modified = request.GET['object_modified']
         objects = StixLanguageContents.objects.filter(
-            Q(object_ref=object_ref) &
-            Q(object_modified=object_modified)).order_by('-modified')
+            Q(object_ref=object_ref)
+            & Q(object_modified=object_modified)).order_by('-modified')
         language_contents = []
         for o_ in objects:
             language_contents.append(o_.object_)

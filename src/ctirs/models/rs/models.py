@@ -121,7 +121,7 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
             return ''
         url = self.url
         if "http://" not in self.url and "https://" not in self.url and len(self.url) > 0:  # noqa: E501
-            #url = "http://" + str(self.url)
+            # url = "http://" + str(self.url)
             url = "http://" + self.url
         return url
 
@@ -181,7 +181,7 @@ def pre_save_stipuser(sender, instance, **kwargs):
             instance.gv_auth_user = GVAuthUser.objects.create_user()
             instance.save()
     except BaseException:
-            # Profile がない
+        # Profile がない
         instance.gv_auth_user = GVAuthUser.objects.create_user()
         instance.save()
 

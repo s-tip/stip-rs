@@ -8,7 +8,7 @@ from ctirs.api import JsonResponse
 from django.http.response import HttpResponse
 from ctirs.core.mongo.documents import Vias, Communities
 from ctirs.core.mongo.documents_stix import StixFiles
-#from opentaxii.taxii.http import HTTP_AUTHORIZATION
+# from opentaxii.taxii.http import HTTP_AUTHORIZATION
 
 RESPONSE_COMMON_CONTENT_TYPE_TAXII_JSON = 'application/taxii+json; version=2.0'
 RESPONSE_COMMON_CONTENT_TYPE_STIX_JSON = 'application/stix+json; version=2.0'
@@ -23,7 +23,7 @@ COLLECTION_MEDIA_TYPE = 'application/vnd.oasis.stix+json; version=2.0'
 
 TEST_TXS_HOST_PORT = 'https://10.0.3.100:10001'
 PLUGFEST_TXS_HOST_PORT = 'https://133.162.143.58:10001'
-#TXS_HOST_PORT = PLUGFEST_TXS_HOST_PORT
+# TXS_HOST_PORT = PLUGFEST_TXS_HOST_PORT
 TXS_HOST_PORT = TEST_TXS_HOST_PORT
 
 READ_COLLECTION = 'read_collection'
@@ -63,28 +63,28 @@ def get_no_accept_json_data(message, error_id='To be determined', error_code='To
 
 # HTTP_ACCEPT チェック
 def check_http_accept(request, expect_content_type=HTTP_ACCEPT_CONTENT_TYPE, expect_version=HTTP_ACCEPT_VERSION):
-    #debug_print('>>>request.META[HTTP_ACCEPT]:' + str(request.META['HTTP_ACCEPT']))
+    # debug_print('>>>request.META[HTTP_ACCEPT]:' + str(request.META['HTTP_ACCEPT']))
     # , で複数の HTTP_ACCEPT が存在する場合に備え分割
     http_accept_list = request.META['HTTP_ACCEPT'].split(',')
-    #debug_print('>>>http_accept_list:' + str(http_accept_list))
+    # debug_print('>>>http_accept_list:' + str(http_accept_list))
     is_invalid = True
     # 一つ一つ吟味
     for http_accept in http_accept_list:
-        #debug_print('>>>http_accept:' + str(http_accept))
+        # debug_print('>>>http_accept:' + str(http_accept))
         # ; で分割
         ll = http_accept.split(';')
         # 長さが 2 以下は無視
         if len(ll) < 2:
-            #debug_print('>>>http_accept is too short. skip.')
+            # debug_print('>>>http_accept is too short. skip.')
             continue
-        #debug_print('>>>ll:' + str(ll))
+        # debug_print('>>>ll:' + str(ll))
         # 最初の要素が正しい ContentType である (空白をトリミングして評価)
         if ll[0].strip(' ') != expect_content_type:
-            #debug_print('>>>Unexpected ContentValue. skip.')
+            # debug_print('>>>Unexpected ContentValue. skip.')
             continue
         # 2番目の要素が正しい version である (空白をトリミングして評価)
         if ll[1].strip(' ') != expect_version:
-            #debug_print('>>>Unexpected Version. skip.')
+            # debug_print('>>>Unexpected Version. skip.')
             continue
         # debug_print('>>>OK')
         is_invalid = False
@@ -95,7 +95,7 @@ def check_http_accept(request, expect_content_type=HTTP_ACCEPT_CONTENT_TYPE, exp
 # HTTP_AUTHORIZATION チェック
 def check_common_authorization(request):
     # credential check
-    if ('HTTP_AUTHORIZATION' in request.META) != True:
+    if 'HTTP_AUTHORIZATION' not in request.META:
         debug_print('>>> no HTTP_AUTHORIZATION')
         r = HttpResponse(content_type=RESPONSE_COMMON_CONTENT_TYPE_TAXII_JSON)
         r['WWW-Authenticate'] = 'Basic realm="taxii", type=1, title="Login to \"apps\"", Basic realm="simple"'
@@ -130,7 +130,7 @@ def top_taxii(request):
 
     # Accept check
     debug_print('>>>request.META.has_key(HTTP_ACCEPT):' + str('HTTP_ACCEPT' in request.META))
-    if ('HTTP_ACCEPT' in request.META) == False:
+    if 'HTTP_ACCEPT' not in request.META:
         print('>>>no HTTP_ACCEPT')
         data = get_no_accept_json_data('No Accept')
         r = JsonResponse(data, safe=False, content_type=RESPONSE_COMMON_CONTENT_TYPE_TAXII_JSON)
@@ -174,7 +174,7 @@ def top(request):
 
     # Accept check
     debug_print('>>>request.META.has_key(HTTP_ACCEPT):' + str('HTTP_ACCEPT' in request.META))
-    if ('HTTP_ACCEPT' in request.META) == False:
+    if 'HTTP_ACCEPT' not in request.META:
         print('>>>no HTTP_ACCEPT')
         data = get_no_accept_json_data('No Accept')
         r = JsonResponse(data, safe=False, content_type=RESPONSE_COMMON_CONTENT_TYPE_TAXII_JSON)
@@ -221,7 +221,7 @@ def collections_root(request):
         return r
 
     # Accept check
-    if ('HTTP_ACCEPT' in request.META) == False:
+    if 'HTTP_ACCEPT' not in request.META:
         debug_print('>>>No HTTP_ACCEPT.')
         data = get_no_accept_json_data('No Accept')
         r = JsonResponse(data, safe=False, content_type=RESPONSE_CONTENT_TYPE_STIX_JSON)
@@ -295,7 +295,7 @@ def collections(request, id_):
         return r
 
     # Accept check
-    if ('HTTP_ACCEPT' in request.META) == False:
+    if 'HTTP_ACCEPT' not in request.META:
         debug_print('>>>No HTTP_ACCEPT.')
         data = get_no_accept_json_data('No Accept')
         r = JsonResponse(data, safe=False, content_type=RESPONSE_CONTENT_TYPE_STIX_JSON)
@@ -384,7 +384,7 @@ def collections_objects(request, id_):
             r.status_code = 406
             return r
         # Accept check
-        if ('HTTP_ACCEPT' in request.META) == False:
+        if 'HTTP_ACCEPT' not in request.META:
             debug_print('>>>No HTTP_ACCEPT.')
             data = get_no_accept_json_data('No Accept')
             r = JsonResponse(data, safe=False, content_type=RESPONSE_CONTENT_TYPE_STIX_JSON)
@@ -418,7 +418,7 @@ def collections_objects(request, id_):
             return r
 
         # Accept check
-        if ('HTTP_ACCEPT' in request.META) == False:
+        if 'HTTP_ACCEPT' not in request.META:
             debug_print('>>>No HTTP_ACCEPT.')
             data = get_no_accept_json_data('No Accept')
             r = JsonResponse(data, safe=False, content_type=RESPONSE_CONTENT_TYPE_STIX_JSON)

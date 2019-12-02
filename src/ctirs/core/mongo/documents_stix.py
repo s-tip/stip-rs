@@ -490,7 +490,7 @@ class IndicatorV2Caches(Document):
         return document
 
 
-####################### STIX 2.x  #######################
+# ###################### STIX 2.x  #######################
 class Stix2Base(Document):
     # STIX 2.x 規定の共通プロパティ
     type_ = fields.StringField(max_length=16)
@@ -1260,7 +1260,7 @@ class StixOthers(Stix2Base):
         return document
 
 
-####################### STIX 1.x  #######################
+# ###################### STIX 1.x  #######################
 # StixIndicators
 class StixIndicators(Document):
     indicator_id = fields.StringField(max_length=100)
@@ -1370,7 +1370,7 @@ class StixObservables(Document):
         document = StixObservables()
         if ('id' in observable):
             document.observable_id = observable['id']
-            #document.v2_observable_id = observable['id']
+            # document.v2_observable_id = observable['id']
             # STIX 2.x の observed-data には title, descriptionがないので id をいれる
             document.title = observable['id']
             document.description = observable['id']
@@ -1642,7 +1642,7 @@ class ExploitTargetCaches(Document):
             return
         # cves の要素だけ cache 作成する
         for cve in stix_vulnerability.cves:
-            #node_id = u'%s-%s' % (stix_vulnerability.vulnerability_id,cve)
+            # node_id = u'%s-%s' % (stix_vulnerability.vulnerability_id,cve)
             node_id = '%s-%s' % (stix_vulnerability.object_id_, cve)
             document = ExploitTargetCaches()
             document.type = 'cve_id'
@@ -1893,11 +1893,11 @@ class ObservableCaches(Document):
                     # print '他の properties は対象外とする'
                     return
             else:
-                #properties is None
+                # properties is None
                 # print 'properties is None'
                 return
         else:
-            #object_ is None
+            # object_ is None
             # print 'object_ is None'
             return
         document.stix_file = stix_file

@@ -142,7 +142,7 @@ AUTH_USER_MODEL = 'ctirs.STIPUser'
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-#LANGUAGE_CODE = 'ja'
+# LANGUAGE_CODE = 'ja'
 
 TIME_ZONE = 'Asia/Tokyo'
 
