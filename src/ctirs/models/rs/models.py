@@ -114,7 +114,7 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
                 v = self.screen_name
         if isinstance(v, str):
             return v
-        return v.decode('utf-8')
+        return v
 
     def get_url(self):
         if self.url is None:
