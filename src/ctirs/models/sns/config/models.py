@@ -114,7 +114,7 @@ class SNSConfig(models.Model):
             SNSConfig.SNS_VERSION = ''
         else:
             try:
-                with open(sns_version_path, 'r') as fp:
+                with open(sns_version_path, 'r', encoding='utf-8') as fp:
                     SNSConfig.SNS_VERSION = fp.readline().strip()
             except IOError:
                 SNSConfig.SNS_VERSION = ''

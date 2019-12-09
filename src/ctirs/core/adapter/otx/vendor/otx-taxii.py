@@ -13,7 +13,7 @@ def saveTimestamp(mtimestamp=None):
         mtimestamp = datetime.datetime.now().isoformat()
 
     try:
-        with open(OTX_FILE, "w") as f:
+        with open(OTX_FILE, "w", encoding='utf-8') as f:
             f.write(mtimestamp)
         return mtimestamp
 
@@ -23,7 +23,7 @@ def saveTimestamp(mtimestamp=None):
 
 def readTimestamp():
     try:
-        with open(OTX_FILE, "r") as f:
+        with open(OTX_FILE, "r", encoding='utf-8') as f:
             mtimestamp = f.read()
         return mtimestamp
 

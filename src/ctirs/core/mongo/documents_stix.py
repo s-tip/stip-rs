@@ -231,7 +231,7 @@ class StixFiles(Document):
     # stix 2.x 系の分解
     def split_child_nodes_stix_2_x(self):
         try:
-            f = open(self.origin_path, 'r')
+            f = open(self.origin_path, 'r', encoding='utf-8')
             j = json.load(f)
             objects = j['objects']
             for object_ in objects:
@@ -1175,7 +1175,7 @@ class StixSightings(Stix2Base):
             # 一時ファイルに保存
             _, stix_file_path = tempfile.mkstemp(suffix='.json')
             content = bundle.serialize(indent=4)
-            with open(stix_file_path, 'w') as fp:
+            with open(stix_file_path, 'w', encoding='utf-8') as fp:
                 fp.write(content)
             # bundle を登録
             community = Communities.get_not_assign_community()

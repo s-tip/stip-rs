@@ -181,7 +181,7 @@ APPEND_SLASH = False
 
 try:
     version_path = '/opt/s-tip/rs/version'
-    fp = open(version_path, 'r')
+    fp = open(version_path, 'r', encoding='utf-8')
     STIP_RS_VERSION = fp.readline().strip()
     fp.close()
 except IOError:

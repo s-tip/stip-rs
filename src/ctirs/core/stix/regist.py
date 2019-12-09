@@ -54,7 +54,7 @@ def regist(stix_file_path, community, via, package_name=None):
     # STIXFileコレクションに保存
     try:
         # StixFileドキュメントを作成
-        with open(stix_file_path, 'r') as fp:
+        with open(stix_file_path, 'r', encoding='utf-8') as fp:
             stix_file_doc = StixFiles.create(
                 package_bean,
                 community,
@@ -284,7 +284,7 @@ def get_package_bean(stix_file_path):
 
     # STIX 2.0 parse
     try:
-        with codecs.open(stix_file_path, 'r', 'utf-8') as fp:
+        with codecs.open(stix_file_path, 'r', encoding='utf-8') as fp:
             content = fp.read()
         doc = json.loads(content)
         package_bean.package_name = None

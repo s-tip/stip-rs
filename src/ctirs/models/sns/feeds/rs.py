@@ -78,7 +78,7 @@ def get_stix_file_path(api_user, package_id):
         # 存在しない場合は RS から 取得してファイルキャッシュに格納する
         content = get_content_from_rs(api_user, package_id)
         try:
-            with open(file_path, 'w') as fp:
+            with open(file_path, 'w', encoding='utf-8') as fp:
                 fp.write(content)
         except BaseException:
             try:

@@ -95,10 +95,10 @@ class Client(object):
             if self._auth_type == clients.HttpClient.AUTH_CERT_BASIC:
                 # certificate/private_keyの一時ファイルを作成
                 _, cert_file = tempfile.mkstemp()
-                with open(cert_file, 'w') as fp:
+                with open(cert_file, 'w', encoding='utf-8') as fp:
                     fp.write(self._cert_file)
                 _, key_file = tempfile.mkstemp()
-                with open(key_file, 'w') as fp:
+                with open(key_file, 'w', encoding='utf-8') as fp:
                     fp.write(self._key_file)
                 auth_credentials_dict['cert_file'] = cert_file
                 auth_credentials_dict['key_file'] = key_file
@@ -411,7 +411,7 @@ class Client(object):
                 raise e
 
         else:
-            with open(stix_file_doc.origin_path, 'r') as fp:
+            with open(stix_file_doc.origin_path, 'r', encoding='utf-8') as fp:
                 content = fp.read()
 
         # Subscription Information xml作成
@@ -456,7 +456,7 @@ class Client(object):
         if stix_file_doc.version != '2.0':
             content = stix_file_doc.get_elevate_2_x()
         else:
-            with open(stix_file_doc.origin_path, 'r') as fp:
+            with open(stix_file_doc.origin_path, 'r', encoding='utf-8') as fp:
                 content = fp.read()
 
         '''
