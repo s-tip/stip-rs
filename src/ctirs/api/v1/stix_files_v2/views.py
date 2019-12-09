@@ -186,7 +186,7 @@ def post_language_contents(request, object_ref, ctirs_auth_user):
         # stixファイルを一時ファイルに出力
         stix_file_path = tempfile.mktemp(suffix='.json')
         with open(stix_file_path, 'wb+') as fp:
-            fp.write(bundle.serialize(indent=4, ensure_ascii=False))
+            fp.write(bundle.serialize(indent=4, ensure_ascii=False)).encode()
         # 登録処理
         regist(stix_file_path, community, via)
         resp = get_normal_response_json()

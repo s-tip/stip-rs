@@ -119,14 +119,14 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     def get_url(self):
         if self.url is None:
             return ''
-        url = self.url
+        url = self.url.encode()
         if "http://" not in self.url and "https://" not in self.url and len(self.url) > 0:  # noqa: E501
             # url = "http://" + str(self.url)
             url = "http://" + self.url
         return url
 
     def get_picture_location(self, prefix):
-        return prefix + '/profile_pictures/' + self.username + '.jpg'
+        return prefix.encode() + '/profile_pictures/' + self.username + '.jpg'
 
     def get_picture(self):
         no_picture_url = '/static/img/user.png'

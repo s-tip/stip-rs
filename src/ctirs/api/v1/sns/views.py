@@ -229,7 +229,7 @@ def get_return_dictionary_from_stix_file_document(stix_file, content=False):
     # uploader は STIPUser の ID
     d['uploader'] = str(stix_file.via.uploader)
     if content:
-        d['content'] = str(stix_file.content.read())
+        d['content'] = stix_file.content.read().decode('utf-8')
     return d
 
 

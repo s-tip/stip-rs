@@ -11,7 +11,7 @@ urllib3.disable_warnings(InsecureRequestWarning)
 
 # CTIM-RSに登録する
 def regist_ctim_rs(api_user, package_name, stix_file_path):
-    with open(stix_file_path, 'rb') as fp:
+    with open(stix_file_path, 'r', encoding='utf-8') as fp:
         files = {
             'stix': fp,
         }
@@ -51,7 +51,7 @@ def _get_ctirs_api_http_headers(api_user):
     # username,api_key は api_userごとの値を使用する
     return {
         'apikey': api_user.api_key,
-        'username': api_user.username,
+        'username': api_user.username.encode(),
     }
 
 

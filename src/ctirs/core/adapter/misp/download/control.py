@@ -86,7 +86,7 @@ class MispAdapterDownloadControl(object):
             text = md.get(from_dt=from_dt, to_dt=to_dt)
             if text is None:
                 return 0
-            stix_packages = self.mc.convert(text=text, published_only=published_only, stix_id_prefix=stix_id_prefix)
+            stix_packages = self.mc.convert(text=text.encode(), published_only=published_only, stix_id_prefix=stix_id_prefix)
         except Exception as e:
             traceback.print_exc()
             raise e

@@ -162,7 +162,7 @@ class Attribute(object):
         return o_
 
     def __str__(self):
-        return 'id:' + str(self.id_) + ' / value:' + self.value
+        return 'id:' + str(self.id_) + ' / value:' + self.value.encode()
 
 
 class Org(object):

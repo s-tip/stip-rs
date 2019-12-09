@@ -154,7 +154,7 @@ class StixFiles(Document):
         document.input_community = input_community
         document.package_id = package_bean.package_id
         document.via = via
-        document.content = content
+        document.content.put(content)
         document.created = document.modified = now
         if document.is_stix_v2():
             # STIX 2.x の場合

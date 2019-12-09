@@ -219,7 +219,7 @@ class Feed(models.Model):
             raise e
 
         # ファイル保存
-        file_path = attachment_stix_dir + os.sep + file_name
+        file_path = attachment_stix_dir + os.sep + file_name.encode()
         with open(file_path, 'w', encoding='utf-8') as fp:
             fp.write(content)
         attach_file = AttachFile()
@@ -348,7 +348,7 @@ class Feed(models.Model):
     def create_feeds_record(api_user, package_id, uploader_id, produced_str):
         # RS から取得した STIX から stix_package 取得する
         stix_file_path = rs.get_stix_file_path(api_user, package_id)
-        stix_package = STIXPackage.from_xml(stix_file_path)
+        stix_package = STIXPackage.from_xml(stix_file_path, encoding='utf-8')
 
         # Feed情報を STIX,RS の API から取得する
         feed = Feed()
