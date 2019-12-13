@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 
 from django.db import models
 from django.db.models import Max
@@ -53,8 +53,8 @@ class Message(models.Model):
                 'last': conversation['last'],
                 'unread': Message.objects.filter(user=user,
                                                  conversation__pk=conversation[
-                                                    'conversation'],
+                                                     'conversation'],
                                                  is_read=False).count(),
-                })
+            })
 
         return users

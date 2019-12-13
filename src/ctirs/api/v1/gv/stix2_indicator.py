@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import datetime
 import pytz
 
@@ -10,7 +9,8 @@ V1_OBSERVABLE_TYPE_SHA256 = 'sha256'
 V1_OBSERVABLE_TYPE_SHA512 = 'sha512'
 V1_OBSERVABLE_TYPE_URL = 'uri'
 
-def get_observed_data_file_objects(type_,value):
+
+def get_observed_data_file_objects(type_, value):
     o_ = {}
     o_['type'] = 'file'
     hashes = {}
@@ -27,7 +27,8 @@ def get_observed_data_file_objects(type_,value):
     o_['hashes'] = hashes
     return o_
 
-def get_observed_data_objects(type_,value):
+
+def get_observed_data_objects(type_, value):
     o_ = {}
     FILE_HASHES = [V1_OBSERVABLE_TYPE_MD5, V1_OBSERVABLE_TYPE_SHA1, V1_OBSERVABLE_TYPE_SHA256, V1_OBSERVABLE_TYPE_SHA512]
 
@@ -41,13 +42,15 @@ def get_observed_data_objects(type_,value):
         o_['type'] = 'url'
         o_['value'] = value
     elif type_ in FILE_HASHES:
-        o_ = get_observed_data_file_objects(type_,value)
+        o_ = get_observed_data_file_objects(type_, value)
     return o_
+
 
 def get_time_str():
     n = datetime.datetime.now(pytz.utc)
     n_str = n.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
     return n_str
+
 
 def _get_observed_data(cache):
     observed_data = {}
@@ -63,7 +66,7 @@ def _get_observed_data(cache):
         observed_data['last_observed'] = now_date_str
     observed_data['number_observed'] = cache.number_observed
     objects_ = {}
-    object_ = get_observed_data_objects(cache.type,cache.value)
+    object_ = get_observed_data_objects(cache.type, cache.value)
     objects_['0'] = object_
     observed_data['objects'] = objects_
     return observed_data
