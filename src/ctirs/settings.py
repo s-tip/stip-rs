@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Django settings for cti_repository_system project.
 
@@ -22,9 +21,8 @@ logging.disable(logging.WARNING)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-
-#LOGIN_URL
-LOGIN_URL='/'
+# LOGIN_URL
+LOGIN_URL = '/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -81,31 +79,31 @@ ROOT_URLCONF = 'ctirs.urls'
 
 SRC_DIR = BASE_DIR + os.sep
 CTIRS_DIR = SRC_DIR + os.sep + 'ctirs' + os.sep
-COMMON_PROJECT_DIR='/opt/s-tip/common'
+COMMON_PROJECT_DIR = '/opt/s-tip/common'
 DIRS = [
-    os.path.join(SRC_DIR,'templates'),
-    os.path.join(CTIRS_DIR,'error/templates'),
-    os.path.join(CTIRS_DIR,'dashboard/templates'),
-    os.path.join(CTIRS_DIR,'login/templates'),
-    os.path.join(CTIRS_DIR,'upload/templates'),
-    os.path.join(CTIRS_DIR,'list/templates'),
-    os.path.join(CTIRS_DIR,'poll/templates'),
-    os.path.join(CTIRS_DIR,'profile/templates'),
-    os.path.join(CTIRS_DIR,'configuration/user/templates'),
-    os.path.join(CTIRS_DIR,'configuration/community/templates'),
-    os.path.join(CTIRS_DIR,'configuration/system/templates'),
-    os.path.join(CTIRS_DIR,'configuration/mongo/templates'),
-    os.path.join(CTIRS_DIR,'configuration/taxii_client/templates'),
-    os.path.join(CTIRS_DIR,'configuration/taxii_client/detail/templates'),
-    os.path.join(CTIRS_DIR,'configuration/taxii_server/templates'),
-    os.path.join(CTIRS_DIR,'configuration/taxii_server/detail/templates'),
-    os.path.join(CTIRS_DIR,'adapter/otx/templates'),
-    os.path.join(CTIRS_DIR,'adapter/otx/detail/templates'),
-    os.path.join(CTIRS_DIR,'adapter/isight/templates'),
-    os.path.join(CTIRS_DIR,'adapter/isight/detail/templates'),
-    os.path.join(CTIRS_DIR,'adapter/misp/templates'),
-    os.path.join(CTIRS_DIR,'adapter/misp/detail/templates'),
-    os.path.join(COMMON_PROJECT_DIR,'src/templates'),
+    os.path.join(SRC_DIR, 'templates'),
+    os.path.join(CTIRS_DIR, 'error/templates'),
+    os.path.join(CTIRS_DIR, 'dashboard/templates'),
+    os.path.join(CTIRS_DIR, 'login/templates'),
+    os.path.join(CTIRS_DIR, 'upload/templates'),
+    os.path.join(CTIRS_DIR, 'list/templates'),
+    os.path.join(CTIRS_DIR, 'poll/templates'),
+    os.path.join(CTIRS_DIR, 'profile/templates'),
+    os.path.join(CTIRS_DIR, 'configuration/user/templates'),
+    os.path.join(CTIRS_DIR, 'configuration/community/templates'),
+    os.path.join(CTIRS_DIR, 'configuration/system/templates'),
+    os.path.join(CTIRS_DIR, 'configuration/mongo/templates'),
+    os.path.join(CTIRS_DIR, 'configuration/taxii_client/templates'),
+    os.path.join(CTIRS_DIR, 'configuration/taxii_client/detail/templates'),
+    os.path.join(CTIRS_DIR, 'configuration/taxii_server/templates'),
+    os.path.join(CTIRS_DIR, 'configuration/taxii_server/detail/templates'),
+    os.path.join(CTIRS_DIR, 'adapter/otx/templates'),
+    os.path.join(CTIRS_DIR, 'adapter/otx/detail/templates'),
+    os.path.join(CTIRS_DIR, 'adapter/isight/templates'),
+    os.path.join(CTIRS_DIR, 'adapter/isight/detail/templates'),
+    os.path.join(CTIRS_DIR, 'adapter/misp/templates'),
+    os.path.join(CTIRS_DIR, 'adapter/misp/detail/templates'),
+    os.path.join(COMMON_PROJECT_DIR, 'src/templates'),
 ]
 TEMPLATES = [
     {
@@ -144,7 +142,7 @@ AUTH_USER_MODEL = 'ctirs.STIPUser'
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-#LANGUAGE_CODE = 'ja'
+# LANGUAGE_CODE = 'ja'
 
 TIME_ZONE = 'Asia/Tokyo'
 
@@ -162,28 +160,28 @@ STATIC_URL = '/static/'
 PROJECT_DIR = Path(__file__).parent.parent
 STATIC_ROOT = PROJECT_DIR.parent.child('staticfiles')
 STATICFILES_DIRS = (
-    ''.join([BASE_DIR, os.sep,'static']),
-    os.path.join(COMMON_PROJECT_DIR,'src/static'),
+    ''.join([BASE_DIR, os.sep, 'static']),
+    os.path.join(COMMON_PROJECT_DIR, 'src/static'),
 )
 
 SESSION_COOKIE_NAME = 'stip'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
-#HTTP 上で動作させるかどうかのフラグ
-ENV_DEV_OVER_HTTP_KEY  = 'DEV_OVER_HTTP'
+# HTTP 上で動作させるかどうかのフラグ
+ENV_DEV_OVER_HTTP_KEY = 'DEV_OVER_HTTP'
 dev_over_http = False
-if os.environ.has_key(ENV_DEV_OVER_HTTP_KEY) == True:
+if (ENV_DEV_OVER_HTTP_KEY in os.environ):
     if os.environ[ENV_DEV_OVER_HTTP_KEY] == 'True':
         dev_over_http = True
-#http で動作させないときは SESSION_COOKIE_SECURE を立てる
-if dev_over_http == False:
+# http で動作させないときは SESSION_COOKIE_SECURE を立てる
+if not dev_over_http:
     SESSION_COOKIE_SECURE = True
 
-APPEND_SLASH =  False
+APPEND_SLASH = False
 
 try:
     version_path = '/opt/s-tip/rs/version'
-    fp = open(version_path,'r')
+    fp = open(version_path, 'r', encoding='utf-8')
     STIP_RS_VERSION = fp.readline().strip()
     fp.close()
 except IOError:

@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 from django.db.utils import OperationalError
 from django.db import models
 from django.utils.translation import ugettext_lazy
+
 
 class Country(models.Model):
     name = models.CharField(max_length=128)
@@ -26,14 +26,15 @@ class Country(models.Model):
                 r = []
                 try:
                     for item in Country.objects.all().exclude(region='').order_by('name'):
-                        r.append((item.alpha_2,ugettext_lazy(item.name)))
-                except:
+                        r.append((item.alpha_2, ugettext_lazy(item.name)))
+                except BaseException:
                     pass
                 cls.__country_tuple = tuple(r)
             return cls.__country_tuple
         except OperationalError:
-            #python magage.py migrate時に発生する
+            # python magage.py migrate時に発生する
             return tuple([])
+
 
 class Region(models.Model):
     country_code = models.CharField(max_length=2)
@@ -42,7 +43,7 @@ class Region(models.Model):
 
     class Meta:
         db_table = 'stip_common_region'
-    
+
     def get_country_name(self):
         return Country.objects.get(alpha_2=self.country_code).name
 
@@ -53,19 +54,19 @@ class Region(models.Model):
             try:
                 for region in Region.objects.all().order_by('country_code'):
                     r.append(region.country_code)
-            except:
+            except BaseException:
                 pass
-            #重複を除き、アルファベット順で返却
+            # 重複を除き、アルファベット順で返却
             return sorted(list(set(r)))
         except OperationalError:
-            #python magage.py migrate時に発生する
+            # python magage.py migrate時に発生する
             return r
-    
+
     @staticmethod
     def get_country_code_choices():
         r = []
         for item in Region.get_country_codes():
-            r.append((item,ugettext_lazy(item)))
+            r.append((item, ugettext_lazy(item)))
         return tuple(r)
 
     @staticmethod
@@ -75,19 +76,19 @@ class Region(models.Model):
             try:
                 for region in Region.objects.filter(country_code=country_code).order_by('code'):
                     r.append(region)
-            except:
+            except BaseException:
                 pass
             return r
         except OperationalError:
-            #python magage.py migrate時に発生する
+            # python magage.py migrate時に発生する
             return r
-    
+
     @staticmethod
     def get_administrative_areas_choices(country_code):
         r = []
         try:
             for item in Region.get_administrative_areas(country_code):
-                r.append((item.code,ugettext_lazy(item.administrative_area)))
-        except:
+                r.append((item.code, ugettext_lazy(item.administrative_area)))
+        except BaseException:
             pass
         return tuple(r)

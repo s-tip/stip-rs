@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytz
 import datetime
 from mongoengine.errors import DoesNotExist
@@ -39,9 +38,11 @@ def stix_files(request):
     except Exception as e:
         return api_root.error(e)
 
+
 # 引数の日時文字列からdatetimeオブジェクトを作成
 def get_datetime_from_argument(s):
     return datetime.datetime.strptime(s, '%Y%m%d%H%M%S').replace(tzinfo=pytz.utc)
+
 
 # stix_file一覧取得
 # GET /api/v1/stix_files
@@ -70,7 +71,7 @@ def get_stix_files(request):
             query['created__gt'] = d
         except Exception as _:
             return api_root.error(Exception('Time string format invalid.'))
-    
+
     # end filter
     # YYYYMMDDHHMMSS形式
     end = get_api_get_stix_files_end(request)
@@ -88,6 +89,7 @@ def get_stix_files(request):
         except DoesNotExist:
             pass
     return JsonResponse(l, safe=False)
+
 
 # STIXファイル追加
 # POST /api/v1/stix_files
@@ -128,6 +130,7 @@ def stix_files_id(request, id_):
     except Exception as e:
         return api_root.error(e)
 
+
 # STIX ファイル情報取得
 # GET /api/v1/stix_files/<id_>
 def get_stix_file_document_info(request, id_):
@@ -137,6 +140,7 @@ def get_stix_file_document_info(request, id_):
     except Exception as _:
         return api_root.error(Exception('The specified id not found.'))
 
+
 # STIX ファイル情報削除
 # DELETE /api/v1/stix_files/<id_>
 def delete_stix_file_document_info(id_):
@@ -144,6 +148,7 @@ def delete_stix_file_document_info(id_):
         api_root.delete_stix_document(id_=id_)
     except Exception as e:
         return api_root.error(e)
+
 
 # STIX取得
 # GET /api/v1/stix_files/<id>/stix
