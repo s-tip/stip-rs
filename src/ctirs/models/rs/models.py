@@ -126,7 +126,8 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
         return url
 
     def get_picture_location(self, prefix):
-        return prefix.encode() + '/profile_pictures/' + self.username + '.jpg'
+        s = prefix + '/profile_pictures/' + self.username + '.jpg'
+        return s.encode()
 
     def get_picture(self):
         no_picture_url = '/static/img/user.png'
