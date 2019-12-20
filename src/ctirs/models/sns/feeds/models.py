@@ -219,8 +219,8 @@ class Feed(models.Model):
             raise e
 
         # ファイル保存
-        file_path = attachment_stix_dir + os.sep + file_name.encode()
-        with open(file_path, 'w', encoding='utf-8') as fp:
+        file_path = attachment_stix_dir + os.sep + file_name
+        with open(file_path, 'wb') as fp:
             fp.write(content)
         attach_file = AttachFile()
         attach_file.file_name = file_name
