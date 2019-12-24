@@ -261,7 +261,7 @@ def feeds(request):
             QQ &= Q(produced__gt=last_feed)
         else:
             # last_feed の指定がない場合 (start_timeを最新として古い投稿を返却)
-            QQ &= Q(produced__lt=start_time)
+            QQ &= Q(produced__lte=start_time)
 
         # range_big_datetime 指定あり
         # 最大より古く(<=)
@@ -293,7 +293,7 @@ def feeds(request):
             QQ & Q(via__in=stip_users_vias)
 
         # count = 0
-        l = []
+        feeds_list = []
         stix_files = StixFiles.objects(QQ).order_by('-produced').skip(index).timeout(False)
         # サイズ指定がある場合は limit 設定
         if size != -1:
@@ -301,9 +301,9 @@ def feeds(request):
         # 指定された数値分 StixFiles から取得する(produced順にソートする かつ is_post_sns が False以外 かつ version が 2.0 以外)
         # for stix_file in StixFiles.objects(QQ).order_by('-produced').all().timeout(False):
         for stix_file in stix_files:
-            l.append(get_return_dictionary_from_stix_file_document(stix_file, content=content))
+            feeds_list.append(get_return_dictionary_from_stix_file_document(stix_file, content=content))
         r = {}
-        r['feeds'] = l
+        r['feeds'] = feeds_list
         return JsonResponse(r, safe=False)
     except Exception as e:
         import traceback
@@ -348,11 +348,11 @@ def related_packages(request):
         if original_package_id is None:
             print('/api/v1/sns/related_packages package_id is None.')
             return HttpResponseNotFound()
-        l = []
+        related_packages_list = []
         # original_package_id を related_packages リスト要素に含む stix_fileを返却
         for stix_file in StixFiles.objects(related_packages=original_package_id):
-            l.append(get_return_dictionary_from_stix_file_document(stix_file))
-        return JsonResponse(l, safe=False)
+            related_packages_list.append(get_return_dictionary_from_stix_file_document(stix_file))
+        return JsonResponse(related_packages_list, safe=False)
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -389,11 +389,11 @@ def comments(request):
         if original_package_id is None:
             print('/api/v1/sns/comments package_id is None.')
             return HttpResponseNotFound()
-        l = []
+        comments_list = []
         # original_package_id を related_packages リスト要素に含み sns_type が comment の stix_fileを返却
         for stix_file in StixFiles.objects(Q(related_packages=original_package_id) & Q(sns_type=StixFiles.STIP_SNS_TYPE_COMMENT)):
-            l.append(get_return_dictionary_from_stix_file_document(stix_file))
-        return JsonResponse(l, safe=False)
+            comments_list.append(get_return_dictionary_from_stix_file_document(stix_file))
+        return JsonResponse(comments_list, safe=False)
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -499,11 +499,11 @@ def query(request):
         stix_files = sorted(list(stix_files), key=lambda s: s.produced, reverse=True)
 
         # 返却データ作成
-        l = []
+        feeds_list = []
         for stix_file in stix_files:
-            l.append(get_return_dictionary_from_stix_file_document(stix_file, content=content))
+            feeds_list.append(get_return_dictionary_from_stix_file_document(stix_file, content=content))
         r = {}
-        r['feeds'] = l
+        r['feeds'] = feeds_list
         return JsonResponse(r, safe=False)
     except Exception as e:
         import traceback
