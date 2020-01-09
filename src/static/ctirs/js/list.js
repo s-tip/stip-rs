@@ -193,4 +193,19 @@ $(function(){
         	alert(msg);
         });
     });
+
+   // auto reload
+    var reload_time = 60000;
+    var reload_event;
+    reload_start();
+    $('#auto-reload-event').change(function() {
+        if($(this).prop('checked')){
+            reload_start();
+        }else{
+            clearTimeout(reload_event);
+        }
+    });
+    function reload_start(){
+        reload_event = setTimeout('location.reload(true)', reload_time);
+    }
 });
