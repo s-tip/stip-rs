@@ -197,15 +197,15 @@ $(function(){
    // auto reload
     var reload_time = 60000;
     var reload_event;
-    reload_start();
+    reload_set();
     $('#auto-reload-event').change(function() {
         if($(this).prop('checked')){
-            reload_start();
+            reload_set();
         }else{
             clearTimeout(reload_event);
         }
     });
-    function reload_start(){
+    function reload_set(){
         reload_event = setTimeout('location.reload(true)', reload_time);
     }
 });
