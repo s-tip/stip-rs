@@ -220,6 +220,7 @@ class Feed(models.Model):
 
         # ファイル保存
         file_path = attachment_stix_dir + os.sep + file_name
+        file_path = file_path.encode('utf-8')
         with open(file_path, 'wb') as fp:
             fp.write(content)
         attach_file = AttachFile()
