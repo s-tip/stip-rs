@@ -12,6 +12,7 @@ from ctirs.models import STIPUser
 from ctirs.models import SNSConfig
 from stix.core.stix_package import STIXPackage
 from stix.extensions.marking.ais import AISMarkingStructure
+from stix.extensions.marking.tlp import TLPMarkingStructure
 from stix.extensions.marking.simple_marking import SimpleMarkingStructure
 from stix.data_marking import MarkingSpecification
 from stix.common.structured_text import StructuredText
@@ -433,10 +434,10 @@ class Feed(models.Model):
         feed.stix_file_path = stix_file_path
         try:
             uploader_stipuser = STIPUser.objects.get(id=uploader_id)
-            feed.tlp = Feed.get_ais_tlp_from_stix_header(stix_package.stix_header, uploader_stipuser.tlp)
+            feed.tlp = Feed.get_tlp_from_stix_header(stix_package.stix_header, uploader_stipuser.tlp)
             if feed.tlp is None:
-                # 取得ができなかった場合は default TLP の AMBER
-                feed.tlp = 'AMBER'
+                # 取得ができなかった場合は ユーザーアカウントの default TLP
+                feed.tlp = uploader_stipuser.tlp
         except BaseException:
             # uploader_profile が存在しない場合は default TLP の AMBER
             feed.tlp = 'AMBER'
@@ -574,14 +575,14 @@ class Feed(models.Model):
             feeds_.append(feed)
         return Feed.get_filter_query_set(None, api_user, feeds_=feeds_)
 
-    # stix_header から AIS の TLP を返却する。該当箇所がない場合はdefault_tlpを返却
+    # stix_header から 標準 の TLP を返却する。該当箇所がない場合はdefault_tlpを返却
     @staticmethod
-    def get_ais_tlp_from_stix_header(stix_header, default_tlp='AMBER'):
+    def get_tlp_from_stix_header(stix_header, default_tlp='AMBER'):
         try:
             for marking in stix_header.handling.marking:
                 marking_strucutre = marking.marking_structures[0]
-                if isinstance(marking_strucutre, AISMarkingStructure):
-                    return marking_strucutre.not_proprietary.tlp_marking.color
+                if isinstance(marking_strucutre, TLPMarkingStructure):
+                    return marking_strucutre.color
         except BaseException:
             pass
         return default_tlp
