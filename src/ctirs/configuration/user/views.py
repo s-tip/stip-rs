@@ -31,6 +31,14 @@ def get_configuration_user_check_value(request, key):
             return True
     return False
 
+def get_configuration_user_change_password_top_username(request):
+    return get_text_field_value(request, 'username', default_value='')
+
+def get_configuration_user_change_password_username(request):
+    return get_text_field_value(request, 'username', default_value='')
+
+def get_configuration_user_change_password_password(request):
+    return get_text_field_value(request, 'password', default_value='')
 
 @login_required
 def top(request):
@@ -84,3 +92,44 @@ def create(request):
     except Exception:
         # エラーページ
         return error_page(request)
+
+@login_required
+def change_password_top(request):
+    # activeユーザー以外はエラー
+    if not request.user.is_active:
+        return error_page_inactive(request)
+    # is_admin権限なしの場合はエラー
+    if not request.user.is_admin:
+        return error_page_no_view_permission(request)
+    try:
+        username = get_configuration_user_change_password_top_username(request)
+        replace_dict = get_common_replace_dict(request)
+        replace_dict['change_pwd_username'] = username
+        # レンダリング
+        return render(request, 'change_pwd.html', replace_dict)
+    except Exception:
+        # エラーページ
+        return error_page(request)
+
+@login_required
+def change_password(request):
+    # activeユーザー以外はエラー
+    if not request.user.is_active:
+        return error_page_inactive(request)
+    # is_admin権限なしの場合はエラー
+    if not request.user.is_admin:
+        return error_page_no_view_permission(request)
+    try:
+        username = get_configuration_user_change_password_username(request)
+        password = get_configuration_user_change_password_password(request)
+        stip_user = STIPUser.objects.get(username=username)
+        stip_user.set_password(password)
+        stip_user.save()
+        replace_dict = get_common_replace_dict(request)
+        replace_dict['info_msg'] = 'Change Password Successfully!!'
+        # レンダリング
+        return render(request, 'change_pwd.html', replace_dict)
+    except Exception:
+        # エラーページ
+        return error_page(request)
+
