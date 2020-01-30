@@ -123,6 +123,7 @@ def change_password(request):
         username = get_configuration_user_change_password_username(request)
         password = get_configuration_user_change_password_password(request)
         stip_user = STIPUser.objects.get(username=username)
+        stip_user.is_modified_password = False
         stip_user.set_password(password)
         stip_user.save()
         replace_dict = get_common_replace_dict(request)
