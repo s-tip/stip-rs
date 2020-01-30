@@ -1,0 +1,56 @@
+{% include 'header.html' %}
+<head>
+<!--  for user_configurations -->
+<link href="/static/ctirs/css/profile_configuration_common.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/change_pwd.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<form name="change_password" id="change-password-form" action="/configuration/user/change_password" method="POST">{% csrf_token %}
+<div class="container">
+    <br/>
+    <h1>User</h1>
+    <br/>
+    <hr/>
+    <h2>Change Password {% if change_pwd_username %}(Username: {{change_pwd_username}}){% endif %}</h2>
+    <div class="form-group">
+    <p id="error-msg">{{ error_msg |default:'' }}</p>
+    <p id="info-msg">{{ info_msg |default:'' }}</p>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Password
+            </div>
+            <div class="col-xs-4">
+                <input id="password-1" type="password" class="form-control"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Password (Again)
+            </div>
+            <div class="col-xs-4">
+                <input id="password-2" type="password" class="form-control"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <br/>
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="back-button-submit" class="btn btn-info">Back</button>
+            <button type="button" id="change-pwd-submit" class="btn btn-danger">Change</button>
+            <input type="hidden" id="change-pwd-username" name="change_pwd_username" value="{{ change_pwd_username}}"/>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+</div> <!--  <div class="container"> -->
+</form>
+</body>
+</html>

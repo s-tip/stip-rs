@@ -10,6 +10,7 @@
 
 <body>
 {% include 'nav_header.html' %}
+<form name="change_password_top" id="change-password-top-form" action="/configuration/user/change_password_top" method="POST">{% csrf_token %}</form>
 <form name="create_user" id="create-user-form" action="/configuration/user/create_user" method="POST">{% csrf_token %}
 <div class="container">
     <br/>
@@ -94,6 +95,9 @@
     <td>
         Admin
     </td>
+    <td>
+        Password
+    </td>
     </tr>
     </thead>
     <tbody>
@@ -110,6 +114,9 @@
     </td>
     <td>
         <input class="change-auth" type="checkbox" username="{{ each_user }}" config_name="is_admin" {% if each_user.is_admin %}checked{% endif %} {% if not user.is_superuser %}disabled{% endif %}>
+    </td>
+    <td>
+        <a class="change-password" username="{{each_user}}">Change</a>
     </td>
     </tr>
     {% endfor %}

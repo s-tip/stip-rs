@@ -8,6 +8,10 @@ urlpatterns = [
     url(r'^$', user.top),
     # configuration/user create
     url(r'^create_user$', user.create),
+    # configuration/user change_password_top
+    url(r'^change_password_top$', user.change_password_top),
+    # configuration/user change_password
+    url(r'^change_password$', user.change_password),
     # configuration ajax
     url(r'^ajax/', include(ctirs.configuration.user.ajax.urls)),
 ]
