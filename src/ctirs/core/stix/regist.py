@@ -4,6 +4,7 @@ import codecs
 import traceback
 import shutil
 import datetime
+import pytz
 # AIS生成 STIX解析のために予め読み込む必要がある
 import stix.extensions.marking.ais  # @UnusedImport
 from stix.extensions.marking.simple_marking import SimpleMarkingStructure
@@ -305,7 +306,7 @@ def get_package_bean(stix_file_path):
         if produced_str is not None:
             package_bean.produced = stix2_str_to_datetime(produced_str)
         else:
-            package_bean.produced = datetime.datetime.now()
+            package_bean.produced = datetime.datetime.now(tz=pytz.utc)
         package_bean.is_post_sns = True
         package_bean.is_created_by_sns = False
         package_bean.related_packages = None
