@@ -18,6 +18,12 @@ $(function(){
         'hideMethod': 'fadeOut'
     };
 
+    // Delete列の表示設定
+    var delete_visible = false;
+    if($('input[name="delete-visible"]').val() == "True"){         
+        delete_visible　= true
+    }
+
     //DataTable初期化
     table = $('#cti-table').DataTable({
         searching: true,
@@ -42,7 +48,7 @@ $(function(){
         	{width:'5%'},	//MISP
         ],
         columnDefs:[
-                    {targets:0,orderable:false,className:'file-delete-td'},
+                    {targets:0,orderable:false,className:'file-delete-td',visible:delete_visible},
                     {targets:1,orderable:true},
                     {targets:2,orderable:true},
                     {targets:3,orderable:true},

@@ -3,7 +3,7 @@ import traceback
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http.response import HttpResponse
-from ctirs.error.views import error_page_inactive, error_page_free_format, error_page
+from ctirs.error.views import error_page_inactive, error_page_no_view_permission, error_page_free_format, error_page
 from ctirs.core.common import get_common_replace_dict, get_text_field_value
 from ctirs.core.mongo.documents_stix import StixFiles
 
@@ -38,6 +38,9 @@ def delete(request):
         return error_page_inactive(request)
     # 削除対象 ID が ,区切り文字列で渡る
     ids = get_list_delete_id(request).split(',')
+    # is_admin権限なしの場合はエラー
+    if not request.user.is_admin:
+        return error_page_no_view_permission(request)
     try:
         for id_ in ids:
             # mongoから該当レコード削除
