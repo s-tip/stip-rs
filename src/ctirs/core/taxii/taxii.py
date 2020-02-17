@@ -72,49 +72,6 @@ class Client(object):
         # _scheduleのstartはschedule単位
         # modify/resume/pauseはjob単位
 
-        # TAXII Protocol 1.1 なら Authentication 設定を行う
-        if self._protocol_version == '1.1':
-            self.set_taxii_11_authentication()
-
-    # TAXII Protocol 1.1 の Authentication 設定を行う
-    def set_taxii_11_authentication(self):
-        try:
-            # auth
-            cert_file = None
-            key_file = None
-
-            # SSL使用設定
-            self._client.set_use_https(self._ssl)
-            # 認証タイプ
-            self._client.set_auth_type(self._auth_type)
-            # BASIC認証情報
-            auth_credentials_dict = {}
-            auth_credentials_dict['username'] = self._username
-            auth_credentials_dict['password'] = self._password
-            # 証明書認証の場合は情報追加
-            if self._auth_type == clients.HttpClient.AUTH_CERT_BASIC:
-                # certificate/private_keyの一時ファイルを作成
-                _, cert_file = tempfile.mkstemp()
-                with open(cert_file, 'w', encoding='utf-8') as fp:
-                    fp.write(self._cert_file)
-                _, key_file = tempfile.mkstemp()
-                with open(key_file, 'w', encoding='utf-8') as fp:
-                    fp.write(self._key_file)
-                auth_credentials_dict['cert_file'] = cert_file
-                auth_credentials_dict['key_file'] = key_file
-            # 認証情報設定
-            self._client.set_auth_credentials(auth_credentials_dict)
-
-        except Exception as e:
-            traceback.print_exc()
-            raise e
-        finally:
-            # 一時ファイルを削除
-            if cert_file is not None:
-                os.remove(cert_file)
-            if key_file is not None:
-                os.remove(key_file)
-
     # TAXII 2.0 用 GET request Header
     def get_taxii_20_get_request_header(self):
         return {
@@ -220,61 +177,91 @@ class Client(object):
 
     # poll(version 1.1) entry
     def poll_11(self):
-        # request xml作成
-        poll_parameters = tm11.PollParameters()
-        poll_request = tm11.PollRequest(
-            message_id=tm11.generate_message_id(),
-            collection_name=self._collection_name,
-            exclusive_begin_timestamp_label=self._start,
-            inclusive_end_timestamp_label=self._end,
-            poll_parameters=poll_parameters,
-        )
-        last_requested = datetime.datetime.now(pytz.utc)
+        auth_credentials_dict = {}
+        auth_credentials_dict['username'] = self._username
+        auth_credentials_dict['password'] = self._password
+        # 証明書認証の場合は情報追加
+        if self._auth_type == clients.HttpClient.AUTH_CERT_BASIC:
+            # certificate/private_keyの一時ファイルを作成
+            _, cert_file = tempfile.mkstemp()
+            with open(cert_file, 'w', encoding='utf-8') as fp:
+                fp.write(self._cert_file)
+            _, key_file = tempfile.mkstemp()
+            with open(key_file, 'w', encoding='utf-8') as fp:
+                fp.write(self._key_file)
+            auth_credentials_dict['cert_file'] = cert_file
+            auth_credentials_dict['key_file'] = key_file
+        # 認証情報設定
+        self._client.set_auth_credentials(auth_credentials_dict)
 
-        # from xml.dom.minidom import parseString
-        # print( parseString(poll_request.to_xml()).toprettyxml(encoding='utf-8'))
-
-        # request
-        http_resp = self._client.call_taxii_service2(
-            self._address,
-            self._path,
-            const.VID_TAXII_XML_11,
-            poll_request.to_xml(),
-            port=self._port)
-
-        # taxii_message抽出
-        taxii_message = libtaxii.get_message_from_http_response(http_resp, poll_request.message_id)
-
-        # content_blocks が None or 存在しない場合は登録ししない
         try:
-            if taxii_message.content_blocks is None:
-                return 0
-        except AttributeError:
-            return 0
+            # request xml作成
+            poll_parameters = tm11.PollParameters()
+            poll_request = tm11.PollRequest(
+                message_id=tm11.generate_message_id(),
+                collection_name=self._collection_name,
+                exclusive_begin_timestamp_label=self._start,
+                inclusive_end_timestamp_label=self._end,
+                poll_parameters=poll_parameters,
+            )
+            last_requested = datetime.datetime.now(pytz.utc)
 
-        # content_blocksごとに登録処理
-        count = 0
-        for cb in taxii_message.content_blocks:
-            # stixファイルを一時ファイルに出力
-            _, stix_file_path = tempfile.mkstemp(suffix='.xml')
-            with open(stix_file_path, 'wb+') as fp:
-                # cb.contentがstixの中身
-                fp.write(cb.content)
-            # 登録
+            # from xml.dom.minidom import parseString
+            # print( parseString(poll_request.to_xml()).toprettyxml(encoding='utf-8'))
+
+            # request
+            http_resp = self._client.call_taxii_service2(
+                self._address,
+                self._path,
+                const.VID_TAXII_XML_11,
+                poll_request.to_xml(),
+                port=self._port)
+
+            # taxii_message抽出
+            taxii_message = libtaxii.get_message_from_http_response(http_resp, poll_request.message_id)
+
+            # content_blocks が None or 存在しない場合は登録ししない
             try:
-                from ctirs.core.stix.regist import regist
-                if self._community is not None:
-                    regist(stix_file_path, self._community, self._via)
-                count += 1
-            except BaseException:
-                # taxiiの場合は途中で失敗しても処理を継続する
-                traceback.print_exc()
+                if taxii_message.content_blocks is None:
+                    return 0
+            except AttributeError:
+                return 0
 
-        # last_requested更新
-        self._taxii.last_requested = last_requested
-        self._taxii.save()
+            # content_blocksごとに登録処理
+            count = 0
+            for cb in taxii_message.content_blocks:
+                # stixファイルを一時ファイルに出力
+                _, stix_file_path = tempfile.mkstemp(suffix='.xml')
+                with open(stix_file_path, 'wb+') as fp:
+                    # cb.contentがstixの中身
+                    fp.write(cb.content)
+                # 登録
+                try:
+                    from ctirs.core.stix.regist import regist
+                    if self._community is not None:
+                        regist(stix_file_path, self._community, self._via)
+                    count += 1
+                except BaseException:
+                    # taxiiの場合は途中で失敗しても処理を継続する
+                    traceback.print_exc()
 
-        return count
+            # last_requested更新
+            self._taxii.last_requested = last_requested
+            self._taxii.save()
+
+            return count
+
+        finally:
+            if 'cert_file' in auth_credentials_dict:
+                try:
+                    os.remove(auth_credentials_dict['cert_file'])
+                except Exception:
+                    pass
+            if 'key_file' in auth_credentials_dict:
+                try:
+                    os.remove(auth_credentials_dict['key_file'])
+                except Exception:
+                    pass
 
     def debug_print(self, msg):
         print(msg)
