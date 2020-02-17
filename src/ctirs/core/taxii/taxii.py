@@ -50,6 +50,8 @@ class Client(object):
         self._username = taxii.login_id
         self._password = taxii.login_password
         self._ssl = taxii.ssl
+        self._client.set_use_https(self._ssl)
+        self._client.set_auth_type(self._auth_type)
 
         # proxy 設定があれば設定する
         self._proxies = System.get_request_proxies()
