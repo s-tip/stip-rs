@@ -249,10 +249,7 @@ def feeds(request):
         user_id = get_feeds_user_id(request)
         instance = get_feeds_instance(request)
         content = get_feeds_content(request)
-        try:
-            query_string = request.GET['query_string']
-        except KeyError:
-            query_string = None
+        query_string = request.GET(key='query_string', default=None)
         # index は 0 開始
         index = get_feeds_index(request)
         size = get_feeds_size(request)  # 指定なし時は size = -1
@@ -279,7 +276,7 @@ def feeds(request):
         if query_string is not None:
             # 空白スペース区切りで分割
             query_strings = query_string.split(' ')
-            # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 稿/タイトル・ユーザ名・スクリーン名)
+            # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル・ユーザ名・スクリーン名)
             if len(query_strings) == 1:
                 QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
             else:
@@ -518,9 +515,9 @@ def query(request):
                 if f_flag == 0:
                     # 空白スペース区切りの場合(検索対象: 投稿/タイトル)
                     query = Q(package_name__icontains=q) | Q(post__icontains=q)
+                    f_flag = 1
                 else:
                     query |= Q(package_name__icontains=q) | Q(post__icontains=q)
-                f_flag += 1
             QQ &= (query)
 
         stix_files = set([])
