@@ -249,7 +249,7 @@ def feeds(request):
         user_id = get_feeds_user_id(request)
         instance = get_feeds_instance(request)
         content = get_feeds_content(request)
-        query_string = request.GET(key='query_string', default=None)
+        query_string = request.GET.get(key='query_string', default=None)
         # index は 0 開始
         index = get_feeds_index(request)
         size = get_feeds_size(request)  # 指定なし時は size = -1
