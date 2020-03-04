@@ -280,14 +280,14 @@ def feeds(request):
             if len(query_strings) == 1:
                 QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
             else:
-                f_flag = 0
+                f_flag = True
                 for q in query_strings:
-                    if f_flag == 0:
+                    if f_flag:
                         # 空白スペース区切りの場合(検索対象: 投稿/タイトル)
                         query = Q(package_name__icontains=q) | Q(post__icontains=q)
-                        f_flag = 1
+                        f_flag = False
                     else:
-                        query |= Q(package_name__icontains=q) | Q(post__icontains=q)
+                        query &= Q(package_name__icontains=q) | Q(post__icontains=q)
                 QQ &= (query)
 
         # user_id が指定の場合はその user_id の投稿のみを抽出
@@ -507,14 +507,14 @@ def query(request):
         if len(query_strings) == 1:
             QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
         else:
-            f_flag = 0
+            f_flag = True
             for q in query_strings:
-                if f_flag == 0:
+                if f_flag:
                     # 空白スペース区切りの場合(検索対象: 投稿/タイトル)(大文字小文字区別せず)
                     query = Q(package_name__icontains=q) | Q(post__icontains=q)
-                    f_flag = 1
+                    f_flag = False
                 else:
-                    query |= Q(package_name__icontains=q) | Q(post__icontains=q)
+                    query &= Q(package_name__icontains=q) | Q(post__icontains=q)
             QQ &= (query)
 
         stix_files = set([])
