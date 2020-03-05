@@ -276,18 +276,18 @@ def feeds(request):
         if query_string is not None:
             # 空白スペース区切りで分割
             query_strings = query_string.split(' ')
-            # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル・ユーザ名・スクリーン名)
+            # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名)
             if len(query_strings) == 1:
                 QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
             else:
                 f_flag = True
                 for q in query_strings:
                     if f_flag:
-                        # 空白スペース区切りの場合(検索対象: 投稿/タイトル)
-                        query = Q(package_name__icontains=q) | Q(post__icontains=q)
+                        # 空白スペース区切りの場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名)
+                        query = Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
                         f_flag = False
                     else:
-                        query &= Q(package_name__icontains=q) | Q(post__icontains=q)
+                        query &= Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
                 QQ &= (query)
 
         # user_id が指定の場合はその user_id の投稿のみを抽出
@@ -503,18 +503,18 @@ def query(request):
 
         # 空白スペース区切りで分割
         query_strings = query_string.split(' ')
-        # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル・ユーザ名・スクリーン名)(大文字小文字区別せず)
+        # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名)(大文字小文字区別せず)
         if len(query_strings) == 1:
             QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
         else:
             f_flag = True
             for q in query_strings:
                 if f_flag:
-                    # 空白スペース区切りの場合(検索対象: 投稿/タイトル)(大文字小文字区別せず)
-                    query = Q(package_name__icontains=q) | Q(post__icontains=q)
+                    # 空白スペース区切りの場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名)(大文字小文字区別せず)
+                    query = Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
                     f_flag = False
                 else:
-                    query &= Q(package_name__icontains=q) | Q(post__icontains=q)
+                    query &= Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
             QQ &= (query)
 
         stix_files = set([])
