@@ -106,6 +106,7 @@ def get_feeds_from_rs(
         user_id=None,
         range_small_datetime=None,  # 期間範囲指定の小さい方(古い方)。この時間を含む
         range_big_datetime=None,  # 期間範囲指定の大きい方(新しい方)。この時間を含む
+        query_string=None,
         index=0,
         size=-1):
     # start_time は aware な datetime
@@ -128,6 +129,9 @@ def get_feeds_from_rs(
     if range_big_datetime is not None:
         # 2018-02-22 08:54:47.187184 のようなフォーマットをGMTでおくる
         params['range_big_datetime'] = get_dtstr_from_datetime(range_big_datetime)
+    # query_string 指定があった場合は設定する
+    if query_string is not None:
+        params['query_string'] = query_string
 
     # index, size 追加
     params['index'] = str(index)
@@ -148,12 +152,14 @@ def get_feeds_from_rs(
 # 検索
 def query(
         api_user,
-        query_string):
+        query_string,
+        size=-1):
     url = '%s' % (SNSConfig.get_rs_query_url())
     headers = _get_ctirs_api_http_headers(api_user)
     params = {}
     # index, size 追加
     params['query_string'] = query_string
+    params['size'] = str(size)
     rsp = requests.get(
         url,
         headers=headers,

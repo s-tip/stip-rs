@@ -520,10 +520,11 @@ class Feed(models.Model):
     # RS に query をかける
     def query(
             api_user=None,
-            query_string=''):
+            query_string='',
+            size=-1):
         feeds_ = []
         # RS に queryする
-        packages_from_rs = rs.query(api_user, query_string)
+        packages_from_rs = rs.query(api_user, query_string, size)
         for package_from_rs in packages_from_rs:
             feed = Feed.get_feeds_from_package_from_rs(api_user, package_from_rs)
             feeds_.append(feed)
@@ -536,6 +537,7 @@ class Feed(models.Model):
             last_feed_datetime=None,  # last_feed_datetime 指定の場合は、この時間を起点とし、新しい投稿を探す (時間ピッタリは含まない)
             range_small_datetime=None,  # 期間範囲指定の小さい方(古い方)。この時間を含む
             range_big_datetime=None,  # 期間範囲指定の大きい方(新しい方)。この時間を含む
+            query_string=None,
             index=0,
             size=-1,
             user_id=None):
@@ -554,6 +556,7 @@ class Feed(models.Model):
                 user_id=user_id,
                 range_small_datetime=range_small_datetime,
                 range_big_datetime=range_big_datetime,
+                query_string=query_string,
                 index=index,
                 size=size)
         else:
@@ -564,6 +567,7 @@ class Feed(models.Model):
                 user_id=user_id,
                 range_small_datetime=range_small_datetime,
                 range_big_datetime=range_big_datetime,
+                query_string=query_string,
                 index=index,
                 size=size)
 
