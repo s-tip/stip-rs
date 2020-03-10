@@ -313,4 +313,4 @@ def get_package_bean(stix_file_path):
 
     except Exception as e:
         traceback.print_exc()
-        raise Exception('Can\'t parse STIX. ' + e.message)
+        raise Exception('Can\'t parse STIX. ' + str(e))

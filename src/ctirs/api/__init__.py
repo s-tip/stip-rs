@@ -70,7 +70,7 @@ class JsonResponse(HttpResponse):
 def error(e):
     d = {}
     d['return_code'] = '1'
-    d['userMessage'] = e.message
+    d['userMessage'] = str(e)
     return JsonResponse(d, status=500, safe=False)
 
 
