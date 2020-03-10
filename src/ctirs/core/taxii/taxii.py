@@ -105,44 +105,43 @@ class Client(object):
     # resume job
     def resume_job(self, job_id):
         schedule_job = ScheduleJobs.objects.get(id=job_id)
+        index = -1
         # interval job と一緒の場合
         if self._interval_job == schedule_job:
-            if schedule_job.status == ScheduleJobs.STATUS_STOP:
-                pass
-            else:
+            if schedule_job.status == ScheduleJobs.STATUS_IN_OPERATION:
                 print('already working.')
-            return
+                return
         # schedule_jobと一緒(cron_jobリストにふくまれている)
         if schedule_job in self._jobs:
-            if schedule_job.status == ScheduleJobs.STATUS_STOP:
-                pass
-            else:
+            index = self._jobs.index(schedule_job)
+            if schedule_job.status == ScheduleJobs.STATUS_IN_OPERATION:
                 print('already working.')
                 return
         else:
             raise Exception('invalid job_id')
         self._schedule.resume_job(schedule_job)
+        if index > -1:
+            self._jobs[index] = schedule_job
 
     # stop job
     def pause_job(self, job_id):
         schedule_job = ScheduleJobs.objects.get(id=job_id)
+        index = -1
         # interval job と一緒の場合
         if self._interval_job == schedule_job:
-            if schedule_job.status == ScheduleJobs.STATUS_IN_OPERATION:
-                pass
-            else:
+            if schedule_job.status == ScheduleJobs.STATUS_STOP:
                 print('not yet start.')
-            return
+                return
         if schedule_job in self._jobs:
-            if schedule_job.status == ScheduleJobs.STATUS_IN_OPERATION:
-                pass
-            else:
+            index = self._jobs.index(schedule_job)
+            if schedule_job.status == ScheduleJobs.STATUS_STOP:
                 print('not yet start.')
                 return
         else:
             raise Exception('invalid job_id')
-            return
         self._schedule.pause_job(schedule_job)
+        if index > -1:
+            self._jobs[index] = schedule_job
 
     # remove_job job
     def remove_job(self, job_id):
@@ -168,7 +167,7 @@ class Client(object):
     def poll_job(self):
         if self._taxii.last_requested is not None:
             self.set_start_time(self._taxii.last_requested.replace(tzinfo=pytz.utc))
-            self.poll()
+        self.poll()
 
     # poll entry
     def poll(self):
