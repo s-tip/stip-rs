@@ -41,7 +41,7 @@ def get_stix_file_package_id_document_info(request, package_id):
 # DELETE /api/v1/stix_files_package_id/<package_id>
 def delete_stix_file_package_id_document_info(package_id):
     try:
-        api_root.delete_stix_document(package_id=package_id)
+        api_root.delete_stix_related_document(package_id=package_id)
     except Exception as e:
         return api_root.error(e)
 

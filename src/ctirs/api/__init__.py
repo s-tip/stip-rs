@@ -118,3 +118,14 @@ def delete_stix_document(id_=None, package_id=None):
     if os.path.exists(origin_path):
         os.remove(origin_path)
     return
+
+
+def delete_stix_related_document(package_id=None):
+    if package_id is not None:
+        # mongoのdocument削除
+        origin_paths = StixFiles.delete_by_related_packages(package_id)
+        # ファイル削除
+        for origin_path in origin_paths:
+            if os.path.exists(origin_path):
+                os.remove(origin_path)
+    return

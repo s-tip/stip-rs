@@ -18,6 +18,7 @@ from cybox.objects.mutex_object import Mutex
 from cybox.objects.network_connection_object import NetworkConnection
 from ctirs.core.mongo.documents import Communities, Vias, InformationSources
 from ctirs.models.rs.models import System
+from ctirs.models.sns.feeds.models import Feed
 from stip.common.tld import TLD
 
 
@@ -191,7 +192,11 @@ class StixFiles(Document):
     def delete_by_id(cls, id_):
         # documentを削除し、origin_pathを返却
         o = StixFiles.objects.get(id=id_)
+        package_id = o.package_id
         o.delete()
+
+        # MySQLのレコードを削除
+        Feed.delete_record_related_packages(package_id)
         return o.origin_path
 
     @classmethod
@@ -199,7 +204,50 @@ class StixFiles(Document):
         # documentを削除し、origin_pathを返却
         o = StixFiles.objects.get(package_id=package_id)
         o.delete()
+
+        # MySQLのレコードを削除
+        Feed.delete_record_related_packages(package_id)
         return o.origin_path
+
+    @classmethod
+    def delete_by_related_packages(cls, package_id):
+        # 連携するdocumentを削除し、origin_pathのリストを返却
+        origin_path_list = []
+
+        # package_idのrelated_packagesにあるdocumentを削除
+        o = StixFiles.objects.get(package_id=package_id)
+        related_packages = o.related_packages
+        if related_packages is not None:
+            for related_package in related_packages:
+                related_o = StixFiles.objects.get(package_id=related_package)
+                related_o.delete()
+                origin_path_list.append(related_o.origin_path)
+
+        remove_related_packages = []
+        # related_packageにpackage_idを含むdocumentを削除
+        objs = StixFiles.objects.filter(related_packages=[package_id])
+        for obj in objs:
+            remove_related_packages.append(obj.package_id)
+            origin_path_list.append(obj.origin_path)
+        objs.delete()
+
+        # 最後にdocumentを削除
+        o.delete()
+        origin_path_list.append(o.origin_path)
+
+        # MySQLのrelated_packagesを削除
+        if related_packages is not None:
+            for related_package in related_packages:
+                Feed.delete_record_related_packages(related_package)
+
+        # MySQLのremove_related_packagesを削除
+        if remove_related_packages is not None:
+            for remove_related_package in remove_related_packages:
+                Feed.delete_record_related_packages(remove_related_package)
+
+        # MySQLのレコードを削除
+        Feed.delete_record_related_packages(package_id)
+        return origin_path_list
 
     # Instance名とunique名の複合文字列を返却する
     def get_unique_name(self):
