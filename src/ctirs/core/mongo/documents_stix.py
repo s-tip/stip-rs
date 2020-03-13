@@ -130,7 +130,7 @@ class StixFiles(Document):
             if stix.produced is None:
                 stix_package = STIXPackage.from_xml(stix.origin_path)
                 # STIX Pacakge のタイムスタンプがあれば採用
-                if stix_package.timestamp is not None:
+                if stix_package.timestamp:
                     stix.produced = stix_package.timestamp
                 else:
                     # なければcreatedと同じ
@@ -217,7 +217,7 @@ class StixFiles(Document):
         # package_idのrelated_packagesにあるdocumentを削除
         o = StixFiles.objects.get(package_id=package_id)
         related_packages = o.related_packages
-        if related_packages is not None:
+        if related_packages:
             for related_package in related_packages:
                 related_o = StixFiles.objects.get(package_id=related_package)
                 related_o.delete()
@@ -236,12 +236,12 @@ class StixFiles(Document):
         origin_path_list.append(o.origin_path)
 
         # MySQLのrelated_packagesを削除
-        if related_packages is not None:
+        if related_packages:
             for related_package in related_packages:
                 Feed.delete_record_related_packages(related_package)
 
         # MySQLのremove_related_packagesを削除
-        if remove_related_packages is not None:
+        if remove_related_packages:
             for remove_related_package in remove_related_packages:
                 Feed.delete_record_related_packages(remove_related_package)
 
@@ -270,7 +270,7 @@ class StixFiles(Document):
         # stix_packageを取得する
         stix_package = self.get_stix_package()
         # None以外の場合は STIX 1.x 系
-        if stix_package is not None:
+        if stix_package:
             self.split_child_nodes_stix_1_x(stix_package)
         else:
             self.split_child_nodes_stix_2_x()
@@ -324,7 +324,7 @@ class StixFiles(Document):
                 else:
                     StixOthers.create(object_, self)
             f.close()
-        except Exception as e:
+        except Exception:
             import traceback
             traceback.print_exc()
             return None
@@ -333,10 +333,10 @@ class StixFiles(Document):
     def split_child_nodes_stix_1_x(self, stix_package):
         # indicators の中の Observable を追加
         indicators = stix_package.indicators
-        if indicators is not None:
+        if indicators:
             # indicator の 回数だけ繰り返す
             for indicator in indicators:
-                if indicator is not None:
+                if indicator:
                     # StixIndicatorとキャッシュを作成する
                     try:
                         StixIndicators.create(indicator, self)
@@ -345,9 +345,9 @@ class StixFiles(Document):
 
         # Observables の中の Observable を追加
         observables = stix_package.observables
-        if observables is not None:
+        if observables:
             for observable in observables:
-                if observable is not None:
+                if observable:
                     try:
                         # StixObservableとキャッシュを作成する
                         StixObservables.create(observable, self)
@@ -356,9 +356,9 @@ class StixFiles(Document):
 
         # Campaigns の中の Campaign を追加
         campaigns = stix_package.campaigns
-        if campaigns is not None:
+        if campaigns:
             for campaign in campaigns:
-                if campaign is not None:
+                if campaign:
                     try:
                         # StixCampaignsを作成する
                         StixCampaigns.create(campaign, self)
@@ -367,9 +367,9 @@ class StixFiles(Document):
 
         # Incidents の中の Incident を追加
         incidents = stix_package.incidents
-        if incidents is not None:
+        if incidents:
             for incident in incidents:
-                if incident is not None:
+                if incident:
                     try:
                         # StixIncidentsを作成する
                         StixIncidents.create(incident, self)
@@ -378,9 +378,9 @@ class StixFiles(Document):
 
         # ThreatActors の中の ThreatActor を追加
         threat_actors = stix_package.threat_actors
-        if threat_actors is not None:
+        if threat_actors:
             for threat_actor in threat_actors:
-                if threat_actor is not None:
+                if threat_actor:
                     try:
                         # StixThreatActorsを作成する
                         StixThreatActors.create(threat_actor, self)
@@ -389,9 +389,9 @@ class StixFiles(Document):
 
         # ExpoitTargets の中の ExploitTarget を追加
         exploit_targets = stix_package.exploit_targets
-        if exploit_targets is not None:
+        if exploit_targets:
             for exploit_target in exploit_targets:
-                if exploit_target is not None:
+                if exploit_target:
                     try:
                         # StixExploitTargetsとキャッシュを作成する
                         StixExploitTargets.create(exploit_target, self)
@@ -400,9 +400,9 @@ class StixFiles(Document):
 
         # CoursesOfactions の中の CoursesOfaction を追加
         courses_of_action = stix_package.courses_of_action
-        if courses_of_action is not None:
+        if courses_of_action:
             for course_of_action in courses_of_action:
-                if course_of_action is not None:
+                if course_of_action:
                     try:
                         # StixCoursesOfActionを作成する
                         StixCoursesOfAction.create(course_of_action, self)
@@ -411,9 +411,9 @@ class StixFiles(Document):
 
         # TTPs の中の TTP を追加
         ttps = stix_package.ttps
-        if ttps is not None:
+        if ttps:
             for ttp in ttps:
-                if ttp is not None:
+                if ttp:
                     try:
                         # StixTTPsを作成する
                         StixTTPs.create(ttp, self)
@@ -571,13 +571,13 @@ class Stix2Base(Document):
 
     @classmethod
     def get_lists_or_string(cls, value):
-        l = []
+        list_ = []
         if isinstance(value, list):
             for item in value:
-                l.append(item)
+                list_.append(item)
         else:
-            l.append(value)
-        return l
+            list_.append(value)
+        return list_
 
     @classmethod
     def create(cls, document, object_, stix_file):
@@ -1214,7 +1214,7 @@ class StixSightings(Stix2Base):
                     pass
 
             # bundle 作成
-            if observed_data_identity is not None:
+            if observed_data_identity:
                 bundle = stix2.Bundle(observed_data, sighting, observed_data_identity, sighting_identity)
             else:
                 bundle = stix2.Bundle(observed_data, sighting, sighting_identity)
@@ -1331,12 +1331,12 @@ class StixIndicators(Document):
         document = StixIndicators()
         document.indicator_id = indicator.id_
         document.title = indicator.title
-        if indicator.description is not None:
+        if indicator.description:
             document.description = indicator.description.value
         document.object_ = indicator.to_dict()
         document.stix_file = stix_file
         # Timestamp指定がある場合はその時間を格納
-        if indicator.timestamp is not None:
+        if indicator.timestamp:
             document.created = indicator.timestamp
             document.modified = indicator.timestamp
         document.save()
@@ -1398,7 +1398,7 @@ class StixObservables(Document):
         document = StixObservables()
         document.observable_id = observable.id_
         document.title = observable.title
-        if observable.description is not None:
+        if observable.description:
             document.description = observable.description.value
         try:
             document.object_ = observable.object_.to_dict()
@@ -1407,7 +1407,7 @@ class StixObservables(Document):
         document.stix_file = stix_file
         document.save()
         # ObservableCaches作成
-        if document.object_ is not None:
+        if document.object_:
             ObservableCaches.create(observable, stix_file, observable.id_)
         return
 
@@ -1465,7 +1465,7 @@ class StixCampaigns(Document):
         document = StixCampaigns()
         document.campaign_id = campaign.id_
         document.title = campaign.title
-        if campaign.description is not None:
+        if campaign.description:
             document.description = campaign.description.value
         document.object_ = campaign.to_dict()
         document.stix_file = stix_file
@@ -1494,7 +1494,7 @@ class StixIncidents(Document):
         document = StixIncidents()
         document.incident_id = incident.id_
         document.title = incident.title
-        if incident.description is not None:
+        if incident.description:
             document.description = incident.description.value
         document.object_ = incident.to_dict()
         document.stix_file = stix_file
@@ -1523,7 +1523,7 @@ class StixThreatActors(Document):
         document = StixThreatActors()
         document.ta_id = ta.id_
         document.title = ta.title
-        if ta.description is not None:
+        if ta.description:
             document.description = ta.description.value
         document.object_ = ta.to_dict()
         document.stix_file = stix_file
@@ -1553,10 +1553,10 @@ class StixExploitTargets(Document):
         document = StixExploitTargets()
         document.et_id = et.id_
         document.title = et.title
-        if et.description is not None:
+        if et.description:
             document.description = et.description.value
         document.object_ = et.to_dict()
-        if et.vulnerabilities is not None:
+        if et.vulnerabilities:
             for vulnerability in et.vulnerabilities:
                 try:
                     document.cve_ids.append(vulnerability.cve_id)
@@ -1590,7 +1590,7 @@ class StixCoursesOfAction(Document):
         document = StixCoursesOfAction()
         document.coa_id = coa.id_
         document.title = coa.title
-        if coa.description is not None:
+        if coa.description:
             document.description = coa.description.value
         document.object_ = coa.to_dict()
         document.stix_file = stix_file
@@ -1620,13 +1620,13 @@ class StixTTPs(Document):
         document = StixTTPs()
         document.ttp_id = ttp.id_
         document.title = ttp.title
-        if ttp.description is not None:
+        if ttp.description:
             document.description = ttp.description.value
         document.object_ = ttp.to_dict()
         document.stix_file = stix_file
         document.save()
         # ExploitTargetCaches作成
-        if ttp.exploit_targets is not None:
+        if ttp.exploit_targets:
             for et in ttp.exploit_targets:
                 ExploitTargetCaches.create(et.item, stix_file, ttp.id_)
         return
@@ -1671,7 +1671,7 @@ class ExploitTargetCaches(Document):
             document.type = 'cve_id'
             document.et_id = et.id_
             document.title = et.title
-            if et.description is not None:
+            if et.description:
                 document.description = et.description.value
             document.value = vulnerability.cve_id
             document.stix_file = stix_file
@@ -1696,7 +1696,7 @@ class ExploitTargetCaches(Document):
             document.type = 'cve_id'
             document.et_id = node_id
             document.title = stix_vulnerability.name
-            if stix_vulnerability.description is not None:
+            if stix_vulnerability.description:
                 document.description = stix_vulnerability.description
             document.value = cve
             document.stix_file = stix_vulnerability.stix_file
@@ -1816,7 +1816,7 @@ class ObservableCaches(Document):
             tld = TLD(rs_system.public_suffix_list_file_path)
             document.domain_without_tld, document.domain_tld = tld.split_domain(value)
             # さらに xxx.yyy.com の yyyの部分を独立して保存
-            if document.domain_without_tld is not None:
+            if document.domain_without_tld:
                 document.domain_last = document.domain_without_tld.split('.')[-1]
         document.type = type_
         document.value = value
@@ -1834,24 +1834,24 @@ class ObservableCaches(Document):
         document = ObservableCaches()
         document.observable_id = observable.id_
         document.title = observable.title
-        if observable.description is not None:
+        if observable.description:
             document.description = observable.description.value
         object_ = observable.object_
-        if object_ is not None:
+        if object_:
             document.object_ = object_.to_dict()
             properties = object_.properties
-            if properties is not None:
+            if properties:
                 if isinstance(properties, File):
-                    if properties.md5 is not None:
+                    if properties.md5:
                         document.type = 'md5'
                         document.value = str(properties.md5)
-                    elif properties.sha1 is not None:
+                    elif properties.sha1:
                         document.type = 'sha1'
                         document.value = str(properties.sha1)
-                    elif properties.sha256 is not None:
+                    elif properties.sha256:
                         document.type = 'sha256'
                         document.value = str(properties.sha256)
-                    elif properties.sha512 is not None:
+                    elif properties.sha512:
                         document.type = 'sha512'
                         document.value = str(properties.sha512)
                     else:
@@ -1872,7 +1872,7 @@ class ObservableCaches(Document):
                     tld = TLD(rs_system.public_suffix_list_file_path)
                     document.domain_without_tld, document.domain_tld = tld.split_domain(properties.value.value)
                     # さらに xxx.yyy.com の yyyの部分を独立して保存
-                    if document.domain_without_tld is not None:
+                    if document.domain_without_tld:
                         document.domain_last = document.domain_without_tld.split('.')[-1]
                 elif isinstance(properties, URI):
                     # type が URL だけ対象
@@ -1964,7 +1964,7 @@ class ObservableCaches(Document):
     # Socket Object から type, value を取得
     @classmethod
     def create_from_socket_object(cls, socket):
-        if socket is not None:
+        if socket:
             return cls.create_address_object(socket.ip_address)
         else:
             return (None, None)
