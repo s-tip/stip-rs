@@ -213,6 +213,7 @@ class StixFiles(Document):
     def delete_by_related_packages(cls, package_id):
         # 連携するdocumentを削除し、origin_pathのリストを返却
         origin_path_list = []
+        remove_package_ids = []
 
         # package_idのrelated_packagesにあるdocumentを削除
         o = StixFiles.objects.get(package_id=package_id)
@@ -222,6 +223,7 @@ class StixFiles(Document):
                 related_o = StixFiles.objects.get(package_id=related_package)
                 related_o.delete()
                 origin_path_list.append(related_o.origin_path)
+                remove_package_ids.append(related_package)
 
         remove_related_packages = []
         # related_packageにpackage_idを含むdocumentを削除
@@ -229,11 +231,13 @@ class StixFiles(Document):
         for obj in objs:
             remove_related_packages.append(obj.package_id)
             origin_path_list.append(obj.origin_path)
+            remove_package_ids.append(obj.package_id)
         objs.delete()
 
         # 最後にdocumentを削除
         o.delete()
         origin_path_list.append(o.origin_path)
+        remove_package_ids.append(package_id)
 
         # MySQLのrelated_packagesを削除
         if related_packages:
@@ -247,7 +251,7 @@ class StixFiles(Document):
 
         # MySQLのレコードを削除
         Feed.delete_record_related_packages(package_id)
-        return origin_path_list
+        return origin_path_list, remove_package_ids
 
     # Instance名とunique名の複合文字列を返却する
     def get_unique_name(self):

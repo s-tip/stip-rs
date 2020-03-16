@@ -86,8 +86,8 @@ def get_put_normal_status():
     return JsonResponse(d, status=201, safe=False)
 
 
-def get_delete_normal_status():
-    return JsonResponse(None, status=200, safe=False)
+def get_delete_normal_status(data_dict=None):
+    return JsonResponse(data_dict, status=200, safe=False)
 
 
 def is_exist_file_option(request):
@@ -123,7 +123,7 @@ def delete_stix_document(id_=None, package_id=None):
 def delete_stix_related_document(package_id=None):
     if package_id:
         # mongoのdocument削除
-        origin_paths = StixFiles.delete_by_related_packages(package_id)
+        origin_paths, remove_package_ids = StixFiles.delete_by_related_packages(package_id)
         # ファイル削除
         for origin_path in origin_paths:
             try:
@@ -133,4 +133,4 @@ def delete_stix_related_document(package_id=None):
                 pass
             except IsADirectoryError:
                 pass
-    return
+    return remove_package_ids
