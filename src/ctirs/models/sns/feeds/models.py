@@ -3,6 +3,7 @@ import datetime
 import pytz
 import os
 import base64
+import shutil
 from . import rs
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -105,31 +106,31 @@ class Feed(models.Model):
         if feeds_ is None:
             return []
 
-        l = []
+        list_ = []
         for feed_ in feeds_:
             # 自分の投稿ならリスト追加
             if request_user is not None:
                 if request_user == feed_.user:
-                    l.append(feed_)
+                    list_.append(feed_)
                     continue
             # sharing_range_typeがallなら追加
             if feed_.sharing_range_type == const.SHARING_RANGE_TYPE_KEY_ALL:
-                l.append(feed_)
+                list_.append(feed_)
                 continue
             elif feed_.sharing_range_type == const.SHARING_RANGE_TYPE_KEY_GROUP:
                 # sharing_group に ログインユーザが含まれていたら追加
                 if request_user is not None:
-                    # filter は Profile の user 検索ではなく STIPUser で行う
+                    # filter は Profile の user 検索ではなく STIPUser で行うlist_
                     if len(feed_.sharing_group.members.filter(username=request_user)) == 1:
-                        l.append(feed_)
+                        list_.append(feed_)
                         continue
             elif feed_.sharing_range_type == const.SHARING_RANGE_TYPE_KEY_PEOPLE:
                 # sharing_people に ログインユーザが含まれていたら追加
                 if request_user is not None:
                     if request_user in feed_.sharing_people.all():
-                        l.append(feed_)
+                        list_.append(feed_)
                         continue
-        return l
+        return list_
 
     @staticmethod
     # 指定の package_id を元に RS から STIX を取得し Feedを構築する
@@ -491,7 +492,7 @@ class Feed(models.Model):
                     feed.ci = feed.user.ci
                     if feed.user.region is not None:
                         feed.region_code = feed.user.region.code
-        except Feed.DoesNotExist as e:
+        except Feed.DoesNotExist:
             # cache 作成
             feed = Feed.create_feeds_record(api_user, package_id, uploader_id, produced_str)
         except Exception as e:
@@ -634,3 +635,28 @@ class Feed(models.Model):
     def get_feeds_after(last_feed_datetime, api_user=None, user_id=None):
         feeds_ = Feed.get_feeds(last_feed_datetime=last_feed_datetime, api_user=api_user, user_id=user_id)
         return Feed.get_filter_query_set(None, api_user, feeds_=feeds_)
+
+    @staticmethod
+    def delete_record_related_packages(package_id=None):
+        try:
+            feeds_ = Feed.objects.filter(package_id=package_id)
+
+            # MySQLのattachを削除
+            attach_package_ids = []
+            if feeds_:
+                for feed_ in feeds_:
+                    for file_ in feed_.files.all():
+                        attach_package_ids.append(file_.package_id)
+                        file_.delete()
+
+            # attachのディレクトリの削除
+            for attach_package_id in attach_package_ids:
+                attach_dir = Feed.get_attach_stix_dir_path(attach_package_id)
+                if os.path.isdir(attach_dir):
+                    shutil.rmtree(attach_dir)
+
+            # packageの削除
+            Feed.objects.filter(package_id=package_id).delete()
+            return
+        except Exception as e:
+            print(e)

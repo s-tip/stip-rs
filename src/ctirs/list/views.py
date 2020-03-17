@@ -82,7 +82,7 @@ def download(request):
                 dest = doc.get_elevate_2_x()
         except Exception as e:
             traceback.print_exc()
-            return error_page_free_format(request, 'Can\'t Convert because of stix2library. ' + str(e.message))
+            return error_page_free_format(request, 'Can\'t Convert because of stix2library. ' + str(e))
 
         response = HttpResponse(dest)
 

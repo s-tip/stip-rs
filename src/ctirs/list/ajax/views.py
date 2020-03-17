@@ -118,7 +118,7 @@ def publish(request):
     except Exception as e:
         # traceback.print_exc()
         resp = {'status': 'NG',
-                'message': e.message}
+                'message': str(e)}
     return JsonResponse(resp)
 
 
@@ -135,5 +135,5 @@ def misp_import(request):
                 'message': 'Success'}
     except Exception as e:
         resp = {'status': 'NG',
-                'message': e.message}
+                'message': str(e)}
     return JsonResponse(resp)
