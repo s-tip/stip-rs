@@ -214,9 +214,12 @@ class iSightAdapterControl(object):
         private_key = str(isight_adapter.private_key)
         public_key = str(isight_adapter.public_key)
 
-        time_stamp = email.Utils.formatdate(localtime=True)
+        time_stamp = email.utils.formatdate(localtime=True)
         new_data = query + self.ACCEPT_VERSION + accept + time_stamp
-        hashed = hmac.new(private_key, new_data, hashlib.sha256)
+        key = bytearray()
+        key.extend(map(ord, private_key))
+
+        hashed = hmac.new(key, new_data.encode('utf-8'), hashlib.sha256)
         headers = {
             'Accept': accept,
             'Accept-Version': self.ACCEPT_VERSION,

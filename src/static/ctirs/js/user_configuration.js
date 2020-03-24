@@ -93,4 +93,16 @@ $(function(){
             //done fail後の共通処理
         });
     });
+
+    //change-password link クリック
+    $('.change-password').click(function(){
+        var user = $(this).attr('username');
+        var f = $('#change-password-top-form');
+        var elem = document.createElement('input');
+        elem.type = 'hidden';
+        elem.name = 'username';
+        elem.value = $(this).attr('username');
+        f.append(elem);
+        f.submit();
+    });
 });
