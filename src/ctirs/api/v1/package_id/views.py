@@ -19,8 +19,8 @@ def stix_files_package_id(request, package_id):
             return get_stix_file_package_id_document_info(request, package_id)
         elif request.method == 'DELETE':
             # STIX ファイル情報削除
-            delete_stix_file_package_id_document_info(package_id)
-            return api_root.get_delete_normal_status()
+            remove_package_ids = delete_stix_file_package_id_document_info(package_id)
+            return api_root.get_delete_normal_status({"remove_package_ids": remove_package_ids})
         else:
             return HttpResponseNotAllowed(['GET', 'DELETE'])
     except Exception as e:
@@ -33,7 +33,7 @@ def get_stix_file_package_id_document_info(request, package_id):
     try:
         doc = StixFiles.objects.get(package_id=package_id)
         return api_root.get_rest_api_document_info(doc)
-    except Exception as _:
+    except Exception:
         return api_root.error(Exception('The specified id not found.'))
 
 
@@ -41,7 +41,8 @@ def get_stix_file_package_id_document_info(request, package_id):
 # DELETE /api/v1/stix_files_package_id/<package_id>
 def delete_stix_file_package_id_document_info(package_id):
     try:
-        api_root.delete_stix_document(package_id=package_id)
+        remove_package_ids = api_root.delete_stix_related_document(package_id=package_id)
+        return remove_package_ids
     except Exception as e:
         return api_root.error(e)
 

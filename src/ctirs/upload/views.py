@@ -4,7 +4,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.contrib.auth.decorators import login_required
 from ctirs.core.stix.regist import regist
 from ctirs.core.mongo.documents import Communities, Vias
-from ctirs.error.views import error_page, error_page_inactive
+from ctirs.error.views import error_page, error_page_no_view_permission, error_page_inactive
 from ctirs.core.common import get_text_field_value, get_common_replace_dict
 
 
@@ -39,6 +39,9 @@ def top(request):
     # activeユーザー以外はエラー
     if not request.user.is_active:
         return error_page_inactive(request)
+    # is_admin権限なしの場合はエラー
+    if not request.user.is_admin:
+        return error_page_no_view_permission(request)
     try:
         replace_dict = get_common_replace_dict(request)
         replace_dict['communities'] = Communities.objects.all()
@@ -79,6 +82,9 @@ def upload(request):
     # activeユーザー以外はエラー
     if not request.user.is_active:
         return error_page_inactive(request)
+    # is_admin権限なしの場合はエラー
+    if not request.user.is_admin:
+        return error_page_no_view_permission(request)
     # post以外はエラー
     if request.method != 'POST':
         # エラー画面

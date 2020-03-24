@@ -70,7 +70,7 @@ class JsonResponse(HttpResponse):
 def error(e):
     d = {}
     d['return_code'] = '1'
-    d['userMessage'] = e.message
+    d['userMessage'] = str(e)
     return JsonResponse(d, status=500, safe=False)
 
 
@@ -86,8 +86,8 @@ def get_put_normal_status():
     return JsonResponse(d, status=201, safe=False)
 
 
-def get_delete_normal_status():
-    return JsonResponse(None, status=200, safe=False)
+def get_delete_normal_status(data_dict=None):
+    return JsonResponse(data_dict, status=200, safe=False)
 
 
 def is_exist_file_option(request):
@@ -108,9 +108,9 @@ def get_rest_api_document_content(doc):
 
 
 def delete_stix_document(id_=None, package_id=None):
-    if id_ is not None:
+    if id_:
         origin_path = StixFiles.delete_by_id(id_)
-    elif package_id is not None:
+    elif package_id:
         origin_path = StixFiles.delete_by_package_id(package_id)
     else:
         return
@@ -118,3 +118,19 @@ def delete_stix_document(id_=None, package_id=None):
     if os.path.exists(origin_path):
         os.remove(origin_path)
     return
+
+
+def delete_stix_related_document(package_id=None):
+    if package_id:
+        # mongoのdocument削除
+        origin_paths, remove_package_ids = StixFiles.delete_by_related_packages(package_id)
+        # ファイル削除
+        for origin_path in origin_paths:
+            try:
+                os.remove(origin_path)
+            # ファイルが見つからない、ディレクトリのときは無視する
+            except FileNotFoundError:
+                pass
+            except IsADirectoryError:
+                pass
+    return remove_package_ids

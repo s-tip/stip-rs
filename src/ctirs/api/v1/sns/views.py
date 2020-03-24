@@ -249,7 +249,7 @@ def feeds(request):
         user_id = get_feeds_user_id(request)
         instance = get_feeds_instance(request)
         content = get_feeds_content(request)
-
+        query_string = request.GET.get(key='query_string', default=None)
         # index は 0 開始
         index = get_feeds_index(request)
         size = get_feeds_size(request)  # 指定なし時は size = -1
@@ -271,6 +271,24 @@ def feeds(request):
         # 最小より新しい(>=)
         if range_small_datetime is not None:
             QQ &= Q(produced__gte=range_small_datetime)
+
+        # package_name か post に query_string が含まれているか (大文字小文字区別せず)
+        if query_string is not None:
+            # 空白スペース区切りで分割
+            query_strings = query_string.split(' ')
+            # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名)
+            if len(query_strings) == 1:
+                QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
+            else:
+                f_flag = True
+                for q in query_strings:
+                    if f_flag:
+                        # 空白スペース区切りの場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名)
+                        query = Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
+                        f_flag = False
+                    else:
+                        query &= Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
+                QQ &= (query)
 
         # user_id が指定の場合はその user_id の投稿のみを抽出
         from ctirs.models.rs.models import STIPUser
@@ -472,6 +490,7 @@ def query(request):
         if request.method != 'GET':
             return HttpResponseNotAllowed(['GET'])
         # 引数取得
+        size = get_feeds_size(request)  # 指定なし時は size = -1
         query_string = get_query_query_string(request)
         # query_string  未指定時は空リスト返却
         if query_string is None:
@@ -482,8 +501,21 @@ def query(request):
         # 返却条件は SNS に返却　かつ　version 2.0 以外
         QQ = Q(is_post_sns__ne=False) & Q(version__ne='2.0')
 
-        # package_name か post に query_string が含まれているか (大文字小文字区別せず)
-        QQ &= (Q(package_name__icontains=query_string) | Q(post__icontains=query_string))
+        # 空白スペース区切りで分割
+        query_strings = query_string.split(' ')
+        # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名)(大文字小文字区別せず)
+        if len(query_strings) == 1:
+            QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
+        else:
+            f_flag = True
+            for q in query_strings:
+                if f_flag:
+                    # 空白スペース区切りの場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名)(大文字小文字区別せず)
+                    query = Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
+                    f_flag = False
+                else:
+                    query &= Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
+            QQ &= (query)
 
         stix_files = set([])
         # Query
@@ -497,6 +529,10 @@ def query(request):
 
         # 時間でソートする
         stix_files = sorted(list(stix_files), key=lambda s: s.produced, reverse=True)
+
+        # サイズ指定がある場合は上位から指定sizeを取得
+        if size != -1:
+            stix_files = stix_files[:size]
 
         # 返却データ作成
         feeds_list = []

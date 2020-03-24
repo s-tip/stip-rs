@@ -3,6 +3,7 @@ import datetime
 import pytz
 import os
 import base64
+import shutil
 from . import rs
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -12,6 +13,7 @@ from ctirs.models import STIPUser
 from ctirs.models import SNSConfig
 from stix.core.stix_package import STIXPackage
 from stix.extensions.marking.ais import AISMarkingStructure
+from stix.extensions.marking.tlp import TLPMarkingStructure
 from stix.extensions.marking.simple_marking import SimpleMarkingStructure
 from stix.data_marking import MarkingSpecification
 from stix.common.structured_text import StructuredText
@@ -104,31 +106,31 @@ class Feed(models.Model):
         if feeds_ is None:
             return []
 
-        l = []
+        list_ = []
         for feed_ in feeds_:
             # 自分の投稿ならリスト追加
             if request_user is not None:
                 if request_user == feed_.user:
-                    l.append(feed_)
+                    list_.append(feed_)
                     continue
             # sharing_range_typeがallなら追加
             if feed_.sharing_range_type == const.SHARING_RANGE_TYPE_KEY_ALL:
-                l.append(feed_)
+                list_.append(feed_)
                 continue
             elif feed_.sharing_range_type == const.SHARING_RANGE_TYPE_KEY_GROUP:
                 # sharing_group に ログインユーザが含まれていたら追加
                 if request_user is not None:
-                    # filter は Profile の user 検索ではなく STIPUser で行う
+                    # filter は Profile の user 検索ではなく STIPUser で行うlist_
                     if len(feed_.sharing_group.members.filter(username=request_user)) == 1:
-                        l.append(feed_)
+                        list_.append(feed_)
                         continue
             elif feed_.sharing_range_type == const.SHARING_RANGE_TYPE_KEY_PEOPLE:
                 # sharing_people に ログインユーザが含まれていたら追加
                 if request_user is not None:
                     if request_user in feed_.sharing_people.all():
-                        l.append(feed_)
+                        list_.append(feed_)
                         continue
-        return l
+        return list_
 
     @staticmethod
     # 指定の package_id を元に RS から STIX を取得し Feedを構築する
@@ -434,10 +436,10 @@ class Feed(models.Model):
         feed.stix_file_path = stix_file_path
         try:
             uploader_stipuser = STIPUser.objects.get(id=uploader_id)
-            feed.tlp = Feed.get_ais_tlp_from_stix_header(stix_package.stix_header, uploader_stipuser.tlp)
+            feed.tlp = Feed.get_tlp_from_stix_header(stix_package.stix_header, uploader_stipuser.tlp)
             if feed.tlp is None:
-                # 取得ができなかった場合は default TLP の AMBER
-                feed.tlp = 'AMBER'
+                # 取得ができなかった場合は ユーザーアカウントの default TLP
+                feed.tlp = uploader_stipuser.tlp
         except BaseException:
             # uploader_profile が存在しない場合は default TLP の AMBER
             feed.tlp = 'AMBER'
@@ -491,7 +493,7 @@ class Feed(models.Model):
                     feed.ci = feed.user.ci
                     if feed.user.region is not None:
                         feed.region_code = feed.user.region.code
-        except Feed.DoesNotExist as e:
+        except Feed.DoesNotExist:
             # cache 作成
             feed = Feed.create_feeds_record(api_user, package_id, uploader_id, produced_str)
         except Exception as e:
@@ -520,10 +522,11 @@ class Feed(models.Model):
     # RS に query をかける
     def query(
             api_user=None,
-            query_string=''):
+            query_string='',
+            size=-1):
         feeds_ = []
         # RS に queryする
-        packages_from_rs = rs.query(api_user, query_string)
+        packages_from_rs = rs.query(api_user, query_string, size)
         for package_from_rs in packages_from_rs:
             feed = Feed.get_feeds_from_package_from_rs(api_user, package_from_rs)
             feeds_.append(feed)
@@ -536,6 +539,7 @@ class Feed(models.Model):
             last_feed_datetime=None,  # last_feed_datetime 指定の場合は、この時間を起点とし、新しい投稿を探す (時間ピッタリは含まない)
             range_small_datetime=None,  # 期間範囲指定の小さい方(古い方)。この時間を含む
             range_big_datetime=None,  # 期間範囲指定の大きい方(新しい方)。この時間を含む
+            query_string=None,
             index=0,
             size=-1,
             user_id=None):
@@ -554,6 +558,7 @@ class Feed(models.Model):
                 user_id=user_id,
                 range_small_datetime=range_small_datetime,
                 range_big_datetime=range_big_datetime,
+                query_string=query_string,
                 index=index,
                 size=size)
         else:
@@ -564,6 +569,7 @@ class Feed(models.Model):
                 user_id=user_id,
                 range_small_datetime=range_small_datetime,
                 range_big_datetime=range_big_datetime,
+                query_string=query_string,
                 index=index,
                 size=size)
 
@@ -575,14 +581,14 @@ class Feed(models.Model):
             feeds_.append(feed)
         return Feed.get_filter_query_set(None, api_user, feeds_=feeds_)
 
-    # stix_header から AIS の TLP を返却する。該当箇所がない場合はdefault_tlpを返却
+    # stix_header から 標準 の TLP を返却する。該当箇所がない場合はdefault_tlpを返却
     @staticmethod
-    def get_ais_tlp_from_stix_header(stix_header, default_tlp='AMBER'):
+    def get_tlp_from_stix_header(stix_header, default_tlp='AMBER'):
         try:
             for marking in stix_header.handling.marking:
                 marking_strucutre = marking.marking_structures[0]
-                if isinstance(marking_strucutre, AISMarkingStructure):
-                    return marking_strucutre.not_proprietary.tlp_marking.color
+                if isinstance(marking_strucutre, TLPMarkingStructure):
+                    return marking_strucutre.color
         except BaseException:
             pass
         return default_tlp
@@ -630,3 +636,28 @@ class Feed(models.Model):
     def get_feeds_after(last_feed_datetime, api_user=None, user_id=None):
         feeds_ = Feed.get_feeds(last_feed_datetime=last_feed_datetime, api_user=api_user, user_id=user_id)
         return Feed.get_filter_query_set(None, api_user, feeds_=feeds_)
+
+    @staticmethod
+    def delete_record_related_packages(package_id=None):
+        try:
+            feeds_ = Feed.objects.filter(package_id=package_id)
+
+            # MySQLのattachを削除
+            attach_package_ids = []
+            if feeds_:
+                for feed_ in feeds_:
+                    for file_ in feed_.files.all():
+                        attach_package_ids.append(file_.package_id)
+                        file_.delete()
+
+            # attachのディレクトリの削除
+            for attach_package_id in attach_package_ids:
+                attach_dir = Feed.get_attach_stix_dir_path(attach_package_id)
+                if os.path.isdir(attach_dir):
+                    shutil.rmtree(attach_dir)
+
+            # packageの削除
+            Feed.objects.filter(package_id=package_id).delete()
+            return
+        except Exception as e:
+            print(e)
