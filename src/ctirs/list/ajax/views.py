@@ -77,11 +77,17 @@ def get_table_info(request):
             l.append('&lt;deleted&gt;')
         l.append(d.via.get_via_display())
         l.append(d.via.get_uploader_screen_name())
-        link_str = '<a href="/list/download?id=%s&version=%s">Original (%s)</a> ' % (d.id, d.version, d.version)
-        if d.version != '2.0':
-            link_str += ('<a href="/list/download?id=%s&version=2.0">Converted (2.0)</a>' % (d.id))
-        else:
-            link_str += ('<a href="/list/download?id=%s&version=1.2">Converted (1.2)</a>' % (d.id))
+        link_str = ''
+        if d.version.startswith('1.'):
+            link_str += '<a href="/list/download?id=%s&version=%s">STIX %s (Original)</a><br/>' % (d.id, d.version, d.version)
+            link_str += ('<a href="/list/download?id=%s&version=2.1">STIX 2.1</a>' % (d.id))
+        elif d.version == '2.0':
+            link_str += ('<a href="/list/download?id=%s&version=1.2">STIX 1.2</a><br/>' % (d.id))
+            link_str += ('<a href="/list/download?id=%s&version=2.0">STIX 2.0 (Original)</a><br/>' % (d.id))
+            link_str += ('<a href="/list/download?id=%s&version=2.1">STIX 2.1</a>' % (d.id))
+        elif d.version == '2.1':
+            link_str += ('<a href="/list/download?id=%s&version=1.2">STIX 1.2</a><br/>' % (d.id))
+            link_str += ('<a href="/list/download?id=%s&version=2.1">STIX 2.1 (Original)</a>' % (d.id))
         l.append(link_str)
         l.append('<a><span class="glyphicon glyphicon-share-alt publish-share-alt-icon" file_id="%s" title="Publish to.."></span></a>' % (d.id))
         if d.version.startswith('1.'):

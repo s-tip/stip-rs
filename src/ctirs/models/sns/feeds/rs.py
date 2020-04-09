@@ -169,22 +169,26 @@ def query(
 
 
 # 投稿用 STIX を取得
-def get_content_from_rs(api_user, package_id):
+def get_content_from_rs(api_user, package_id, version=None):
     # /api/v1/sns/content をコールし、 content のみを返却する
-    j = get_package_info_from_package_id(api_user, package_id)
+    j = get_package_info_from_package_id(api_user, package_id, version)
     return j['content']
 
 
-def get_package_info_from_package_id(api_user, package_id):
+def get_package_info_from_package_id(api_user, package_id, version=None):
     url = '%s' % (SNSConfig.get_rs_get_content_url())
     params = {}
     params['package_id'] = package_id
+    if version:
+        params['version'] = version
     headers = _get_ctirs_api_http_headers(api_user)
     rsp = requests.get(
         url,
         headers=headers,
         params=params,
         verify=False)
+    if rsp.status_code != 200:
+        raise Exception('Error occured: status=%d' % (rsp.status_code))
     return rsp.json()
 
 

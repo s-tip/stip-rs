@@ -52,23 +52,9 @@ class StipRsBoot(AppConfig):
                 print('>>> Skip loaddata rs_system')
 
         # mongo を初期化する
-        self.init_mongo()
+        init_mongo()
         # taxii client のスケジューラー起動
         self.init_taxii_client_scheduler()
-
-    # mongo 初期化
-    def init_mongo(self):
-        MONGO_DEFAULT_DB_NAME = 'ctirs'
-        MONGO_DEFAULT_HOST_NAME = 'localhost'
-        MONGO_DEFAULT_PORT = 27017
-
-        try:
-            from ctirs.models.rs.models import MongoConfig
-            config = MongoConfig.objects.get()
-            connect(config.db, host=config.host, port=int(config.port))
-        except BaseException:
-            # デフォルト設定を用いる
-            connect(MONGO_DEFAULT_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT)
 
     # scheduler 起動
     def boot_scheduler(self, job, taxii_client):
@@ -96,3 +82,21 @@ class StipRsBoot(AppConfig):
             if doc.interval_schedule_job is not None:
                 job = doc.interval_schedule_job
                 self.boot_scheduler(job, taxii_client)
+
+
+# mongo 初期化
+def init_mongo():
+    MONGO_DEFAULT_DB_NAME = 'ctirs'
+    MONGO_DEFAULT_TXS21_DB_NAME = 'taxii21'
+    MONGO_DEFAULT_HOST_NAME = 'localhost'
+    MONGO_DEFAULT_PORT = 27017
+
+    try:
+        from ctirs.models.rs.models import MongoConfig
+        config = MongoConfig.objects.get()
+        connect(config.db, host=config.host, port=int(config.port))
+        connect(config.db_taxii21, host=config.host, port=int(config.port), alias='taxii21_alias')
+    except BaseException:
+        # デフォルト設定を用いる
+        connect(MONGO_DEFAULT_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT)
+        connect(MONGO_DEFAULT_TXS21_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT, alias='taxii21_alias')

@@ -4,8 +4,12 @@ import pytz
 import datetime
 import stix2slider
 import tempfile
-from stix2elevator import elevate_string
-from stix2elevator.options import initialize_options
+import stip.common.const as const
+from stix2slider.options import initialize_options as sl_init
+from stix2elevator import elevate_file
+from stix2elevator.options import initialize_options as el_init
+from stix2elevator.options import set_option_value
+from stix2elevator.stix_stepper import step_file
 from mongoengine import fields, CASCADE, DoesNotExist
 from mongoengine.document import Document
 from mongoengine.errors import NotUniqueError
@@ -20,11 +24,16 @@ from ctirs.core.mongo.documents import Communities, Vias, InformationSources
 from ctirs.models.rs.models import System
 from ctirs.models.sns.feeds.models import Feed
 from stip.common.tld import TLD
+from stip.common.mongo.txs21_objects_models import StixObject as TXS21_StixObject
+from stip.common.x_stip_sns import StipSns  # noqa
 
 
 # STIX2 で使われる時間文字列から datetime に変換する
 def stix2_str_to_datetime(s):
-    return datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=pytz.utc)
+    try:
+        return datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=pytz.utc)
+    except ValueError:
+        return datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc)
 
 
 class StixFiles(Document):
@@ -40,10 +49,12 @@ class StixFiles(Document):
 
     # S-TIP SNS 作成の STIX タイプを返却
     STIP_SNS_TYPE_ORIGIN = 'origin'
+    STIP_SNS_TYPE_V2_POST = const.STIP_STIX2_SNS_POST_TYPE_POST
     STIP_SNS_TYPE_LIKE = 'like'
     STIP_SNS_TYPE_UNLIKE = 'unlike'
     STIP_SNS_TYPE_COMMENT = 'comment'
     STIP_SNS_TYPE_ATTACH = 'attach'
+    STIP_SNS_TYPE_V2_ATTACH = const.STIP_STIX2_SNS_POST_TYPE_ATTACHMENT
     STIP_SNS_TYPE_NOT = 'not'
     STIP_SNS_TYPE_UNDEFINED = 'undefined'
 
@@ -55,6 +66,8 @@ class StixFiles(Document):
         (STIP_SNS_TYPE_ATTACH, STIP_SNS_TYPE_ATTACH),
         (STIP_SNS_TYPE_NOT, STIP_SNS_TYPE_NOT),
         (STIP_SNS_TYPE_UNDEFINED, STIP_SNS_TYPE_UNDEFINED),
+        (STIP_SNS_TYPE_V2_POST, STIP_SNS_TYPE_V2_POST),
+        (STIP_SNS_TYPE_V2_ATTACH, STIP_SNS_TYPE_V2_ATTACH),
     )
 
     version = fields.StringField(max_length=32, choices=VERSION_CHOICES)
@@ -157,14 +170,10 @@ class StixFiles(Document):
         document.via = via
         document.content.put(content)
         document.created = document.modified = now
-        if document.is_stix_v2():
-            # STIX 2.x の場合
-            # package_id と同様
-            document.package_name = document.package_id
+        if package_bean.package_name and len(package_bean.package_name) > 0:
+            document.package_name = package_bean.package_name
         else:
-            # STIX 1.x の場合
-            # 指定があればpackage_name/なければGridFsのID
-            document.package_name = package_bean.package_name if package_bean.package_name is not None else str(document.content.grid_id)
+            document.package_name = package_bean.package_id
         document.generation.append(document.content.grid_id)
         # producedの指定がある場合はその時間。存在しない場合はcreatedと同様の時間を格納
         if package_bean.produced is None:
@@ -461,21 +470,30 @@ class StixFiles(Document):
 
     # STIX version 2.0 のドキュメントを 1.x にして中身を返却
     # 2.0以外の場合は None を返却
-    def get_slide_1_x(self):
-        if self.version == "2.0":
+    def get_slide_12(self):
+        if self.version.startswith('2.'):
             stix2slider.convert_stix._ID_NAMESPACE = self.NS_S_TIP_NAME
-            from stix2slider.options import initialize_options
-            initialize_options()
+            sl_init()
             return stix2slider.slide_file(self.origin_path)
         return None
 
     # STIX version 1.x のドキュメントを 2.0 にして中身を返却
     # 1.0以外の場合は None を返却
-    def get_elevate_2_x(self):
-        if self.version != "2.0":
-            src = self.content.read()
-            initialize_options()
-            return elevate_string(src)
+    def get_elevate_20(self):
+        if self.version.startswith('1.'):
+            el_init()
+            return elevate_file(self.origin_path)
+        return None
+
+    # STIX version 1.x のドキュメントを 2.1 にして中身を返却
+    # 1.0以外の場合は None を返却
+    def get_elevate_21(self):
+        if self.version.startswith('1.'):
+            el_init()
+            set_option_value('spec_version', '2.1')
+            return elevate_file(self.origin_path)
+        if self.version == '2.0':
+            return step_file(self.origin_path)
         return None
 
     # InformationSource を設定する
@@ -2046,29 +2064,3 @@ class SimilarScoreCache(Document):
     start_cache = fields.ReferenceField(ObservableCaches, reverse_delete_rule=CASCADE)
     end_cache = fields.ReferenceField(ObservableCaches, reverse_delete_rule=CASCADE)
     edge_type = fields.StringField(max_length=32)
-
-
-'''
-#起動時に StixFiles をチェックする
-from ctirs.core.stix.regist import get_package_bean, get_sns_user_name_from_instance
-for stix_file in StixFiles.objects.all():
-    if stix_file.information_source is None:
-        #InformationSourceをセットする
-        stix_file.set_information_source()
-    package_bean = None
-    #post がなければ格納する (search 検索のため)
-    if stix_file.post is None:
-        if package_bean is None:
-            package_bean = get_package_bean(stix_file.origin_path)
-        stix_file.post = package_bean.description
-        stix_file.save()
-    #sns_user_name が未定義
-    if len(stix_file.sns_user_name) == 0:
-        if package_bean is None:
-            package_bean = get_package_bean(stix_file.origin_path)
-        #instance 名を小文字にして空白を取りのぞいた値が sns_user_name
-        #Ex. Alienvalut OTX   -->  alienvaultotx
-        stix_file.sns_user_name = get_sns_user_name_from_instance(package_bean.sns_instance)
-        stix_file.save()
-
-'''
