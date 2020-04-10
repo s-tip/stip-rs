@@ -157,7 +157,6 @@ class Feed(models.Model):
         except BaseException:
             return False, None
 
-
     @staticmethod
     # stix_package が S-TIP SNS 産？ (v1)
     def is_stip_sns_stix_package_v1(stix_package):
@@ -629,7 +628,6 @@ class Feed(models.Model):
             feed.stix2_package_id = bean.stix2_package_id
         feed.save()
         return feed
-
 
     # cache 作成 (1.x)
     @staticmethod

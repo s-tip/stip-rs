@@ -305,9 +305,9 @@ def feeds(request):
             stip_user = STIPUser.objects.get(id=user_id)
             QQ &= (
                 # SNS 産 STIX なら instance 名とユーザ名が一致した
-                (Q(is_created_by_sns=True) & Q(sns_user_name=stip_user.username) & Q(sns_instance=instance))
+                (Q(is_created_by_sns=True) & Q(sns_user_name=stip_user.username) & Q(sns_instance=instance)) |
                 # SNS 産以外の STIX なら ユーザ名が一致した
-                | (Q(is_created_by_sns__ne=True) & Q(sns_user_name=stip_user.username))
+                (Q(is_created_by_sns__ne=True) & Q(sns_user_name=stip_user.username))
             )
 
         else:
@@ -432,7 +432,7 @@ def content(request):
 
 def _get_stix_file_document(stix_file):
     return get_return_dictionary_from_stix_file_document(
-            stix_file, content=True)
+        stix_file, content=True)
 
 
 # GET /api/v1/sns/comments

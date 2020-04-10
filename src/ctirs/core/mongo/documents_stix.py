@@ -24,7 +24,6 @@ from ctirs.core.mongo.documents import Communities, Vias, InformationSources
 from ctirs.models.rs.models import System
 from ctirs.models.sns.feeds.models import Feed
 from stip.common.tld import TLD
-from stip.common.mongo.txs21_objects_models import StixObject as TXS21_StixObject
 from stip.common.x_stip_sns import StipSns  # noqa
 
 

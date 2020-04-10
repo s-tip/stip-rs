@@ -7,20 +7,28 @@ from ctirs.core.mongo.documents_stix import StixFiles, stix2_str_to_datetime
 from ctirs.models.sns.feeds.models import Feed
 
 
-def _is_produced_by_stip_sns_v2(doc):
+def _get_firstr_object(doc, object_type):
     if 'objects' not in doc:
         return None
-    stip_sns = None
+    ret_o = None
     count = 0
     for o_ in doc['objects']:
         if 'type' not in o_:
             continue
-        if o_['type'] == 'x-stip-sns':
-            stip_sns = o_
+        if o_['type'] == object_type:
+            ret_o = o_
             count += 1
     if count == 1:
-        return stip_sns
+        return ret_o
     return None
+
+
+def _is_produced_by_stip_sns_v2(doc):
+    return _get_firstr_object(doc, 'x-stip-sns')
+
+
+def _get_report_object(doc):
+    return _get_firstr_object(doc, 'report')
 
 
 def _get_stip_sns_type_v2(stip_sns):
@@ -45,36 +53,45 @@ def get_package_bean_v2(stix_file_path):
             content = fp.read()
         doc = json.loads(content)
         package_bean = StixFiles.PackageBean()
-        produced_str = None
-        for d in doc['objects']:
-            if d['type'] == 'report':
-                package_bean.package_name = d['name']
-                produced_str = d['created']
         package_bean.package_id = doc['id']
         if ('spec_version' in doc):
             package_bean.version = doc['spec_version']
         else:
             package_bean.version = '2.1'
 
-        if produced_str is not None:
-            package_bean.produced = stix2_str_to_datetime(produced_str)
-        else:
-            package_bean.produced = datetime.datetime.now(tz=pytz.utc)
-
         stip_sns = _is_produced_by_stip_sns_v2(doc)
         package_bean.related_packages = None
+        produced_str = None
         if stip_sns:
             package_bean.package_name = stip_sns['name']
+            package_bean.description = stip_sns['description']
             package_bean.is_created_by_sns = True
             package_bean.sns_type = _get_stip_sns_type_v2(stip_sns)
             if package_bean.sns_type != StixFiles.STIP_SNS_TYPE_V2_POST:
                 package_bean.is_post_sns = False
             if const.STIP_STIX2_PROP_OBJECT_REF in stip_sns:
                 package_bean.related_packages = [stip_sns[const.STIP_STIX2_PROP_OBJECT_REF]]
+            produced_str = stip_sns['created']
         else:
+            package_bean.package_name = None
+            package_bean.description = None
+            report = _get_report_object(doc)
+            if report:
+                package_bean.package_name = report['name']
+                if 'description' in report:
+                    package_bean.description = report['description']
+                produced_str = report['created']
+            if not package_bean.package_name:
+                package_bean.package_name = package_bean.package_id
+            if not package_bean.description:
+                package_bean.description = 'Post: %s' % (package_bean.package_id)
             package_bean.is_created_by_sns = False
             package_bean.is_post_sns = True
         _set_stix_bean_from_doc_v2(package_bean, doc)
+        if produced_str:
+            package_bean.produced = stix2_str_to_datetime(produced_str)
+        else:
+            package_bean.produced = datetime.datetime.now(tz=pytz.utc)
         return package_bean
     except Exception as e:
         raise Exception('Can\'t parse STIX. ' + e.message)
