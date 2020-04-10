@@ -69,8 +69,14 @@ def get_package_bean_v2(stix_file_path):
             package_bean.sns_type = _get_stip_sns_type_v2(stip_sns)
             if package_bean.sns_type != StixFiles.STIP_SNS_TYPE_V2_POST:
                 package_bean.is_post_sns = False
+            package_bean.related_packages = []
             if const.STIP_STIX2_PROP_OBJECT_REF in stip_sns:
-                package_bean.related_packages = [stip_sns[const.STIP_STIX2_PROP_OBJECT_REF]]
+                package_bean.related_packages.append(stip_sns[const.STIP_STIX2_PROP_OBJECT_REF])
+            if const.STIP_STIX2_PROP_ATTACHMENT_REFS in stip_sns:
+                for ref in stip_sns[const.STIP_STIX2_PROP_ATTACHMENT_REFS]:
+                    package_bean.related_packages.append(ref['bundle'])
+            if len(package_bean.related_packages) == 0:
+                package_bean.related_packages = None
             produced_str = stip_sns['created']
         else:
             package_bean.package_name = None
