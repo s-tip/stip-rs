@@ -90,10 +90,7 @@ def get_table_info(request):
             link_str += ('<a href="/list/download?id=%s&version=2.1">STIX 2.1 (Original)</a>' % (d.id))
         l.append(link_str)
         l.append('<a><span class="glyphicon glyphicon-share-alt publish-share-alt-icon" file_id="%s" title="Publish to.."></span></a>' % (d.id))
-        if d.version.startswith('1.'):
-            link_str = ('<a><span class="glyphicon glyphicon-export misp-import-icon" package_id="%s" title="Import into MISP .."></span></a>' % (d.package_id))
-        else:
-            link_str = ('<span class="glyphicon glyphicon-remove-sign"></span>')
+        link_str = ('<a><span class="glyphicon glyphicon-export misp-import-icon" package_id="%s" title="Import into MISP .."></span></a>' % (d.package_id))
         l.append(link_str)
         aaData.append(l)
         count += 1

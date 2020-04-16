@@ -1,3 +1,4 @@
+import io
 import urllib.parse
 from pymisp.api import PyMISP
 from pymisp.tools.stix import load_stix
@@ -28,7 +29,11 @@ class MispUploadAdapterControl(object):
     # package_id から　stix を抽出し、misp import 形式に変換し upload する
     def upload_misp(self, package_id):
         stix_file = StixFiles.objects.get(package_id=package_id)
-        stix_package = STIXPackage.from_xml(stix_file.content)
+        if stix_file.version.startswith('1.'):
+            content = stix_file.content
+        else:
+            content = io.StringIO(stix_file.get_slide_12())
+        stix_package = STIXPackage.from_xml(content)
         misp_event = load_stix(stix_package)
         tag = self.get_tlp_tag(stix_package)
         if tag is not None:
