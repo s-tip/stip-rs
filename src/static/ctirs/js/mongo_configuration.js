@@ -34,7 +34,7 @@ $(function(){
             return;
         }
     	var db = $('#modify-mongo-db').val()
-    	if(db.modify_mongo_error == 0){
+    	if(db.length == 0){
     		alert('Enter DB Name');
     		return;
     	}

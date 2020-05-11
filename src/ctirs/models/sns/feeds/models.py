@@ -4,6 +4,7 @@ import pytz
 import os
 import base64
 import shutil
+import json
 from . import rs
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -70,7 +71,7 @@ class Feed(models.Model):
     ci = models.CharField(max_length=128, default='', null=True)
     referred_url = models.TextField(max_length=1024, default=None, null=True)
     stix2_package_id = models.CharField(max_length=128, default='', null=True)
-    tmp_sharing_people = []
+    stix_version = models.CharField(max_length=8, default='1.2', null=True)
     build_cache_flag = False
 
     class Meta:
@@ -139,8 +140,26 @@ class Feed(models.Model):
         return Feed.get_feeds_from_package_from_rs(api_user, package_from_rs)
 
     @staticmethod
-    # stix_package が S-TIP SNS 産？
-    def is_stip_sns_stix_package(stix_package):
+    def is_stip_sns_stix_package_v2(bundle):
+        if 'objects' not in bundle:
+            return False, None
+        try:
+            count = 0
+            stip_sns = None
+            for o_ in bundle['objects']:
+                if o_['type'] == const.STIP_STIX2_X_STIP_SNS_TYPE:
+                    stip_sns = o_
+                    count += 1
+            if count == 1:
+                return True, stip_sns
+            else:
+                return False, None
+        except BaseException:
+            return False, None
+
+    @staticmethod
+    # stix_package が S-TIP SNS 産？ (v1)
+    def is_stip_sns_stix_package_v1(stix_package):
         try:
             for tool in stix_package.stix_header.information_source.tools:
                 if (tool.name == const.SNS_TOOL_NAME) and (tool.vendor == const.SNS_TOOL_VENDOR):
@@ -172,7 +191,7 @@ class Feed(models.Model):
 
     @staticmethod
     # stix_id が SNS 作成のアタッチメント情報を含まない場合は None を返却する
-    def get_attach_file(api_user, stix_id):
+    def get_attach_file(api_user, stix_id, version):
         attachment_stix_dir = Feed.get_attach_stix_dir_path(stix_id)
         if os.path.exists(attachment_stix_dir):
             # ここのファイル名とファイルパスを返却する　
@@ -193,28 +212,46 @@ class Feed(models.Model):
 
         attachement_cached_stix_file_path = rs.get_stix_file_path(api_user, stix_id)
         try:
-            # Attachement STIX Package parse
-            attachement_stix_package = STIXPackage.from_xml(attachement_cached_stix_file_path)
-            # marking から file_name, content 取得
-            file_name = None
-            content = None
-            try:
-                markings = attachement_stix_package.stix_header.handling.marking
-            except AttributeError:
-                return None
+            if version.startswith('v1'):
+                # Attachement STIX Package parse
+                attachement_stix_package = STIXPackage.from_xml(attachement_cached_stix_file_path)
+                # marking から file_name, content 取得
+                file_name = None
+                content = None
+                try:
+                    markings = attachement_stix_package.stix_header.handling.marking
+                except AttributeError:
+                    return None
 
-            for marking in markings:
-                marking_structure = marking.marking_structures[0]
-                if isinstance(marking_structure, SimpleMarkingStructure):
-                    statement = marking_structure.statement
-                    if statement.startswith(const.MARKING_STRUCTURE_STIP_ATTACHEMENT_FILENAME_PREFIX):
-                        file_name = statement[len(const.MARKING_STRUCTURE_STIP_ATTACHEMENT_FILENAME_PREFIX + ': '):]
-                    elif statement.startswith(const.MARKING_STRUCTURE_STIP_ATTACHEMENT_CONTENT_PREFIX):
-                        content_str = statement[len(const.MARKING_STRUCTURE_STIP_ATTACHEMENT_CONTENT_PREFIX + ': '):]
-                        # content は base64 で decode する
-                        content = base64.b64decode(content_str)
-            if (file_name is None) or (content is None):
-                return None
+                for marking in markings:
+                    marking_structure = marking.marking_structures[0]
+                    if isinstance(marking_structure, SimpleMarkingStructure):
+                        statement = marking_structure.statement
+                        if statement.startswith(const.MARKING_STRUCTURE_STIP_ATTACHEMENT_FILENAME_PREFIX):
+                            file_name = statement[len(const.MARKING_STRUCTURE_STIP_ATTACHEMENT_FILENAME_PREFIX + ': '):]
+                        elif statement.startswith(const.MARKING_STRUCTURE_STIP_ATTACHEMENT_CONTENT_PREFIX):
+                            content_str = statement[len(const.MARKING_STRUCTURE_STIP_ATTACHEMENT_CONTENT_PREFIX + ': '):]
+                            # content は base64 で decode する
+                            content = base64.b64decode(content_str)
+                if (file_name is None) or (content is None):
+                    return None
+            elif version.startswith('v2'):
+                with open(attachement_cached_stix_file_path, 'r') as fp:
+                    attachment_bundle = json.load(fp)
+                file_name = None
+                content = None
+                for o_ in attachment_bundle['objects']:
+                    if o_['type'] != const. STIP_STIX2_X_STIP_SNS_TYPE:
+                        continue
+                    if o_[const.STIP_STIX2_PROP_TYPE] != const.STIP_STIX2_SNS_POST_TYPE_ATTACHMENT:
+                        continue
+                    stip_sns_attachment = o_[const.STIP_STIX2_PROP_ATTACHMENT]
+                    content_str = stip_sns_attachment[const.STIP_STIX2_SNS_ATTACHMENT_CONTENT_KEY]
+                    content = base64.b64decode(content_str)
+                    file_name = stip_sns_attachment[const.STIP_STIX2_SNS_ATTACHMENT_FILENAME_KEY]
+                    break
+                if (file_name is None) or (content is None):
+                    return None
         except Exception as e:
             import traceback
             traceback.print_exc()
@@ -252,12 +289,47 @@ class Feed(models.Model):
             self.country_code = None
             self.administrative_code = None
             self.stix2_package_id = None
+            self.sharing_range = None
 
-    # stix_package の user_name取得
+    # stix_package の user_name取得 (v2)
     @staticmethod
-    def get_stip_from_stix_package(stix_package):
+    def get_stip_from_stix_package_v2(bundle):
         bean = Feed.StipInformationFromStix()
-        bean.is_sns = Feed.is_stip_sns_stix_package(stix_package)
+        bean.is_sns, stip_sns = Feed.is_stip_sns_stix_package_v2(bundle)
+
+        # from x-stip-sns
+        if stip_sns:
+            if const.STIP_STIX2_PROP_AUTHOR in stip_sns:
+                sns_author = stip_sns[const.STIP_STIX2_PROP_AUTHOR]
+                if const.STIP_STIX2_SNS_AUTHOR_USER_NAME_KEY in sns_author:
+                    bean.user_name = sns_author[const.STIP_STIX2_SNS_AUTHOR_USER_NAME_KEY]
+                if const.STIP_STIX2_SNS_AUTHOR_SCREEN_NAME_KEY in sns_author:
+                    bean.screen_name = sns_author[const.STIP_STIX2_SNS_AUTHOR_SCREEN_NAME_KEY]
+                if const.STIP_STIX2_SNS_AUTHOR_AFFILIATION_KEY in sns_author:
+                    bean.affiliation = sns_author[const.STIP_STIX2_SNS_AUTHOR_AFFILIATION_KEY]
+                if const.STIP_STIX2_SNS_AUTHOR_REGION_CODE_KEY in sns_author:
+                    bean.region_code = sns_author[const.STIP_STIX2_SNS_AUTHOR_REGION_CODE_KEY]
+                    bean.administrative_area = sns_author[const.STIP_STIX2_SNS_AUTHOR_REGION_CODE_KEY]
+                if const.STIP_STIX2_SNS_AUTHOR_COUNTRY_CODE_KEY in sns_author:
+                    bean.country_code = sns_author[const.STIP_STIX2_SNS_AUTHOR_COUNTRY_CODE_KEY]
+                if const.STIP_STIX2_SNS_AUTHOR_CI_KEY in sns_author:
+                    bean.ci = sns_author[const.STIP_STIX2_SNS_AUTHOR_CI_KEY]
+            if const.STIP_STIX2_PROP_POST in stip_sns:
+                sns_post = stip_sns[const.STIP_STIX2_PROP_POST]
+                if const.STIP_STIX2_SNS_POST_REFERRED_URL_KEY in sns_post:
+                    if len(sns_post[const.STIP_STIX2_SNS_POST_REFERRED_URL_KEY]) != 0:
+                        bean.referred_url = sns_post[const.STIP_STIX2_SNS_POST_REFERRED_URL_KEY]
+                if const.STIP_STIX2_SNS_POST_SHARING_RANGE_KEY in sns_post:
+                    bean.sharing_range = sns_post[const.STIP_STIX2_SNS_POST_SHARING_RANGE_KEY]
+            if const.STIP_STIX2_PROP_IDENTITY in stip_sns:
+                bean.instance = stip_sns[const.STIP_STIX2_PROP_IDENTITY]
+        return bean, stip_sns
+
+    # stix_package の user_name取得 (v1)
+    @staticmethod
+    def get_stip_from_stix_package_v1(stix_package):
+        bean = Feed.StipInformationFromStix()
+        bean.is_sns = Feed.is_stip_sns_stix_package_v1(stix_package)
         try:
             for marking in stix_package.stix_header.handling:
                 if isinstance(marking, MarkingSpecification):
@@ -346,20 +418,232 @@ class Feed(models.Model):
     def get_na_account():
         return STIPUser.objects.get(username=const.SNS_NA_ACCOUNT)
 
-    # cache 作成
+    # cache 作成 (entry)
     @staticmethod
-    def create_feeds_record(api_user, package_id, uploader_id, produced_str):
+    def create_feeds_record(api_user, package_id, uploader_id, produced_str, version):
+        if version.startswith('1.'):
+            return Feed.create_feeds_record_v1(
+                api_user, package_id,
+                uploader_id, produced_str, version)
+        if version.startswith('2.'):
+            return Feed.create_feeds_record_v2(
+                api_user, package_id,
+                uploader_id, produced_str, version)
+
+    # Report, Identity 取得 (v2)
+    @staticmethod
+    def get_reports_and_identities(bundle):
+        reports = []
+        identities = []
+        for o_ in bundle['objects']:
+            try:
+                if o_['type'] == 'report':
+                    reports.append(o_)
+                elif o_['type'] == 'identity':
+                    identities.append(o_)
+            except KeyError:
+                None
+        return reports, identities
+
+    # cache 作成 (2.x)
+    @staticmethod
+    def create_feeds_record_v2(api_user, package_id, uploader_id, produced_str, version, feed=None):
+        # RS から取得した STIX から stix_package 取得する
+        stix_file_path = rs.get_stix_file_path(api_user, package_id)
+        with open(stix_file_path, 'r', encoding='utf-8') as fp:
+            bundle = json.load(fp)
+
+        # Feed情報を STIX,RS の API から取得する
+        if not feed:
+            feed = Feed()
+        feed.stix_version = version
+        package_id = bundle['id']
+        feed.package_id = package_id
+        feed.filename_pk = package_id
+
+        # STIX から表示情報を取得する
+        bean, stip_sns = Feed.get_stip_from_stix_package_v2(bundle)
+
+        if bean.is_sns:
+            # SNS 産 STIX である
+            if bean.instance == SNSConfig.get_sns_identity_name():
+                # 現在稼働中インスタンスと同一
+                try:
+                    # STIX 定義の username が存在する
+                    feed.user = STIPUser.objects.get(username=bean.user_name)
+                    # 表示はローカル DB から取得する
+                    Feed.set_screen_value_from_local_db(feed, bean)
+                except BaseException:
+                    # STIX 定義の username が存在しない → N/A アカウント
+                    feed.user = Feed.get_na_account()
+                    # 表示はSTIX File から取得する
+                    Feed.set_screen_value_from_stix(feed, bean)
+                    # すでにユーザーが削除されている
+                    feed.is_valid_user = False
+            else:
+                # 現在稼働中インスタンスと異なる
+                try:
+                    # インスタンス名と同じアカウント
+                    feed.user = STIPUser.objects.get(username=bean.instance)
+                    # 表示はSTIX File から取得する
+                    Feed.set_screen_value_from_stix(feed, bean)
+                except BaseException:
+                    # インスタンス名と同じアカウントが存在しない → N/A アカウント
+                    feed.user = Feed.get_na_account()
+                    # 表示はSTIX File から取得する
+                    Feed.set_screen_value_from_stix(feed, bean)
+        else:
+            # SNS 産 STIX ではない
+            reports, identities = Feed.get_reports_and_identities(bundle)
+
+            is_found = False
+            if len(identities) > 0:
+                for identity in identities:
+                    if 'name' in identity:
+                        try:
+                            # インスタンス名と同じアカウント
+                            feed.user = STIPUser.objects.get(username=identity['name'])
+                            is_found = True
+                            # 表示はローカル DB から取得する
+                            Feed.set_screen_value_from_local_db(feed, bean)
+                            break
+                        except STIPUser.DoesNotExist:
+                            pass
+            if not is_found:
+                # インスタンス名と同じアカウントが存在しない → N/A アカウント
+                feed.user = Feed.get_na_account()
+                # 表示はローカル DB から取得する
+                Feed.set_screen_value_from_local_db(feed, bean)
+                feed.screen_instance = bean.instance
+
+        # v1 same
+        feed.date = Feed.get_datetime_from_string(produced_str)
+
+        if stip_sns:
+            # from x-stip-sns
+            if 'description' in stip_sns:
+                feed.post = stip_sns['description']
+            else:
+                feed.post = ''
+
+            if 'name' in stip_sns:
+                feed.title = stip_sns['name']
+            else:
+                feed.title = ''
+            if const.STIP_STIX2_PROP_POST in stip_sns:
+                sns_post = stip_sns[const.STIP_STIX2_PROP_POST]
+                feed.tlp = sns_post['tlp']
+                sharing_range = sns_post[const.STIP_STIX2_SNS_POST_SHARING_RANGE_KEY]
+                if sharing_range.startswith('Group:'):
+                    group_name = sharing_range.split(':')[1].strip()
+                    sharing_range_info = Group.objects.get(
+                        en_name=group_name)
+                elif sharing_range.startswith('People:'):
+                    people_list = []
+                    accounts = sharing_range.split(':')[1].strip()
+                    for account in accounts.split(','):
+                        try:
+                            people = STIPUser.objects.get(
+                                username=account.strip())
+                            people_list.append(people)
+                        except STIPUser.DoesNotExist:
+                            pass
+                        sharing_range_info = people_list
+                else:
+                    sharing_range_info = None
+            else:
+                feed.tlp = None
+                sharing_range_info = None
+        else:
+            # from not x-stip-sns
+            feed.post = None
+            for report in reports:
+                if 'description' in report:
+                    feed.post = report['description']
+                    break
+            if not feed.post:
+                feed.post = 'Post, %s' % (feed.package_id)
+
+            feed.title = None
+            for report in reports:
+                if 'name' in report:
+                    feed.title = report['name']
+                    break
+            if not feed.title:
+                feed.title = package_id
+            feed.tlp = None
+            sharing_range_info = None
+
+        # Attachement Files 情報取得
+        if stip_sns:
+            # S-TIP SNS 作成 STIX
+            if const.STIP_STIX2_PROP_ATTACHMENT_REFS in stip_sns:
+                # 一度 feed をsave()する
+                for attach in stip_sns[const.STIP_STIX2_PROP_ATTACHMENT_REFS]:
+                    feed.save()
+                    attach_bundle_id = attach['bundle']
+                    attach_file = Feed.get_attach_file(
+                        api_user,
+                        attach_bundle_id,
+                        'v2')
+                    if attach_file:
+                        feed.files.add(attach_file)
+                feed.save()
+        feed.stix_file_path = stix_file_path
+
+        if not feed.tlp:
+            feed.tlp = feed.user.tlp
+
+        if isinstance(sharing_range_info, list):
+            # sharing_range_info の中は STIPUser list
+            feed.sharing_range_type = const.SHARING_RANGE_TYPE_KEY_PEOPLE
+            feed.save()
+            for stip_user in sharing_range_info:
+                feed.sharing_people.add(stip_user)
+        elif isinstance(sharing_range_info, Group):
+            feed.sharing_range_type = const.SHARING_RANGE_TYPE_KEY_GROUP
+            feed.sharing_group = sharing_range_info
+        else:
+            feed.sharing_range_type = const.SHARING_RANGE_TYPE_KEY_ALL
+
+        # v1 same
+        if bean.region_code is not None:
+            feed.region_code = bean.region_code
+        else:
+            if feed.user.region is not None:
+                feed.region_code = feed.user.region.code
+            else:
+                feed.region_code = ''
+
+        # v1 same
+        if bean.ci is not None:
+            feed.ci = bean.ci
+        else:
+            feed.ci = feed.user.ci
+
+        # v1 same
+        if bean.referred_url is not None:
+            feed.referred_url = bean.referred_url
+        if bean.stix2_package_id is not None:
+            feed.stix2_package_id = bean.stix2_package_id
+        feed.save()
+        return feed
+
+    # cache 作成 (1.x)
+    @staticmethod
+    def create_feeds_record_v1(api_user, package_id, uploader_id, produced_str, version):
         # RS から取得した STIX から stix_package 取得する
         stix_file_path = rs.get_stix_file_path(api_user, package_id)
         stix_package = STIXPackage.from_xml(stix_file_path, encoding='utf-8')
 
         # Feed情報を STIX,RS の API から取得する
         feed = Feed()
+        feed.stix_version = version
         feed.package_id = package_id
         feed.filename_pk = rs.convert_package_id_to_filename(package_id)
 
         # STIX から表示情報を取得する
-        bean = Feed.get_stip_from_stix_package(stix_package)
+        bean = Feed.get_stip_from_stix_package_v1(stix_package)
         if bean.is_sns:
             # SNS 産 STIX である
             if bean.instance == SNSConfig.get_sns_identity_name():
@@ -417,15 +701,19 @@ class Feed(models.Model):
             feed.post = ''
 
         # Attachement Files 情報取得
-        if Feed.is_stip_sns_stix_package(stix_package):
+        if Feed.is_stip_sns_stix_package_v1(stix_package):
             # S-TIP SNS 作成 STIX
             if stix_package.related_packages is not None:
                 # 一度 feed をsave()する
                 feed.save()
                 # Related_packages は SNS STIX 以外の可能性もある
                 for related_package in stix_package.related_packages:
-                    # attachement は attachdirにいれるべきその時のファイル名は attachment_stix_idであるべき
-                    attach_file = Feed.get_attach_file(api_user, related_package.item.id_)
+                    # attachement は attachdirにいれるべきその時のファイル名は
+                    # attachment_stix_idであるべき
+                    attach_file = Feed.get_attach_file(
+                        api_user,
+                        related_package.item.id_,
+                        'v1')
                     # attach_file が None の場合は Attach File ではない
                     if attach_file is None:
                         continue
@@ -480,6 +768,7 @@ class Feed(models.Model):
         package_id = package_from_rs['package_id']
         uploader_id = package_from_rs['uploader']
         produced_str = package_from_rs['produced']
+        version = package_from_rs['version']
 
         try:
             # cache にあれば採用する
@@ -495,7 +784,12 @@ class Feed(models.Model):
                         feed.region_code = feed.user.region.code
         except Feed.DoesNotExist:
             # cache 作成
-            feed = Feed.create_feeds_record(api_user, package_id, uploader_id, produced_str)
+            feed = Feed.create_feeds_record(
+                api_user,
+                package_id,
+                uploader_id,
+                produced_str,
+                version)
         except Exception as e:
             import traceback
             traceback.print_exc()
@@ -634,7 +928,10 @@ class Feed(models.Model):
 
     @staticmethod
     def get_feeds_after(last_feed_datetime, api_user=None, user_id=None):
-        feeds_ = Feed.get_feeds(last_feed_datetime=last_feed_datetime, api_user=api_user, user_id=user_id)
+        feeds_ = Feed.get_feeds(
+            last_feed_datetime=last_feed_datetime,
+            api_user=api_user,
+            user_id=user_id)
         return Feed.get_filter_query_set(None, api_user, feeds_=feeds_)
 
     @staticmethod
