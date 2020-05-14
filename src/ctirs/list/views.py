@@ -75,24 +75,31 @@ def download(request):
         try:
             # 変換する
             if doc.version == '2.0':
-                # 2.0 -> 1.2
-                dest = doc.get_slide_1_x()
+                if version == '2.1':
+                    # 2.0 -> 2.1
+                    dest = doc.get_elevate_21()
+                else:
+                    # 2.0 -> 1.2
+                    dest = doc.get_slide_12()
+            elif doc.version == '2.1':
+                # 2.1 -> 1.2
+                dest = doc.get_slide_12()
             else:
-                # 1.2 -> 2.0
-                dest = doc.get_elevate_2_x()
-        except Exception as e:
+                # 1.2 -> 2.1
+                dest = doc.get_elevate_21()
+        except Exception:
             traceback.print_exc()
-            return error_page_free_format(request, 'Can\'t Convert because of stix2library. ' + str(e))
+            return error_page_free_format(request, 'Can\'t Convert because of stix2library. ')
 
         response = HttpResponse(dest)
 
     if version.startswith('1.'):
         # download version が 1.x
         response['Content-Type'] = 'application/xml'
-        response['Content-Disposition'] = 'attachment; filename=%s.xml' % (id_)
+        response['Content-Disposition'] = 'attachment; filename=%s.xml' % (doc.package_id)
     else:
         # download version が 2.x
         response['Content-Type'] = 'application/json'
-        response['Content-Disposition'] = 'attachment; filename=%s.json' % (id_)
+        response['Content-Disposition'] = 'attachment; filename=%s.json' % (doc.package_id)
 
     return response

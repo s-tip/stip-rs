@@ -393,7 +393,7 @@ class Client(object):
         # stix_file_doc の versionが 2.0 ならスライド
         if stix_file_doc.version == '2.0':
             try:
-                content = stix_file_doc.get_slide_1_x()
+                content = stix_file_doc.get_slide_12()
             except Exception as e:
                 traceback.print_exc()
                 raise e
@@ -442,7 +442,7 @@ class Client(object):
         self.debug_print('>>> push_20: enter')
         # stix_file_doc の versionが 2.0以外 ならelevate
         if stix_file_doc.version != '2.0':
-            content = stix_file_doc.get_elevate_2_x()
+            content = stix_file_doc.get_elevate_20()
         else:
             with open(stix_file_doc.origin_path, 'r', encoding='utf-8') as fp:
                 content = fp.read()

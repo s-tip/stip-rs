@@ -177,6 +177,14 @@ def get_content_original_package_id(request):
     return get_package_id_from_get_argument(request)
 
 
+# package_id の version を返却
+def get_content_version(request):
+    try:
+        return request.GET['version']
+    except KeyError:
+        return None
+
+
 # GET /api/v1/sns/check
 # last_time の 引数を返却
 def get_check_last_datetime(request):
@@ -230,6 +238,7 @@ def get_return_dictionary_from_stix_file_document(stix_file, content=False):
     d['uploader'] = str(stix_file.via.uploader)
     if content:
         d['content'] = stix_file.content.read().decode('utf-8')
+    d['version'] = str(stix_file.version)
     return d
 
 
@@ -254,8 +263,8 @@ def feeds(request):
         index = get_feeds_index(request)
         size = get_feeds_size(request)  # 指定なし時は size = -1
 
-        # 返却条件は SNS に返却　かつ　version 2.0 / 2.1 以外
-        QQ = Q(is_post_sns__ne=False) & Q(version__ne='2.0') & Q(version__ne='2.1')
+        # 返却条件は SNS に返却
+        QQ = Q(is_post_sns__ne=False)
         if last_feed is not None:
             # last_feed の指定があった場合 (last_feed より新しい投稿を返却)
             QQ &= Q(produced__gt=last_feed)
@@ -296,9 +305,9 @@ def feeds(request):
             stip_user = STIPUser.objects.get(id=user_id)
             QQ &= (
                 # SNS 産 STIX なら instance 名とユーザ名が一致した
-                (Q(is_created_by_sns=True) & Q(sns_user_name=stip_user.username) & Q(sns_instance=instance))
+                (Q(is_created_by_sns=True) & Q(sns_user_name=stip_user.username) & Q(sns_instance=instance)) |
                 # SNS 産以外の STIX なら ユーザ名が一致した
-                | (Q(is_created_by_sns__ne=True) & Q(sns_user_name=stip_user.username))
+                (Q(is_created_by_sns__ne=True) & Q(sns_user_name=stip_user.username))
             )
 
         else:
@@ -385,15 +394,46 @@ def content(request):
             return HttpResponseNotAllowed(['GET'])
         # 引数取得
         package_id = get_content_original_package_id(request)
+        version = get_content_version(request)
+
         if package_id is None:
             print('/api/v1/sns/content package_id is None.')
             return HttpResponseNotFound()
+
         stix_file = StixFiles.objects.get(package_id=package_id)
-        return JsonResponse(get_return_dictionary_from_stix_file_document(stix_file, content=True), safe=False)
+        doc = _get_stix_file_document(stix_file)
+        if not version:
+            return JsonResponse(doc, safe=False)
+        if stix_file.version.startswith('1.'):
+            if version.startswith('2.'):
+                content = stix_file.get_elevate_21()
+                doc['content'] = content
+                doc['version'] = '2.1'
+        elif stix_file.version == '2.0':
+            if version == '2.1':
+                content = stix_file.get_elevate_21()
+                doc['content'] = content
+                doc['version'] = '2.1'
+            elif version.startswith('1.'):
+                content = stix_file.get_slide_12()
+                doc['content'] = content
+                doc['version'] = '1.2'
+        elif stix_file.version == '2.1':
+            if version.startswith('1.'):
+                content = stix_file.get_slide_12()
+                doc['content'] = content
+                doc['version'] = '1.2'
+        return JsonResponse(doc, safe=False)
     except Exception as e:
         import traceback
         traceback.print_exc()
         return error(e)
+
+
+def _get_stix_file_document(stix_file):
+    return get_return_dictionary_from_stix_file_document(
+        stix_file, content=True)
+
 
 # GET /api/v1/sns/comments
 @csrf_exempt
