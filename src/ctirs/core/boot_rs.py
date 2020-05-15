@@ -95,8 +95,8 @@ def init_mongo():
         from ctirs.models.rs.models import MongoConfig
         config = MongoConfig.objects.get()
         connect(config.db, host=config.host, port=int(config.port))
-        connect(config.db_taxii21, host=config.host, port=int(config.port), alias='taxii21_alias')
+#        connect(config.db_taxii21, host=config.host, port=int(config.port), alias='taxii21_alias')
     except BaseException:
         # デフォルト設定を用いる
         connect(MONGO_DEFAULT_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT)
-        connect(MONGO_DEFAULT_TXS21_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT, alias='taxii21_alias')
+#        connect(MONGO_DEFAULT_TXS21_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT, alias='taxii21_alias')
