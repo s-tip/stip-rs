@@ -14,14 +14,11 @@ class StipRsBoot(AppConfig):
         if not is_skip_sequnece:
             print('>>> Start Auto Deploy')
             print('>>> Start collcect static --noinput')
-            # collectstatic
             call_command('collectstatic', '--noinput')
 
-            # makemigrations/migrate
             call_command('makemigrations')
             call_command('migrate')
 
-            # create_user_user は loaddata でデータ注入できると思われる
             stip_user_count = STIPUser.objects.count()
             print('>>> users record count: ' + str(stip_user_count))
             if stip_user_count == 0:
@@ -31,7 +28,6 @@ class StipRsBoot(AppConfig):
             else:
                 print('>>> Skip loaddata users')
 
-            # loaddata (mongo)
             mongo_config_count = MongoConfig.objects.count()
             print('>>> mongo record count: ' + str(mongo_config_count))
             if mongo_config_count == 0:
@@ -41,7 +37,6 @@ class StipRsBoot(AppConfig):
             else:
                 print('>>> Skip loaddata mongo')
 
-            # loaddata (rs_system)
             system_count = System.objects.count()
             print('>>> rs_system record count: ' + str(System.objects.count()))
             if system_count == 0:
@@ -51,40 +46,37 @@ class StipRsBoot(AppConfig):
             else:
                 print('>>> Skip loaddata rs_system')
 
-        # mongo を初期化する
         init_mongo()
-        # taxii client のスケジューラー起動
         self.init_taxii_client_scheduler()
 
-    # scheduler 起動
     def boot_scheduler(self, job, taxii_client):
         from ctirs.core.mongo.documents import ScheduleJobs
         status = job.status
         taxii_client.add_job(job)
-        # 稼働中のステータスの場合のみschedulerに登録
         if status == ScheduleJobs.STATUS_IN_OPERATION:
             taxii_client.resume_job(job.id)
         else:
             taxii_client.pause_job(job.id)
 
-    # taxii client スケジューラ起動
     def init_taxii_client_scheduler(self):
-        from ctirs.core.mongo.documents import TaxiiClients
+        from ctirs.core.mongo.documents import TaxiiClients, Taxii2Clients
         from ctirs.core.taxii.taxii import Client
-        # schedulerを起動
-        # mongoに格納されている全TaxiiClientsドキュメントについて
         for doc in TaxiiClients.objects:
-            taxii_client = Client(taxii_id=doc.id)
-            # 各job設定ごとに
+            taxii_client = Client(taxii_client=doc)
             for job in doc.jobs:
                 self.boot_scheduler(job, taxii_client)
-            # interval
             if doc.interval_schedule_job is not None:
                 job = doc.interval_schedule_job
                 self.boot_scheduler(job, taxii_client)
+        for doc in Taxii2Clients.objects:
+            taxii2_client = Client(taxii2_client=doc)
+            for job in doc.jobs:
+                self.boot_scheduler(job, taxii2_client)
+            if doc.interval_schedule_job is not None:
+                job = doc.interval_schedule_job
+                self.boot_scheduler(job, taxii2_client)
 
 
-# mongo 初期化
 def init_mongo():
     MONGO_DEFAULT_DB_NAME = 'ctirs'
     MONGO_DEFAULT_TXS21_DB_NAME = 'taxii21'
@@ -95,8 +87,7 @@ def init_mongo():
         from ctirs.models.rs.models import MongoConfig
         config = MongoConfig.objects.get()
         connect(config.db, host=config.host, port=int(config.port))
-#        connect(config.db_taxii21, host=config.host, port=int(config.port), alias='taxii21_alias')
+        connect(config.db_taxii21, host=config.host, port=int(config.port), alias='taxii21_alias')
     except BaseException:
-        # デフォルト設定を用いる
         connect(MONGO_DEFAULT_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT)
-#        connect(MONGO_DEFAULT_TXS21_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT, alias='taxii21_alias')
+        connect(MONGO_DEFAULT_TXS21_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT, alias='taxii21_alias')

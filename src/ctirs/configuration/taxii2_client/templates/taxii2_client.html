@@ -1,18 +1,18 @@
 {% include 'header.html' %}
 <head>
-<!--  for taxii_client_configurations -->
+<!--  for taxii2_client_configurations -->
 <link href="/static/ctirs/css/profile_configuration_common.css" rel="stylesheet">
-<script type="text/javascript" src="/static/ctirs/js/taxii_client_configuration.js"></script>
+<script type="text/javascript" src="/static/ctirs/js/taxii2_client_configuration.js"></script>
 </head>
 
 <body>
 {% include 'nav_header.html' %}
-<form name="delete_taxii_client" id="delete-taxii-client-form" action="/configuration/taxii_client/delete" method="GET"></form>
-<form name="conifuration_taxii_client_detail" id="configuration-taxii-client-detail" action="/configuration/taxii_client/detail/" method="GET"></form>
-<form name="create_taxii_client" id="create-taxii-client-form" action="/configuration/taxii_client/create" method="POST">{% csrf_token %}
+<form name="delete_taxii2_client" id="delete-taxii2-client-form" action="/configuration/taxii2_client/delete" method="GET"></form>
+<form name="conifuration_taxii2_client_detail" id="configuration-taxii2-client-detail" action="/configuration/taxii2_client/detail/" method="GET"></form>
+<form name="create_taxii2_client" id="create-taxii2-client-form" action="/configuration/taxii2_client/create" method="POST">{% csrf_token %}
 <div class="container">
     <br/>
-    <h1>TAXII Client (1.x)</h1>
+    <h1>TAXII Client (2.x)</h1>
     <br/>
     <hr/>
     <h2>Create or Modify TAXII Client Setting</h2>
@@ -76,10 +76,10 @@
     <div class="form-group">
         <div class="row">
             <div class="col-xs-2">
-                Path
+                API Root
             </div>
             <div class="col-xs-4">
-                <input id="create-path" type="text" name="path" class="form-control"/>
+                <input id="create-api-root" type="text" name="api_root" class="form-control"/>
             </div>
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
@@ -113,53 +113,6 @@
             </div>
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
-
-    <div class="form-group">
-        <div class="row">
-            <div class="col-xs-2">
-                Use Certificate Authentication
-            </div>
-            <div class="col-xs-4" >
-                <input id="create-ca" type="checkbox" name="ca"/>
-            </div>
-        </div> <!-- <div class="row">-->
-    </div><!-- <div class="form-group"> -->
-
-	<div id="certificate-file-div">
-        <div class="form-group">
-            <div class="row">
-                <div class="col-xs-2">
-                    Certificate
-                </div>
-                <div class="col-xs-4" >
-                    <textarea id="create-certificate" name="certificate" placeholder="-----BEGIN CERTIFICATE..."></textarea>
-                </div>
-            </div> <!-- <div class="row">-->
-        </div><!-- <div class="form-group"> -->
-
-        <div class="form-group">
-            <div class="row">
-                <div class="col-xs-2">
-                    Private Key
-                </div>
-                <div class="col-xs-4" >
-                    <textarea id="create-private-key" name="private_key" placeholder="-----BEGIN PRIVATE..."></textarea>
-                </div>
-            </div> <!-- <div class="row">-->
-        </div><!-- <div class="form-group"> -->
-    </div><!--  <div id="certificate-file-div"> -->
-
-    <div class="form-group">
-        <div class="row">
-            <div class="col-xs-2">
-                Use SSL
-            </div>
-            <div class="col-xs-4" >
-                <input id="create-ssl" type="checkbox" name="ssl"/>
-            </div>
-        </div> <!-- <div class="row">-->
-    </div><!-- <div class="form-group"> -->
-
     <div class="form-group">
         <div class="row">
             <div class="col-xs-2">
@@ -222,12 +175,12 @@
     <br/>
     <div class="form-group">
         <div class="row">
-            <button type="button" id="create-taxii-client-submit" class="btn btn-default">Create Or Modify</button>
+            <button type="button" id="create-taxii2-client-submit" class="btn btn-default">Create Or Modify</button>
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
     <hr/>
     <h2>TAXII Client Configuration</h2>
-    {% if taxii_clients %}
+    {% if taxii2_clients %}
     <table class="table table-striped table-hover" style="table-layout: fixed;">
     <thead>
     <tr>
@@ -253,7 +206,7 @@
         Port
     </td>
     <td>
-        Path
+        API Root
     </td>
     <td>
         Collection
@@ -263,12 +216,6 @@
     </td>
     <td>
         Login Password
-    </td>
-    <td>
-        Use Certificate
-    </td>
-    <td>
-        Use SSL
     </td>
     <td>
         Push on Adding Files
@@ -282,67 +229,61 @@
     </tr>
     </thead>
     <tbody>
-    {% for taxii_client in taxii_clients %}
+    {% for taxii2_client in taxii2_clients %}
     <tr class="configure-tr">
     <td>
         <div class="form-group">
-            <button class="btn btn-default delete-taxii-client-button btn-sm" type="button" display_name="{{ taxii_client.name }}" >Delete</button>
+            <button class="btn btn-default delete-taxii2-client-button btn-sm" type="button" display_name="{{ taxii2_client.name }}" >Delete</button>
         </div><!-- <div class="form-group"> -->
     </td>
     <td>
         <div class="form-group">
-            <button class="btn btn-default modify-taxii-client-button btn-sm" type="button" display_name="{{ taxii_client.name }}" >Modify</button>
+            <button class="btn btn-default modify-taxii2-client-button btn-sm" type="button" display_name="{{ taxii2_client.name }}" >Modify</button>
         </div><!-- <div class="form-group"> -->
     </td>
     <td>
         <div class="form-group">
-            <button class="btn btn-default detail-taxii-client-button btn-sm" type="button" display_name="{{ taxii_client.name }}" taxii_client_id="{{ taxii_client.id }}">Detail</button>
+            <button class="btn btn-default detail-taxii2-client-button btn-sm" type="button" display_name="{{ taxii2_client.name }}" taxii2_client_id="{{ taxii2_client.id }}">Detail</button>
     <td>
-        <p class="display-name" style="word-wrap: break-word;">{{ taxii_client.name }}</p>
+        <p class="display-name" style="word-wrap: break-word;">{{ taxii2_client.name }}</p>
     </td>
     <td>
-        <p class="protocol-version">{{ taxii_client.protocol_version }}</p>
+        <p class="protocol-version">{{ taxii2_client.protocol_version }}</p>
     </td>
     <td>
-        <p class="address" style="word-wrap: break-word;">{{ taxii_client.address }}</p>
+        <p class="address" style="word-wrap: break-word;">{{ taxii2_client.address }}</p>
     </td>
     <td>
-        <p class="port">{{ taxii_client.port }}</p>
+        <p class="port">{{ taxii2_client.port }}</p>
     </td>
     <td>
-        <p class="path" style="word-wrap: break-word;">{{ taxii_client.path }}</p>
+        <p class="api-root" style="word-wrap: break-word;">{{ taxii2_client.api_root }}</p>
     </td>
     <td>
-        <p class="collection" style="word-wrap: break-word;">{{ taxii_client.collection }}</p>
+        <p class="collection" style="word-wrap: break-word;">{{ taxii2_client.collection }}</p>
     </td>
     <td>
-        <p class="login-id" style="word-wrap: break-word;">{{ taxii_client.login_id }}</p>
+        <p class="login-id" style="word-wrap: break-word;">{{ taxii2_client.login_id }}</p>
     </td>
     <td>
         <p class="login-password">xxx</p>
     </td>
     <td>
-        <input type="checkbox" disabled {% if taxii_client.is_use_cert %}checked{% endif %} class="ca"/> 
+        <input type="checkbox" disabled {% if taxii2_client.push %}checked{% endif %} class="push"/> 
     </td>
     <td>
-        <input type="checkbox" disabled {% if taxii_client.ssl %}checked{% endif %} class="ssl"/> 
-    </td>
-    <td>
-        <input type="checkbox" disabled {% if taxii_client.push %}checked{% endif %} class="push"/> 
-    </td>
-    <td>
-    	{% if taxii_client.is_exist_community %}
-        <p class="community" style="word-wrap: break-word;">{{ taxii_client.community.name}}</p>
-        <input type="hidden" class="community-id" value="{{taxii_client.community.id}}"/>
+    	{% if taxii2_client.is_exist_community %}
+        <p class="community" style="word-wrap: break-word;">{{ taxii2_client.community.name}}</p>
+        <input type="hidden" class="community-id" value="{{taxii2_client.community.id}}"/>
     	{% else %}
         <p class="community" style="word-wrap: break-word;">&lt;undefined&gt;</p>
         <input type="hidden" class="community-id" value=""/>
     	{% endif %}
     </td>
     <td>
-    	{% if taxii_client.uploader %}
-		<p class="uploader" style="word-wrap: break-word;">{{ taxii_client.uploader_name }}</p>
-        <input type="hidden" class="uploader-id" value="{{taxii_client.uploader}}"/>
+    	{% if taxii2_client.uploader %}
+		<p class="uploader" style="word-wrap: break-word;">{{ taxii2_client.uploader_name }}</p>
+        <input type="hidden" class="uploader-id" value="{{taxii2_client.uploader}}"/>
     	{% else %}
         <p class="uploader" style="word-wrap: break-word;">&lt;undefined&gt;</p>
         <input type="hidden" class="uploader-id" value=""/>

@@ -95,6 +95,8 @@ DIRS = [
     os.path.join(CTIRS_DIR, 'configuration/mongo/templates'),
     os.path.join(CTIRS_DIR, 'configuration/taxii_client/templates'),
     os.path.join(CTIRS_DIR, 'configuration/taxii_client/detail/templates'),
+    os.path.join(CTIRS_DIR, 'configuration/taxii2_client/templates'),
+    os.path.join(CTIRS_DIR, 'configuration/taxii2_client/detail/templates'),
     os.path.join(CTIRS_DIR, 'configuration/taxii_server/templates'),
     os.path.join(CTIRS_DIR, 'configuration/taxii_server/detail/templates'),
     os.path.join(CTIRS_DIR, 'adapter/otx/templates'),

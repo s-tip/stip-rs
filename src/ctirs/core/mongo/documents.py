@@ -498,19 +498,15 @@ if MispAdapter.objects.count() == 0:
 
 class TaxiiClients(Document):
     TAXII_PROTOCOL_VERSION_CHOICES = (
+        ('1.0', '1.0'),
         ('1.1', '1.1'),
-        ('2.0', '2.0'),
     )
 
     @classmethod
-    def get_protocol_versions(cls):
-        l = []
-        for choice in cls.TAXII_PROTOCOL_VERSION_CHOICES:
-            l.append(choice[0])
-        return l
-
-    @classmethod
-    def create(cls, name, address='', port=0, ssl=False, path='', collection='', login_id='', login_password='', community_id='', ca=False, key_file=None, cert_file=None, protocol_version='', push=False, uploader_id=None):
+    def create(
+            cls, name, address='', port=0, ssl=False, path='', collection='', login_id='', login_password='',
+            community_id='', ca=False, key_file=None, cert_file=None,
+            protocol_version='1.1', push=False, uploader_id=None):
         community = Communities.objects.get(id=community_id)
         try:
             t = TaxiiClients.objects.get(name=name)
@@ -539,46 +535,25 @@ class TaxiiClients(Document):
         t.save()
         return
 
-    # job追加
-    def add_job(self, type_, **kwargs):
-        job = ScheduleJobs.create(type_, **kwargs)
-        if job.job_type == ScheduleJobs.JOB_CRON:
-            # type が cron の場合はリストに追加
-            self.jobs.append(job)
-            self.save()
-        elif job.job_type == ScheduleJobs.JOB_INTERVAL:
-            # type が interval の場合は document を 更新
-            if self.interval_schedule_job is not None:
-                self.interval_schedule_job.interval_job.delete()
-                self.interval_schedule_job.delete()
-            self.interval_schedule_job = job
-            self.save()
-        return job
-
-    # job削除
-    def remove_job(self, jobs_id):
-        job = ScheduleJobs.objects.get(id=jobs_id)
-        self.jobs.remove(job)
-        self.save()
-
-    # job削除(interval)
-    def remove_interval_job(self):
-        if self.interval_schedule_job is not None:
-            self.interval_schedule_job.interval_job.delete()
-            self.interval_schedule_job.delete()
-            self.save()
-
-    # template表示用/communityが削除されずに残っているか
-    def is_exist_community(self):
-        try:
-            v = self.community
-            return v == self.community
-        except DoesNotExist:
-            return False
+    @staticmethod
+    def get_protocol_versions():
+        return CommonTaxiiClient.get_protocol_versions(TaxiiClients.TAXII_PROTOCOL_VERSION_CHOICES)
 
     @property
     def uploader_name(self):
-        return STIPUser.objects.get(id=self.uploader).username
+        return CommonTaxiiClient.uploader_name(self)
+
+    def add_job(self, type_, **kwargs):
+        return CommonTaxiiClient.add_job(self, type_, **kwargs)
+
+    def remove_job(self, jobs_id):
+        CommonTaxiiClient.remove_job(self, jobs_id)
+
+    def remove_interval_job(self):
+        CommonTaxiiClient.remove_job(self)
+
+    def is_exist_community(self):
+        return CommonTaxiiClient.is_exist_community(self)
 
     name = fields.StringField(max_length=100, unique=True)
     address = fields.StringField(max_length=100, default='localhost')
@@ -595,10 +570,123 @@ class TaxiiClients(Document):
     last_requested = fields.DateTimeField(default=None)
     protocol_version = fields.StringField(max_length=16, choices=TAXII_PROTOCOL_VERSION_CHOICES, default='1.1')
     push = fields.BooleanField(default=False)
-    # uploader には STIPUser の ID を格納
     uploader = fields.IntField()
     jobs = fields.ListField()
     interval_schedule_job = fields.ReferenceField(ScheduleJobs)
+
+
+class Taxii2Clients(Document):
+    TAXII_PROTOCOL_VERSION_CHOICES = (
+        ('2.0', '2.0'),
+        ('2.1', '2.1'),
+    )
+
+    @classmethod
+    def create(
+            cls, name, address='', port=0, api_root='', collection='', login_id='', login_password='',
+            community_id='', protocol_version='', push=False, uploader_id=None):
+        community = Communities.objects.get(id=community_id)
+        try:
+            t = Taxii2Clients.objects.get(name=name)
+        except DoesNotExist:
+            t = Taxii2Clients()
+            t.last_requested = None
+        t.address = address
+        t.name = name
+        t.port = port
+        t.api_root = api_root
+        t.collection = collection
+        t.login_id = login_id
+        t.login_password = login_password
+        t.community = community
+        t.protocol_version = protocol_version
+        t.push = push
+        t.uploader = uploader_id
+        t.save()
+        return
+
+    @staticmethod
+    def get_protocol_versions():
+        return CommonTaxiiClient.get_protocol_versions(Taxii2Clients.TAXII_PROTOCOL_VERSION_CHOICES)
+
+    @property
+    def uploader_name(self):
+        return CommonTaxiiClient.uploader_name(self)
+
+    def add_job(self, type_, **kwargs):
+        return CommonTaxiiClient.add_job(self, type_, **kwargs)
+
+    def remove_job(self, jobs_id):
+        CommonTaxiiClient.remove_job(self, jobs_id)
+
+    def remove_interval_job(self):
+        CommonTaxiiClient.remove_job(self)
+
+    def is_exist_community(self):
+        return CommonTaxiiClient.is_exist_community(self)
+
+    name = fields.StringField(max_length=100, unique=True)
+    address = fields.StringField(max_length=100, default='localhost')
+    port = fields.IntField(default=443)
+    api_root = fields.StringField(max_length=100, default='/api1')
+    collection = fields.StringField(max_length=100, default='collection')
+    login_id = fields.StringField(max_length=100, default='login_id')
+    login_password = fields.StringField(max_length=100, default='login_password')
+    community = fields.ReferenceField(Communities)
+    last_requested = fields.DateTimeField(default=None)
+    protocol_version = fields.StringField(max_length=16, choices=TAXII_PROTOCOL_VERSION_CHOICES, default='2.1')
+    push = fields.BooleanField(default=False)
+    uploader = fields.IntField()
+    jobs = fields.ListField()
+    interval_schedule_job = fields.ReferenceField(ScheduleJobs)
+
+
+class CommonTaxiiClient(object):
+    @staticmethod
+    def get_protocol_versions(choices):
+        l = []
+        for choice in choices:
+            l.append(choice[0])
+        return l
+
+    @staticmethod
+    def add_job(taxii_client, type_, **kwargs):
+        job = ScheduleJobs.create(type_, **kwargs)
+        if job.job_type == ScheduleJobs.JOB_CRON:
+            taxii_client.jobs.append(job)
+            taxii_client.save()
+        elif job.job_type == ScheduleJobs.JOB_INTERVAL:
+            if taxii_client.interval_schedule_job is not None:
+                taxii_client.interval_schedule_job.interval_job.delete()
+                taxii_client.interval_schedule_job.delete()
+            taxii_client.interval_schedule_job = job
+            taxii_client.save()
+        return job
+
+    @staticmethod
+    def remove_job(taxii_client, jobs_id):
+        job = ScheduleJobs.objects.get(id=jobs_id)
+        taxii_client.jobs.remove(job)
+        taxii_client.save()
+
+    @staticmethod
+    def remove_interval_job(taxii_client):
+        if taxii_client.interval_schedule_job is not None:
+            taxii_client.interval_schedule_job.interval_job.delete()
+            taxii_client.interval_schedule_job.delete()
+            taxii_client.save()
+
+    @staticmethod
+    def is_exist_community(taxii_client):
+        try:
+            v = taxii_client.community
+            return v == taxii_client.community
+        except DoesNotExist:
+            return False
+
+    @staticmethod
+    def uploader_name(taxii_client):
+        return STIPUser.objects.get(id=taxii_client.uploader).username
 
 
 class Vias(Document):
@@ -615,6 +703,7 @@ class Vias(Document):
     # uploader には STIPUser の ID を格納
     uploader = fields.IntField()
     taxii_client = fields.ReferenceField(TaxiiClients)
+    taxii2_client = fields.ReferenceField(Taxii2Clients)
     adapter_name = fields.StringField(max_length=32)
     taxii_publisher = fields.StringField(max_length=32)
 
@@ -661,16 +750,20 @@ class Vias(Document):
             return document
 
     @classmethod
-    def get_via_taxii_poll(cls, taxii_client=None, uploader=None):
+    def get_via_taxii_poll(cls, taxii_client=None, taxii2_client=None, uploader=None):
         via = 'taxii_poll'
         try:
-            # すでにある場合は返却
-            return Vias.objects.get(via=via, taxii_client=taxii_client, uploader=uploader)
+            if taxii_client:
+                return Vias.objects.get(via=via, taxii_client=taxii_client, uploader=uploader)
+            if taxii2_client:
+                return Vias.objects.get(via=via, taxii2_client=taxii2_client, uploader=uploader)
         except DoesNotExist:
-            # 存在しない場合は新規作成/保存後返却
             document = Vias()
             document.via = via
-            document.taxii_client = taxii_client
+            if taxii_client:
+                document.taxii_client = taxii_client
+            if taxii2_client:
+                document.taxii2_client = taxii2_client
             document.uploader = uploader
             document.save()
             return document

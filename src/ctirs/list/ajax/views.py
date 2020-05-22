@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from mongoengine.queryset.visitor import Q
 from mongoengine import DoesNotExist
 from ctirs.api import JsonResponse
-from ctirs.core.mongo.documents import Communities, Vias
+from ctirs.core.mongo.documents import Communities, Vias, TaxiiClients
 from ctirs.core.mongo.documents_stix import StixFiles
 from ctirs.core.taxii.taxii import Client
 from ctirs.models.rs.models import STIPUser
@@ -14,7 +14,6 @@ from ctirs.core.adapter.misp.upload.control import MispUploadAdapterControl
 
 @login_required
 def get_table_info(request):
-    # ajax parameter取得
     iDisplayLength = int(request.GET['iDisplayLength'])
     sEcho = request.GET['sEcho']
     iDisplayStart = int(request.GET['iDisplayStart'])
@@ -33,23 +32,16 @@ def get_table_info(request):
         order_query = 'version'
 
     if order_query is not None:
-        # descが降順
         if sort_dir == 'desc':
             order_query = '-' + order_query
 
-    # 検索対象のcommunity
     s_input_communities = Communities.objects.filter(Q(name__icontains=sSearch))
-    # 検索対象のvia_choice
     s_via_choices = Vias.get_search_via_choices(sSearch)
-    # 検索対象のUploader
     s_uploaders = []
     for uploader in STIPUser.objects.filter(QQ(screen_name__icontains=sSearch) | QQ(username__icontains=sSearch)):
         s_uploaders.append(uploader.id)
-    # 検索対象のvias
-    # viaとuploaderとadapter_nameが検索時対象
     s_vias = Vias.objects.filter(Q(via__in=s_via_choices) | Q(uploader__in=s_uploaders) | Q(adapter_name__icontains=sSearch))
 
-    # 検索する
     objects = StixFiles.objects \
         .filter(
             Q(package_name__icontains=sSearch)
@@ -60,7 +52,6 @@ def get_table_info(request):
         )\
         .order_by(order_query)
 
-    # 検索結果から表示範囲のデータを抽出する
     aaData = []
     count = 0
     for d in objects[iDisplayStart:(iDisplayStart + iDisplayLength)]:
@@ -73,7 +64,6 @@ def get_table_info(request):
         try:
             l.append(d.input_community.name)
         except DoesNotExist:
-            # commmunityが削除されたなどの理由でない場合
             l.append('&lt;deleted&gt;')
         l.append(d.via.get_via_display())
         l.append(d.via.get_uploader_screen_name())
@@ -106,20 +96,16 @@ def get_table_info(request):
 
 @login_required
 def publish(request):
-    # ajax parameter取得
     stix_id = request.GET['stix_id']
     taxii_id = request.GET['taxii_id']
-    # Publish (Push) する StixFile object
     stix = StixFiles.objects.get(id=stix_id)
-    # Publish (Push) の時に使用する TaxiiClients object
-    client = Client(taxii_id=taxii_id)
-    # publish する
+    taxii_client = TaxiiClients.objects.get(id=taxii_id)
+    client = Client(taxii_client=taxii_client)
     try:
         client.push(stix)
         resp = {'status': 'OK',
                 'message': 'Success'}
     except Exception as e:
-        # traceback.print_exc()
         resp = {'status': 'NG',
                 'message': str(e)}
     return JsonResponse(resp)
