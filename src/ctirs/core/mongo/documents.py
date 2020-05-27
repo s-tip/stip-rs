@@ -520,7 +520,8 @@ class TaxiiClients(Document):
         t.path = path
         t.collection = collection
         t.login_id = login_id
-        t.login_password = login_password
+        if login_password is not None and len(login_password) != 0:
+            t.login_password = login_password
         t.community = community
         t.is_use_cert = ca
         if ca is True:
@@ -583,7 +584,7 @@ class Taxii2Clients(Document):
 
     @classmethod
     def create(
-            cls, name, address='', port=0, api_root='', collection='', login_id='', login_password='',
+            cls, name, api_root='', collection='', login_id='', login_password='',
             community_id='', protocol_version='', push=False, uploader_id=None):
         community = Communities.objects.get(id=community_id)
         try:
@@ -591,13 +592,12 @@ class Taxii2Clients(Document):
         except DoesNotExist:
             t = Taxii2Clients()
             t.last_requested = None
-        t.address = address
         t.name = name
-        t.port = port
         t.api_root = api_root
         t.collection = collection
         t.login_id = login_id
-        t.login_password = login_password
+        if login_password is not None and len(login_password) != 0:
+            t.login_password = login_password
         t.community = community
         t.protocol_version = protocol_version
         t.push = push
@@ -626,8 +626,6 @@ class Taxii2Clients(Document):
         return CommonTaxiiClient.is_exist_community(self)
 
     name = fields.StringField(max_length=100, unique=True)
-    address = fields.StringField(max_length=100, default='localhost')
-    port = fields.IntField(default=443)
     api_root = fields.StringField(max_length=100, default='/api1')
     collection = fields.StringField(max_length=100, default='collection')
     login_id = fields.StringField(max_length=100, default='login_id')

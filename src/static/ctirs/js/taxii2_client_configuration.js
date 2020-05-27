@@ -30,25 +30,6 @@ $(function(){
             modify_taxii2_error('Enter Display Name');
             return;
         }
-        var address = $('#create-address').val();
-        if(address.length == 0){
-            modify_taxii2_error('Enter Address');
-            return;
-        }
-        var port_str = $('#create-port').val();
-        if(port_str.length == 0){
-        	modify_taxii2_error('Enter port');
-            return;
-        }
-        var port = Number(port_str);
-        if (isNaN(port) == true){
-        	modify_taxii2_error('Invalid port');
-            return;
-        }
-        if((port < 0) || (port > 65535)){
-        	modify_taxii2_error('Invalid port');
-            return;
-        }
         var api_root = $('#create-api-root').val();
         if(api_root.length == 0){
             modify_taxii2_error('Enter API Root');
@@ -97,8 +78,6 @@ $(function(){
         $('#error-msg').html('');
         var tr = $(this).closest('.configure-tr');
         $('#create-display-name').val(tr.find('.display-name').text());
-        $('#create-address').val(tr.find('.address').text());
-        $('#create-port').val(tr.find('.port').text());
         $('#create-api-root').val(tr.find('.api-root').text());
         $('#create-collection').val(tr.find('.collection').text());
         $('#create-login-id').val(tr.find('.login-id').text());

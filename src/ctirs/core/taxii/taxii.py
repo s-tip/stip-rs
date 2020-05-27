@@ -15,8 +15,6 @@ class Client(object):
         elif taxii_client:
             taxii = taxii_client
 
-        self._address = taxii.address
-        self._port = taxii.port
         self._protocol_version = taxii.protocol_version
         self._username = taxii.login_id
         self._password = taxii.login_password
@@ -28,6 +26,8 @@ class Client(object):
             self._collection = taxii.collection
             self._via = Vias.get_via_taxii_poll(taxii2_client=taxii, uploader=taxii.uploader)
         else:
+            self._address = taxii.address
+            self._port = taxii.port
             self._path = taxii.path
             self._collection_name = taxii.collection
             self._via = Vias.get_via_taxii_poll(taxii_client=taxii, uploader=taxii.uploader)
@@ -122,16 +122,16 @@ class Client(object):
 
     def poll(self):
         if self._protocol_version == '2.0':
-            return poll_20(self)
+            return poll_20(self, protocol_version='2.0')
         elif self._protocol_version == '2.1':
-            return poll_20(self)
+            return poll_20(self, protocol_version='2.1')
         else:
             return poll_11(self)
 
     def push(self, stix_file_doc):
         if self._protocol_version == '2.0':
-            push_20(self, stix_file_doc)
+            push_20(self, stix_file_doc, protocol_version='2.0')
         elif self._protocol_version == '2.1':
-            push_20(self, stix_file_doc)
+            push_20(self, stix_file_doc, protocol_version='2.1')
         else:
             push_11(self, stix_file_doc)

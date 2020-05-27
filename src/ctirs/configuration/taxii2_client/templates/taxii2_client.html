@@ -56,26 +56,6 @@
     <div class="form-group">
         <div class="row">
             <div class="col-xs-2">
-                Address
-            </div>
-            <div class="col-xs-4">
-                <input id="create-address" type="text" name="address" class="form-control"/>
-            </div>
-        </div> <!-- <div class="row">-->
-    </div><!-- <div class="form-group"> -->
-    <div class="form-group">
-        <div class="row">
-            <div class="col-xs-2">
-                Port
-            </div>
-            <div class="col-xs-4">
-                <input id="create-port" type="text" name="port" class="form-control"/>
-            </div>
-        </div> <!-- <div class="row">-->
-    </div><!-- <div class="form-group"> -->
-    <div class="form-group">
-        <div class="row">
-            <div class="col-xs-2">
                 API Root
             </div>
             <div class="col-xs-4">
@@ -200,12 +180,6 @@
         Protocol Version
     </td>
     <td>
-        Address
-    </td>
-    <td>
-        Port
-    </td>
-    <td>
         API Root
     </td>
     <td>
@@ -249,12 +223,6 @@
     </td>
     <td>
         <p class="protocol-version">{{ taxii2_client.protocol_version }}</p>
-    </td>
-    <td>
-        <p class="address" style="word-wrap: break-word;">{{ taxii2_client.address }}</p>
-    </td>
-    <td>
-        <p class="port">{{ taxii2_client.port }}</p>
     </td>
     <td>
         <p class="api-root" style="word-wrap: break-word;">{{ taxii2_client.api_root }}</p>

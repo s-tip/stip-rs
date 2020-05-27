@@ -97,8 +97,6 @@ def init_mongo():
         if taxii_client.protocol_version.startswith('2.'):
             Taxii2Clients.create(
                 taxii_client.name,
-                taxii_client.address,
-                taxii_client.port,
                 taxii_client.path,
                 taxii_client.collection,
                 taxii_client.login_id,

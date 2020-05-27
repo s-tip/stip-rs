@@ -10,14 +10,6 @@ def get_taxii2_client_create_display_name(request):
     return get_text_field_value(request, 'display_name', default_value='')
 
 
-def get_taxii2_client_create_address(request):
-    return get_text_field_value(request, 'address', default_value='')
-
-
-def get_taxii2_client_create_port(request):
-    return int(get_text_field_value(request, 'port', default_value='-1'))
-
-
 def get_taxii2_client_create_api_root(request):
     return get_text_field_value(request, 'api_root', default_value='')
 
@@ -77,15 +69,6 @@ def create(request):
         setting_name = get_taxii2_client_create_display_name(request)
         if(setting_name is None or len(setting_name) == 0):
             return error_page_free_format(request, 'No Display Name.')
-        address = get_taxii2_client_create_address(request)
-        if(address is None or len(address) == 0):
-            return error_page_free_format(request, 'No Address.')
-        try:
-            port = get_taxii2_client_create_port(request)
-            if(port < 0 or port > 65535):
-                return error_page_free_format(request, 'Invalid port.')
-        except ValueError:
-            return error_page_free_format(request, 'Invalid port.')
         api_root = get_taxii2_client_create_api_root(request)
         if(api_root is None or len(api_root) == 0):
             return error_page_free_format(request, 'No API Root.')
@@ -101,8 +84,6 @@ def create(request):
 
         Taxii2Clients.create(
             setting_name,
-            address=address,
-            port=port,
             api_root=api_root,
             collection=collection,
             login_id=login_id,
