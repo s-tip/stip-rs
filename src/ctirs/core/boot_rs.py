@@ -91,3 +91,21 @@ def init_mongo():
     except BaseException:
         connect(MONGO_DEFAULT_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT)
         connect(MONGO_DEFAULT_TXS21_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT, alias='taxii21_alias')
+
+    from ctirs.core.mongo.documents import TaxiiClients, Taxii2Clients
+    for taxii_client in TaxiiClients.objects:
+        if taxii_client.protocol_version.startswith('2.'):
+            Taxii2Clients.create(
+                taxii_client.name,
+                taxii_client.address,
+                taxii_client.port,
+                taxii_client.path,
+                taxii_client.collection,
+                taxii_client.login_id,
+                taxii_client.login_password,
+                taxii_client.community.id,
+                taxii_client.protocol_version,
+                taxii_client.push,
+                taxii_client.uploader
+            )
+            taxii_client.delete()
