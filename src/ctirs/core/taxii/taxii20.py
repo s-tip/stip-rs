@@ -4,10 +4,15 @@ import datetime
 import pytz
 import requests
 import traceback
+import urllib.parse as urlparse
+from urllib.parse import urlencode
 from requests.auth import _basic_auth_str
+from stix2 import parse
+from stix2.v21.bundle import Bundle
 
 
 TAXII_20_ACCEPT = 'application/vnd.oasis.taxii+json; version=2.0'
+TAXII_21_ACCEPT = 'application/taxii+json; version=2.1'
 TAXII_20_PUBLICATION_CONTENT_TYPE = 'application/vnd.oasis.stix+json; version=2.0'
 
 
@@ -30,6 +35,13 @@ def _get_taxii_20_get_request_header(taxii_client):
     }
 
 
+def _get_taxii_21_get_request_header(taxii_client):
+    return {
+        'Accept': TAXII_21_ACCEPT,
+        'Authorization': _get_taxii_2x_authorization(taxii_client),
+    }
+
+
 def _get_taxii_2x_objects_url(taxii_client):
     url = '%scollections/%s/objects/' % (
         taxii_client._api_root,
@@ -37,37 +49,81 @@ def _get_taxii_2x_objects_url(taxii_client):
     return url
 
 
-def poll_20(taxii_client, protocol_version='2.0'):
+def _get_json_response(taxii_client, protocol_version, next=None):
     url = _get_taxii_2x_objects_url(taxii_client)
+    url_parts = list(urlparse.urlparse(url))
+    query = {}
+
     if taxii_client._start is not None:
-        url += ('?added_after=%s' % (taxii_client._start.strftime('%Y-%m-%dT%H:%M:%S.000Z')))
+        query['added_after'] = taxii_client._start.strftime('%Y-%m-%dT%H:%M:%S.000Z')
     if protocol_version == '2.0':
         headers = _get_taxii_20_get_request_header(taxii_client)
-    else:
+    elif protocol_version == '2.1':
         headers = None
+        headers = _get_taxii_21_get_request_header(taxii_client)
+        if next is not None:
+            query['next'] = next
+
+    url_parts[4] = urlencode(query)
+    url = urlparse.urlunparse(url_parts)
+    resp = requests.get(
+        url,
+        headers=headers,
+        verify=False,
+        proxies=taxii_client._proxies
+    )
+    if resp.status_code >= 300:
+        raise Exception('Invalid http response (%s).' % (resp.status_code))
+    return resp.json()
+
+
+def _get_objects_21(taxii_client, protocol_version, objects, resp_json):
+    if resp_json is None:
+        return objects
+    if 'objects' not in resp_json:
+        return objects
+    if len(resp_json['objects']) == 0:
+        return objects
+    for o_dict in resp_json['objects']:
+        try:
+            o_ = parse(o_dict, version='2.1', allow_custom=True)
+            objects.append(o_)
+        except Exception:
+            pass
+
+    if 'more' not in resp_json:
+        return objects
+    if resp_json['more'] and 'next' in resp_json:
+        next_resp_json = _get_json_response(
+            taxii_client,
+            protocol_version,
+            next=resp_json['next'])
+        return _get_objects_21(
+            taxii_client,
+            protocol_version,
+            objects,
+            next_resp_json)
+    return objects
+
+
+def poll_20(taxii_client, protocol_version='2.0'):
     try:
         count = 0
-        resp = requests.get(
-            url,
-            headers=headers,
-            verify=False,
-            proxies=taxii_client._proxies
-        )
-        if resp.status_code >= 300:
-            raise Exception('Invalid http response (%s).' % (resp.status_code))
+        js = _get_json_response(taxii_client, protocol_version)
+        if 'objects' not in js:
+            return 0
 
-        js = resp.json()
-        if protocol_version == '2.0':
-            if 'objects' not in js:
-                return 0
         _, stix_file_path = tempfile.mkstemp(suffix='.json')
         if protocol_version == '2.0':
             with open(stix_file_path, 'wb+') as fp:
                 fp.write(json.dumps(js, indent=4).encode('utf-8'))
         elif protocol_version == '2.1':
-            ### bundle を作る
+            objects = _get_objects_21(taxii_client, protocol_version, [], js)
+            if len(objects) == 0:
+                return 0
+            bundle = Bundle(objects)
             with open(stix_file_path, 'wb+') as fp:
-                fp.write(json.dumps(js, indent=4).encode('utf-8'))
+                fp.write(bundle.serialize(pretty=True).encode('utf-8'))
         from ctirs.core.stix.regist import regist
         if taxii_client._community is not None:
             regist(stix_file_path, taxii_client._community, taxii_client._via)
