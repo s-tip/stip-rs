@@ -110,9 +110,9 @@ def publish(request):
         taxii_client = Taxii2Clients.objects.get(id=taxii_id)
         client = Client(taxii2_client=taxii_client)
     try:
-        client.push(stix)
+        msg = client.push(stix)
         resp = {'status': 'OK',
-                'message': 'Success'}
+                'message': msg}
     except Exception as e:
         resp = {'status': 'NG',
                 'message': str(e)}

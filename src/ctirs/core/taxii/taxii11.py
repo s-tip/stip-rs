@@ -123,6 +123,7 @@ def push_11(taxii_client, stix_file_doc):
             im.message_id)
         if taxii_message.status_type != 'SUCCESS':
             raise Exception('taxii_message.status_type is not SUCCESS')
+        return 'Success !!'
     except Exception as e:
         traceback.print_exc()
         raise e

@@ -145,7 +145,10 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
             content = fp.read()
 
     url = _get_taxii_2x_objects_url(taxii_client)
-    headers = _get_taxii_20_post_request_header(taxii_client)
+    if protocol_version == '2.0':
+        headers = _get_taxii_20_post_request_header(taxii_client)
+    elif protocol_version == '2.1':
+        headers = None
 
     resp = requests.post(
         url,
@@ -159,13 +162,9 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
         raise Exception('Invalid http response: %s' % (resp.status_code))
 
     try:
-        j = resp.json()
-        if j['status'] != 'complete':
-            return
-        if j['failure_count'] != 0:
-            return
-        if j['pending_count'] != 0:
-            return
+        msg = 'An add object status response shows below.'
+        msg += json.dumps(resp.json(), indent=4)
+        return msg
     except Exception as e:
         traceback.print_exc()
         raise e

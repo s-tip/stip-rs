@@ -123,9 +123,9 @@ $(function(){
                         dataType: 'json',
                     }).done(function(r,textStatus,jqXHR){
                     	if(r['status'] == 'OK'){
-                    		msg = 'publish finished. Message: ' + r['message'];
+                    		msg = 'Publish finished successfully!!\nMessage:\n' + r['message'];
                     	}else{
-                    		msg = 'publish failed. Message: ' + r['message'];
+                    		msg = 'Publish failed. Message: ' + r['message'];
                     	}
                     }).fail(function(jqXHR,textStatus,errorThrown){
                         msg = 'publish error has occured: ' + textStatus + ': ' + errorThrown;

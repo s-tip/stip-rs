@@ -130,8 +130,8 @@ class Client(object):
 
     def push(self, stix_file_doc):
         if self._protocol_version == '2.0':
-            push_20(self, stix_file_doc, protocol_version='2.0')
+            return push_20(self, stix_file_doc, protocol_version='2.0')
         elif self._protocol_version == '2.1':
-            push_20(self, stix_file_doc, protocol_version='2.1')
+            return push_20(self, stix_file_doc, protocol_version='2.1')
         else:
-            push_11(self, stix_file_doc)
+            return push_11(self, stix_file_doc)
