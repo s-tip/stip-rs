@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from mongoengine.queryset.visitor import Q
 from mongoengine import DoesNotExist
 from ctirs.api import JsonResponse
-from ctirs.core.mongo.documents import Communities, Vias, TaxiiClients
+from ctirs.core.mongo.documents import Communities, Vias, TaxiiClients, Taxii2Clients
 from ctirs.core.mongo.documents_stix import StixFiles
 from ctirs.core.taxii.taxii import Client
 from ctirs.models.rs.models import STIPUser
@@ -79,7 +79,10 @@ def get_table_info(request):
             link_str += ('<a href="/list/download?id=%s&version=1.2">STIX 1.2</a><br/>' % (d.id))
             link_str += ('<a href="/list/download?id=%s&version=2.1">STIX 2.1 (Original)</a>' % (d.id))
         l.append(link_str)
-        l.append('<a><span class="glyphicon glyphicon-share-alt publish-share-alt-icon" file_id="%s" title="Publish to.."></span></a>' % (d.id))
+        if request.user.is_admin:
+            l.append('<a><span class="glyphicon glyphicon-share-alt publish-share-alt-icon" data-file-id="%s" data-package-name="%s" data-package-id="%s" title="Publish to.."></span></a>' % (d.id, d.package_name, d.package_id))
+        else:
+            l.append('<span class="glyphicon glyphicon-ban-circle" disabled></span>')
         link_str = ('<a><span class="glyphicon glyphicon-export misp-import-icon" package_id="%s" title="Import into MISP .."></span></a>' % (d.package_id))
         l.append(link_str)
         aaData.append(l)
@@ -98,9 +101,14 @@ def get_table_info(request):
 def publish(request):
     stix_id = request.GET['stix_id']
     taxii_id = request.GET['taxii_id']
+    protocol_version = request.GET['protocol_version']
     stix = StixFiles.objects.get(id=stix_id)
-    taxii_client = TaxiiClients.objects.get(id=taxii_id)
-    client = Client(taxii_client=taxii_client)
+    if protocol_version.startswith('1.'):
+        taxii_client = TaxiiClients.objects.get(id=taxii_id)
+        client = Client(taxii_client=taxii_client)
+    else:
+        taxii_client = Taxii2Clients.objects.get(id=taxii_id)
+        client = Client(taxii2_client=taxii_client)
     try:
         client.push(stix)
         resp = {'status': 'OK',
