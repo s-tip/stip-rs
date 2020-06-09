@@ -14,6 +14,7 @@ from stix2.v21.bundle import Bundle
 TAXII_20_ACCEPT = 'application/vnd.oasis.taxii+json; version=2.0'
 TAXII_21_ACCEPT = 'application/taxii+json; version=2.1'
 TAXII_20_PUBLICATION_CONTENT_TYPE = 'application/vnd.oasis.stix+json; version=2.0'
+TAXII_21_PUBLICATION_CONTENT_TYPE = TAXII_21_ACCEPT
 
 
 def _get_taxii_2x_authorization(taxii_client):
@@ -41,6 +42,14 @@ def _get_taxii_21_get_request_header(taxii_client):
         'Authorization': _get_taxii_2x_authorization(taxii_client),
     }
 
+
+def _get_taxii_21_post_request_header(taxii_client):
+    return {
+        'Accept': TAXII_21_ACCEPT,
+        'Authorization': _get_taxii_2x_authorization(taxii_client),
+        'Content-Type': TAXII_21_PUBLICATION_CONTENT_TYPE,
+    }
+    
 
 def _get_taxii_2x_objects_url(taxii_client):
     url = '%scollections/%s/objects/' % (
@@ -138,30 +147,38 @@ def poll_20(taxii_client, protocol_version='2.0'):
 
 
 def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
-    if stix_file_doc.version != '2.0':
-        content = stix_file_doc.get_elevate_20()
-    else:
-        with open(stix_file_doc.origin_path, 'r', encoding='utf-8') as fp:
-            content = fp.read()
-
     url = _get_taxii_2x_objects_url(taxii_client)
+
     if protocol_version == '2.0':
         headers = _get_taxii_20_post_request_header(taxii_client)
+        if stix_file_doc.version.startswith('2.'):
+            with open(stix_file_doc.origin_path, 'r', encoding='utf-8') as fp:
+                content = fp.read().encode('utf-8')
+        else:
+            content = stix_file_doc.get_elevate_20().encode('utf-8')
     elif protocol_version == '2.1':
-        headers = None
-
-    resp = requests.post(
-        url,
-        headers=headers,
-        data=content,
-        verify=False,
-        proxies=taxii_client._proxies
-    )
-
-    if resp.status_code != 202:
-        raise Exception('Invalid http response: %s' % (resp.status_code))
+        headers = _get_taxii_21_post_request_header(taxii_client)
+        if stix_file_doc.version == '2.1':
+            with open(stix_file_doc.origin_path, 'r', encoding='utf-8') as fp:
+                content = fp.read().encode('utf-8')
+        else:
+            content = stix_file_doc.get_elevate_21().encode('utf-8')
+        org_stix = json.loads(content)
+        push_stix = {}
+        push_stix['objects'] = org_stix['objects']
+        content = json.dumps(push_stix, indent=4)
 
     try:
+        resp = requests.post(
+            url,
+            headers=headers,
+            data=content,
+            verify=False,
+            proxies=taxii_client._proxies
+        )
+
+        if resp.status_code != 202:
+            raise Exception('Invalid http response: %s' % (resp.status_code))
         msg = 'An add object status response shows below.'
         msg += json.dumps(resp.json(), indent=4)
         return msg
