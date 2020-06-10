@@ -23,6 +23,7 @@ from cybox.objects.network_connection_object import NetworkConnection
 from ctirs.core.mongo.documents import Communities, Vias, InformationSources
 from ctirs.models.rs.models import System
 from ctirs.models.sns.feeds.models import Feed
+from ctirs.core.mongo.documents_taxii21_objects import StixObject as txs21_so
 from stip.common.tld import TLD
 from stip.common.x_stip_sns import StipSns  # noqa
 
@@ -295,6 +296,8 @@ class StixFiles(Document):
             j = json.load(f)
             objects = j['objects']
             for object_ in objects:
+                media_types = ["application/stix+json;version=2.1"]
+                txs21_so.create(object_, media_types)
                 type_ = object_['type']
                 # Attack Pattern
                 if type_ == 'attack-pattern':
