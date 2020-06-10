@@ -46,6 +46,14 @@ def get_taxii2_client_delete_display_name(request):
     return get_text_field_value(request, 'display_name', default_value='')
 
 
+def get_taxii2_client_create_can_read(request):
+    return 'can_read' in request.POST
+
+
+def get_taxii2_client_create_can_write(request):
+    return 'can_write' in request.POST
+
+
 @login_required
 def top(request):
     if not request.user.is_active:
@@ -81,6 +89,8 @@ def create(request):
         protocol_version = get_taxii2_client_create_protocol_version(request)
         push = get_taxii2_client_create_push(request)
         uploader_id = int(get_taxii2_client_create_uploader_id(request))
+        can_read = get_taxii2_client_create_can_read(request)
+        can_write = get_taxii2_client_create_can_write(request)
 
         Taxii2Clients.create(
             setting_name,
@@ -91,7 +101,9 @@ def create(request):
             community_id=community_id,
             protocol_version=protocol_version,
             push=push,
-            uploader_id=uploader_id)
+            uploader_id=uploader_id,
+            can_read=can_read,
+            can_write=can_write)
         replace_dict = _get_taxii2_client_common_replace_dict(request)
         replace_dict['info_msg'] = 'Create or Modify Success!!'
         return render(request, 'taxii2_client.html', replace_dict)

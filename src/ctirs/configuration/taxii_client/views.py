@@ -70,6 +70,14 @@ def get_taxii_client_delete_display_name(request):
     return get_text_field_value(request, 'display_name', default_value='')
 
 
+def get_taxii_client_can_read(request):
+    return 'can_read' in request.POST
+
+
+def get_taxii_client_can_write(request):
+    return 'can_write' in request.POST
+
+
 @login_required
 def top(request):
     # activeユーザー以外はエラー
@@ -123,6 +131,8 @@ def create(request):
         protocol_version = get_taxii_client_create_protocol_version(request)
         push = get_taxii_client_create_push(request)
         uploader_id = int(get_taxii_client_create_uploader_id(request))
+        can_read = get_taxii_client_can_read(request)
+        can_write = get_taxii_client_can_write(request)
         if(ca):
             if certificate is None:
                 return error_page_free_format(request, 'No Certificate.')
@@ -149,7 +159,9 @@ def create(request):
                             key_file=private_key,
                             protocol_version=protocol_version,
                             push=push,
-                            uploader_id=uploader_id)
+                            uploader_id=uploader_id,
+                            can_read=can_read,
+                            can_write=can_write)
         replace_dict = get_taxii_client_common_replace_dict(request)
         replace_dict['info_msg'] = 'Create or Modify Success!!'
         # レンダリング

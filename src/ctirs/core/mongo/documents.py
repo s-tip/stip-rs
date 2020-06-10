@@ -506,7 +506,8 @@ class TaxiiClients(Document):
     def create(
             cls, name, address='', port=0, ssl=False, path='', collection='', login_id='', login_password='',
             community_id='', ca=False, key_file=None, cert_file=None,
-            protocol_version='1.1', push=False, uploader_id=None):
+            protocol_version='1.1', push=False, uploader_id=None,
+            can_read=False, can_write=False):
         community = Communities.objects.get(id=community_id)
         try:
             t = TaxiiClients.objects.get(name=name)
@@ -533,6 +534,8 @@ class TaxiiClients(Document):
         t.protocol_version = protocol_version
         t.push = push
         t.uploader = uploader_id
+        t.can_read = can_read
+        t.can_write = can_write
         t.save()
         return
 
@@ -574,6 +577,8 @@ class TaxiiClients(Document):
     uploader = fields.IntField()
     jobs = fields.ListField()
     interval_schedule_job = fields.ReferenceField(ScheduleJobs)
+    can_read = fields.BooleanField(default=False)
+    can_write = fields.BooleanField(default=False)
 
 
 class Taxii2Clients(Document):
@@ -585,7 +590,8 @@ class Taxii2Clients(Document):
     @classmethod
     def create(
             cls, name, api_root='', collection='', login_id='', login_password='',
-            community_id='', protocol_version='', push=False, uploader_id=None):
+            community_id='', protocol_version='', push=False, uploader_id=None,
+            can_read=False, can_write=False):
         community = Communities.objects.get(id=community_id)
         try:
             t = Taxii2Clients.objects.get(name=name)
@@ -602,6 +608,8 @@ class Taxii2Clients(Document):
         t.protocol_version = protocol_version
         t.push = push
         t.uploader = uploader_id
+        t.can_read = can_read
+        t.can_write = can_write
         t.save()
         return
 
@@ -637,6 +645,8 @@ class Taxii2Clients(Document):
     uploader = fields.IntField()
     jobs = fields.ListField()
     interval_schedule_job = fields.ReferenceField(ScheduleJobs)
+    can_read = fields.BooleanField(default=False)
+    can_write = fields.BooleanField(default=False)
 
 
 class CommonTaxiiClient(object):
