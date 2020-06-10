@@ -10,7 +10,6 @@ import ctirs.adapter.urls
 import ctirs.configuration.urls
 import ctirs.profile.urls
 import ctirs.api.urls
-import ctirs.taxii2_server.urls
 import django.views.i18n
 
 urlpatterns = [
@@ -25,7 +24,5 @@ urlpatterns = [
     url(r'^login/$', login, name='login'),
     url(r'^logout/$', logout),
     url(r'^api/', include(ctirs.api.urls)),
-    url(r'^taxii/', ctirs.taxii2_server.views.top_taxii),
-    url(r'^api1/', include(ctirs.taxii2_server.urls)),
     url(r'^jsi18n/(?P<packages>\S+?)/$', django.views.i18n.javascript_catalog),
 ]
