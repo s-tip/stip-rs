@@ -40,10 +40,14 @@
     <tr class="configure-tr">
     <td>
         <div class="form-group">
-		    {% if taxii_client.is_exist_community %}
-            <button class="btn btn-default poll-detail-button btn-sm" type="button" display_name="{{ taxii_client.name }}" taxii_client_protocol_version="{{taxii_client.protocol_version}}" taxii_client_id="{{ taxii_client.id }}">Poll</button>
+            {% if taxii_client.is_exist_community %}
+                {% if taxii_client.can_read %}
+                <button class="btn btn-default poll-detail-button btn-sm" type="button" display_name="{{ taxii_client.name }}" taxii_client_protocol_version="{{taxii_client.protocol_version}}" taxii_client_id="{{ taxii_client.id }}">Poll</button>
+                {% else %}
+                <button class="btn btn-default poll-detail-button btn-sm" type="button" disabled>Poll</button>
+                {% endif %}
 		    {% else %}
-            <button class="btn btn-default poll-detail-button btn-sm" type="button" display_name="{{ taxii_client.name }}" taxii_client_protocol_version="{{taxii_client.protocol_version}}" taxii_client_id="{{ taxii_client.id }}" disabled>Poll</button>
+            <button class="btn btn-default poll-detail-button btn-sm" type="button" disabled>Poll</button>
 		    {% endif %}
         </div><!-- <div class="form-group"> -->
     </td>
@@ -81,7 +85,7 @@
         Display Name
     </td>
     <td>
-        Address
+        API_ROOT
     </td>
     <td>
         Community
@@ -97,9 +101,13 @@
     <td>
         <div class="form-group">
 		    {% if taxii2_client.is_exist_community %}
-            <button class="btn btn-default poll-detail-button btn-sm" type="button" display_name="{{ taxii2_client.name }}" taxii_client_protocol_version="{{taxii2_client.protocol_version}}" taxii_client_id="{{ taxii2_client.id }}">Poll</button>
+                {% if taxii2_client.can_read %}
+                <button class="btn btn-default poll-detail-button btn-sm" type="button" display_name="{{ taxii2_client.name }}" taxii_client_protocol_version="{{taxii2_client.protocol_version}}" taxii_client_id="{{ taxii2_client.id }}">Poll</button>
+                {% else %}
+                <button class="btn btn-default poll-detail-button btn-sm" type="button" disabled>Poll</button>
+                {% endif %}
 		    {% else %}
-            <button class="btn btn-default poll-detail-button btn-sm" type="button" display_name="{{ taxii2_client.name }}" taxii_client_protocol_version="{{taxii2_client.protocol_version}}" taxii_client_id="{{ taxii2_client.id }}" disabled>Poll</button>
+            <button class="btn btn-default poll-detail-button btn-sm" type="button" disabled>Poll</button>
 		    {% endif %}
         </div><!-- <div class="form-group"> -->
     </td>
@@ -107,7 +115,7 @@
         <p class="display-name">{{ taxii2_client.name }}</p>
     </td>
     <td>
-        <p class="address">{{ taxii2_client.address }}</p>
+        <p class="address">{{ taxii2_client.api_root }}</p>
     </td>
     <td>
 	    {% if taxii2_client.is_exist_community %}

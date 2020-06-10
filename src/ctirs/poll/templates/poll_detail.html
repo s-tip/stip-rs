@@ -25,12 +25,21 @@
     </div><!-- <div class="form-group"> -->
     <div class="form-group">
         <div class="row">
+            {% if taxii.protocol_version == '1.0' or taxii.protocol_version == '1.1' %}
             <div class="col-xs-2">
                 Address
             </div>
             <div class="col-xs-4">
             	<p>{{ taxii.address }}</p>
             </div>
+            {% else %}
+            <div class="col-xs-2">
+                API ROOT
+            </div>
+            <div class="col-xs-4">
+            	<p>{{ taxii.api_root }}</p>
+            </div>
+            {% endif %}
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
     <br/>

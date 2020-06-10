@@ -82,10 +82,14 @@ def start(request, id_):
             cl = Client(taxii2_client=taxii2_client)
         else:
             raise Exception('Invalid taxii protocol version.')
-        cl.set_start_time(start)
-        cl.set_end_time(end)
-        count = cl.poll()
-        replace_dict['info_msg'] = 'Poll end successfully!! (Get %d stix files.)' % (count)
+
+        if cl._can_read:
+            cl.set_start_time(start)
+            cl.set_end_time(end)
+            count = cl.poll()
+            replace_dict['info_msg'] = 'Poll end successfully!! (Get %d stix files.)' % (count)
+        else:
+            replace_dict['error_msg'] = 'This collection is not for polling'
         return render(request, 'poll_detail.html', replace_dict)
     except Exception:
         return error_page(request)

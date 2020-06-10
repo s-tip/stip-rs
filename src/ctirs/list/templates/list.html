@@ -99,8 +99,10 @@
             <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" id="dropdown-choose-taxii">
-            	{% for taxii in taxiis %}
+                {% for taxii in taxiis %}
+                    {% if taxii.can_write %}
                     <li><a data-taxii-id="{{taxii.id}}" data-address="{{taxii.address}}" data-collection="{{taxii.collection}}" data-protocol-version="{{taxii.protocol_version}}">{{taxii.name}}</a></li>
+                    {% endif %}
             	{% endfor %}
             </ul>
         </div>
@@ -117,7 +119,9 @@
             </button>
             <ul class="dropdown-menu" id="dropdown-choose-taxii">
             	{% for taxii in taxii2s %}
+                    {% if taxii.can_write %}
                     <li><a data-taxii-id="{{taxii.id}}" data-address="{{taxii.api_root}}" data-collection="{{taxii.collection}}" data-protocol-version="{{taxii.protocol_version}}">{{taxii.name}}</a></li>
+                    {% endif %}
             	{% endfor %}
             </ul>
         </div>

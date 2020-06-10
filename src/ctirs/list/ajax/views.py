@@ -109,6 +109,10 @@ def publish(request):
     else:
         taxii_client = Taxii2Clients.objects.get(id=taxii_id)
         client = Client(taxii2_client=taxii_client)
+    if not client._can_write:
+        resp = {'status': 'NG',
+                'message': 'This collection is not for publishing.'}
+        return JsonResponse(resp)
     try:
         msg = client.push(stix)
         resp = {'status': 'OK',

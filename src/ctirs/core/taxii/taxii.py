@@ -15,11 +15,14 @@ class Client(object):
         elif taxii_client:
             taxii = taxii_client
 
+        self._name = taxii.name
         self._protocol_version = taxii.protocol_version
         self._username = taxii.login_id
         self._password = taxii.login_password
         self._jobs = taxii.jobs
         self._interval_job = taxii.interval_schedule_job
+        self._can_read = taxii.can_read
+        self._can_write = taxii.can_write
 
         if taxii2_client:
             self._api_root = taxii.api_root
@@ -121,6 +124,9 @@ class Client(object):
         self.poll()
 
     def poll(self):
+        if not self._can_read:
+            print('This collection is not for polling/consuming.: %s ' % (self._name))
+            return 0
         if self._protocol_version == '2.0':
             return poll_20(self, protocol_version='2.0')
         elif self._protocol_version == '2.1':
@@ -129,6 +135,10 @@ class Client(object):
             return poll_11(self)
 
     def push(self, stix_file_doc):
+        if not self._can_write:
+            msg = 'This collection is not for inbox/publishing: %s ' % (self._name)
+            print(msg)
+            return msg
         if self._protocol_version == '2.0':
             return push_20(self, stix_file_doc, protocol_version='2.0')
         elif self._protocol_version == '2.1':
