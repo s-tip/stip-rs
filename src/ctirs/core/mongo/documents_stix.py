@@ -24,7 +24,7 @@ from ctirs.core.mongo.documents import Communities, Vias, InformationSources
 from ctirs.models.rs.models import System
 from ctirs.models.sns.feeds.models import Feed
 from ctirs.core.mongo.documents_taxii21_objects import StixObject as TXS21_SO
-from ctirs.core.mongo.documents_taxii21_objects import get_modified_from_object
+from ctirs.core.mongo.documents_taxii21_objects import get_modified_from_object, StixManifest
 from stip.common.tld import TLD
 from stip.common.x_stip_sns import StipSns  # noqa
 
@@ -134,6 +134,27 @@ class StixFiles(Document):
         ExploitTargetCaches.drop_collection()
         SimilarScoreCache.drop_collection()
 
+        StixAttackPatterns.drop_collection()
+        StixCampaignsV2.drop_collection()
+        StixCoursesOfActionV2.drop_collection()
+        StixIdentities.drop_collection()
+        StixIntrusionSets.drop_collection()
+        StixLocations.drop_collection()
+        StixMalwares.drop_collection()
+        StixNotes.drop_collection()
+        StixOpinions.drop_collection()
+        StixReports.drop_collection()
+        StixThreatActorsV2.drop_collection()
+        StixTools.drop_collection()
+        StixVulnerabilities.drop_collection()
+        StixRelationships.drop_collection()
+        StixSightings.drop_collection()
+        StixLanguageContents.drop_collection()
+        StixOthers.drop_collection()
+
+        TXS21_SO.drop_collection()
+        StixManifest.drop_collection()
+
         for stix in StixFiles.objects.all().timeout(False):
             stix.split_child_nodes()
             if stix.produced is None:
@@ -188,14 +209,6 @@ class StixFiles(Document):
         document.set_information_source()
         return document
 
-    '''
-    @classmethod
-    def delete_by_stix_file(cls, stix_file):
-        for so in stix_file.taxii2_stix_objects:
-            so.delete(stix_file)
-        stix_file.delete()
-        return
-    '''
     def delete_by_stix_file(self):
         for so in self.taxii2_stix_objects:
             so.delete(self)
@@ -1663,6 +1676,8 @@ class ObservableCaches(Document):
     @classmethod
     def create_2_x(cls, observable, stix_file, node_id):
         if observable is None:
+            return
+        if 'objects' not in observable:
             return
         for object_key, object_value in observable['objects'].items():
             object_type = object_value['type']
