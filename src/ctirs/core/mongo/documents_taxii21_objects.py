@@ -2,6 +2,14 @@ import datetime
 import mongoengine as me
 
 
+def get_modified_from_object(object_):
+    if 'modified' in object_:
+        modified = object_['modified']
+    else:
+        modified = object_['created']
+    return modified
+
+
 class StixManifest(me.Document):
     added = me.DateTimeField(default=datetime.datetime.utcnow, required=True)
     object_type = me.StringField(required=True)
@@ -11,13 +19,50 @@ class StixManifest(me.Document):
     media_types = me.ListField(me.StringField())
     deleted_versions = me.ListField(me.StringField(), default=[])
     deleted = me.BooleanField(required=True, default=False)
+    stix_files = me.ListField()
 
     meta = {
         'db_alias': 'taxii21_alias'
     }
 
+    def _get_version_elem(self, stix_file, modified):
+        return [stix_file.id, modified]
+
+    def _is_exist_version(self, modified):
+        for tup in self.stix_files:
+            _, version = tup
+            if version == modified:
+                return True
+        return False
+
+    def append_stix_file(self, stix_file, modified):
+        if modified not in self.versions:
+            self.versions.append(modified)
+        version_elem = self._get_version_elem(stix_file, modified)
+        if version_elem not in self.stix_files:
+            self.stix_files.append(version_elem)
+        self.deleted = False
+        self.save()
+        return
+
+    def delete(self, stix_file, modified):
+        version_elem = self._get_version_elem(stix_file, modified)
+        if version_elem in self.stix_files:
+            self.stix_files.remove(version_elem)
+        if not self._is_exist_version(modified):
+            if modified in self.versions:
+                self.versions.remove(modified)
+            if modified not in self.deleted_versions:
+                self.deleted_versions.append(modified)
+        if len(self.versions) == 0:
+            self.deleted = True
+        else:
+            self.deleted = False
+        self.save()
+        return self.deleted
+
     @staticmethod
-    def update_or_create(stix_object, media_types):
+    def update_or_create(stix_object, media_types, stix_file):
         try:
             manifest = StixManifest.objects.get(object_id=stix_object.object_id)
         except me.DoesNotExist:
@@ -27,9 +72,7 @@ class StixManifest(me.Document):
             manifest.spec_version = stix_object.spec_version
             manifest.object_id = stix_object.object_id
             manifest.deleted_versions = []
-            manifest.deleted = False
-        manifest.versions.append(stix_object.modified)
-        manifest.save()
+        manifest.append_stix_file(stix_file, stix_object.modified)
         return manifest
 
 
@@ -55,80 +98,54 @@ class StixObject(me.Document):
         'db_alias': 'taxii21_alias'
     }
 
+    def append_stix_file(self, stix_file):
+        self.manifest.append_stix_file(stix_file, self.modified)
+        self.deleted = False
+        self.save()
+        return
+
+    def delete(self, stix_file):
+        self.deleted = self.manifest.delete(stix_file, self.modified)
+        self.save()
+        return
+
     @staticmethod
-    def create(stix_object, media_types):
+    def create(stix_object, media_types, stix_file):
         so = StixObject()
-        # object_value
         so.object_value = stix_object
-        # object_type
         so.object_type = stix_object['type']
-        # spec_version
         if 'spec_version' in stix_object:
             so.spec_version = stix_object['spec_version']
         else:
             so.spec_version = '2.1'
-        # object_id
         so.object_id = stix_object['id']
-        # created
         so.created = stix_object['created']
-        # modified
-        so.modified = stix_object['modified']
-        # revoked
+        so.modified = get_modified_from_object(stix_object)
         if 'revoked' in stix_object:
             so.revoked = stix_object['revoked']
         else:
             so.revoked = False
-        # object_marking_refs
         if 'object_marking_refs' in stix_object:
             so.object_marking_refs = stix_object['object_marking_refs']
         else:
             so.object_marking_refs = []
-        # created_by_ref
         if 'created_by_ref' in stix_object:
             so.created_by_ref = stix_object['created_by_ref']
         else:
             so.created_by_ref = ''
-        # labels
         if 'labels' in stix_object:
             so.labels = stix_object['labels']
         else:
             so.labels = []
-        # source_ref
         if 'source_ref' in stix_object:
             so.source_ref = stix_object['source_ref']
-        # target_ref
         if 'target_ref' in stix_object:
             so.target_ref = stix_object['target_ref']
-        # relationship_type
         if 'relationship_type' in stix_object:
             so.relationship_type = stix_object['relationship_type']
-        # deleted
         so.deleted = False
         so.save()
-        manifest = StixManifest.update_or_create(so, media_types)
+        manifest = StixManifest.update_or_create(so, media_types, stix_file)
         so.manifest = manifest
         so.save()
         return so
-
-    # filtering option
-    # type
-    # spec_version
-    # object id
-    # created
-    # modified
-    # revoked = False
-    # ---
-    # filtering option (Marlon)
-    # source_ref (SRO only)
-    # target_ref (SRO only)
-    # relationship_type (SRO only)
-    # sighting_of_ref (Sighting object only)
-    # object_marking_refs (Any object)
-    # TLP (object_mrarking_refs)
-    # external_ids (in external_references)
-    # source_names (in external_references)
-    # created_by_ref (Any Object)
-    # sectors (Identity only)
-    # labels (Any Object)
-    # object_refs (Grouoping, Observed-data, Report)
-    # value (SCO only)
