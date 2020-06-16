@@ -28,6 +28,8 @@ from ctirs.core.mongo.documents_taxii21_objects import get_modified_from_object,
 from stip.common.tld import TLD
 from stip.common.x_stip_sns import StipSns  # noqa
 
+DESCRIPTION_LENGTH = 10240
+
 
 def stix2_str_to_datetime(s):
     try:
@@ -508,7 +510,7 @@ class StixFiles(Document):
 class IndicatorV2Caches(Document):
     indicator_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     pattern = fields.StringField(max_length=1024)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
@@ -613,7 +615,7 @@ class Stix2Base(Document):
 
 class StixAttackPatterns(Stix2Base):
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     kill_chain_phases = fields.ListField()
 
     meta = {
@@ -638,7 +640,7 @@ class StixAttackPatterns(Stix2Base):
 
 class StixCampaignsV2(Stix2Base):
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     aliases = fields.ListField()
     first_seen = fields.DateTimeField()
     last_seen = fields.DateTimeField()
@@ -672,7 +674,7 @@ class StixCampaignsV2(Stix2Base):
 
 class StixCoursesOfActionV2(Stix2Base):
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     action = fields.StringField(max_length=10240)
 
     meta = {
@@ -695,7 +697,7 @@ class StixCoursesOfActionV2(Stix2Base):
 
 class StixIdentities(Stix2Base):
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     identity_class = fields.StringField(max_length=1024)
     sectors = fields.ListField()
     contact_information = fields.StringField(max_length=1024)
@@ -726,7 +728,7 @@ class StixIdentities(Stix2Base):
 
 class StixIndicatorsV2(Stix2Base):
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     pattern = fields.StringField(max_length=10240)
     valid_from = fields.DateTimeField()
     valid_until = fields.DateTimeField()
@@ -760,7 +762,7 @@ class StixIndicatorsV2(Stix2Base):
 
 class StixIntrusionSets(Stix2Base):
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     aliases = fields.ListField()
     first_seen = fields.DateTimeField()
     last_seen = fields.DateTimeField()
@@ -802,7 +804,7 @@ class StixIntrusionSets(Stix2Base):
 
 
 class StixLocations(Stix2Base):
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     latitude = fields.FloatField()
     longitude = fields.FloatField()
     precision = fields.FloatField()
@@ -849,7 +851,7 @@ class StixLocations(Stix2Base):
 
 class StixMalwares(Stix2Base):
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     kill_chain_phases = fields.ListField()
 
     meta = {
@@ -958,7 +960,7 @@ class StixOpinions(Stix2Base):
 
 class StixReports(Stix2Base):
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     published = fields.DateTimeField()
     object_refs = fields.ListField()
 
@@ -986,7 +988,7 @@ class StixReports(Stix2Base):
 
 class StixThreatActorsV2(Stix2Base):
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     aliases = fields.ListField()
     roles = fields.ListField()
     goals = fields.ListField()
@@ -1032,7 +1034,7 @@ class StixThreatActorsV2(Stix2Base):
 
 class StixTools(Stix2Base):
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     kill_chain_phases = fields.ListField()
     tool_version = fields.StringField(max_length=1024)
 
@@ -1060,7 +1062,7 @@ class StixTools(Stix2Base):
 
 class StixVulnerabilities(Stix2Base):
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
 
     cves = fields.ListField()
 
@@ -1093,7 +1095,7 @@ class StixVulnerabilities(Stix2Base):
 
 class StixRelationships(Stix2Base):
     relationship_type = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=1024)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     source_ref = fields.StringField(max_length=1024)
     target_ref = fields.StringField(max_length=1024)
 
@@ -1255,7 +1257,7 @@ class StixOthers(Stix2Base):
 class StixIndicators(Document):
     indicator_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1317,7 +1319,7 @@ class StixIndicators(Document):
 class StixObservables(Document):
     observable_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1379,7 +1381,7 @@ class StixObservables(Document):
 class StixCampaigns(Document):
     campaign_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1407,7 +1409,7 @@ class StixCampaigns(Document):
 class StixIncidents(Document):
     incident_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1435,7 +1437,7 @@ class StixIncidents(Document):
 class StixThreatActors(Document):
     ta_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1463,7 +1465,7 @@ class StixThreatActors(Document):
 class StixExploitTargets(Document):
     et_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1499,7 +1501,7 @@ class StixExploitTargets(Document):
 class StixCoursesOfAction(Document):
     coa_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1527,7 +1529,7 @@ class StixCoursesOfAction(Document):
 class StixTTPs(Document):
     ttp_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1563,7 +1565,7 @@ class ExploitTargetCaches(Document):
     type = fields.StringField(max_length=16, choices=TYPE_CHOICES)
     et_id = fields.StringField(max_length=100, unique=True)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
     stix_file = fields.ReferenceField(StixFiles, reverse_delete_rule=CASCADE)
@@ -1648,7 +1650,7 @@ class ObservableCaches(Document):
     observable_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
     value = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
