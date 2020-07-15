@@ -124,10 +124,6 @@ def create(request):
         push = get_taxii_client_create_push(request)
         uploader_id = int(get_taxii_client_create_uploader_id(request))
         if(ca):
-            if certificate is None:
-                return error_page_free_format(request, 'No Certificate.')
-            if private_key is None:
-                return error_page_free_format(request, 'No Private Key.')
             if ssl is not True:
                 return error_page_free_format(request, 'Use SSL.')
         else:
