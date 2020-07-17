@@ -88,6 +88,10 @@ $(function(){
                 modify_taxii_error('Enter Login ID');
                 return;
             }
+            // certificate
+            $('#create-certificate').val('');
+            // private_key
+            $('#create-private-key').val('');
         }
     	//Community check
         var community = $('#create-community-id').val();

@@ -43,11 +43,11 @@ def get_taxii_client_create_ca(request):
 
 
 def get_taxii_client_create_certificate(request):
-    return get_text_field_value(request, 'certificate', default_value=None)
+    return get_text_field_value(request, 'certificate', default_value='')
 
 
 def get_taxii_client_create_private_key(request):
-    return get_text_field_value(request, 'private_key', default_value=None)
+    return get_text_field_value(request, 'private_key', default_value='')
 
 
 def get_taxii_client_create_community_id(request):
