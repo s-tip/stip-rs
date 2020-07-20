@@ -96,10 +96,10 @@ def create(request):
         return error_page_inactive(request)
     try:
         setting_name = get_taxii_client_create_display_name(request)
-        if(setting_name is None or len(setting_name) == 0):
+        if not setting_name:
             return error_page_free_format(request, 'No Display Name.')
         address = get_taxii_client_create_address(request)
-        if(address is None or len(address) == 0):
+        if not address:
             return error_page_free_format(request, 'No Address.')
         try:
             port = get_taxii_client_create_port(request)
@@ -108,10 +108,10 @@ def create(request):
         except ValueError:
             return error_page_free_format(request, 'Invalid port.')
         path = get_taxii_client_create_path(request)
-        if(path is None or len(path) == 0):
+        if not path:
             return error_page_free_format(request, 'No Path.')
         collection = get_taxii_client_create_collection(request)
-        if(collection is None or len(collection) == 0):
+        if not collection:
             return error_page_free_format(request, 'No Collection.')
         login_id = get_taxii_client_create_login_id(request)
         login_password = get_taxii_client_create_login_password(request)
@@ -123,11 +123,11 @@ def create(request):
         protocol_version = get_taxii_client_create_protocol_version(request)
         push = get_taxii_client_create_push(request)
         uploader_id = int(get_taxii_client_create_uploader_id(request))
-        if(ca):
-            if ssl is not True:
+        if ca:
+            if not ssl:
                 return error_page_free_format(request, 'Use SSL.')
         else:
-            if(login_id is None or len(login_id) == 0):
+            if not login_id:
                 return error_page_free_format(request, 'No Login ID.')
 
         # taxii作成

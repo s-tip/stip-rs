@@ -528,7 +528,7 @@ class TaxiiClients(Document):
             t.login_password = login_password
         t.community = community
         t.is_use_cert = ca
-        if ca is True:
+        if ca:
             if key_file:
                 t.key_file = key_file
             if cert_file:
