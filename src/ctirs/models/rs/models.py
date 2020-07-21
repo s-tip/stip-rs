@@ -11,6 +11,11 @@ from ctirs.models.sns.authentication.models import Profile
 from ctirs.models.sns.core.models import Region
 import stip.common.const as const
 
+
+COUNTRY_CODE_LIST = list(set([country_code_list['country_code'] for country_code_list in Region.objects.values('country_code')]))
+LANGUAGE_LIST = [language_info[0] for language_info in const.LANGUAGES]
+
+
 #####################
 class STIPUserManager(BaseUserManager):
     def create_user(self, username, screen_name, password, is_admin=False):
@@ -32,9 +37,9 @@ class STIPUserManager(BaseUserManager):
         user.sns_profile = Profile.create_first_login()
         if os.name == 'posix':
             os_language, os_country_code, os_timezone = get_os_info()
-            if os_country_code in list(set([country_code_list['country_code'] for country_code_list in Region.objects.values('country_code')])):
+            if os_country_code in COUNTRY_CODE_LIST:
                 user.country_code = os_country_code
-            if os_language in [language_info[0] for language_info in const.LANGUAGES]:
+            if os_language in LANGUAGE_LIST:
                 user.language = os_language
             if os_timezone in pytz.all_timezones:
                 user.timezone = os_timezone
