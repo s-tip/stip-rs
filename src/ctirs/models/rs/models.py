@@ -2,6 +2,7 @@ import os
 import hmac
 import uuid
 import hashlib
+import pytz
 from django.db import models
 from django.db.models.signals import pre_save
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
@@ -51,11 +52,11 @@ def get_os_info():
     try:
         with open('/etc/default/locale', 'r') as f:
             for i in  f.read().split('\n'):
-                if i in 'LANG=':
+                if 'LANG=' in i:
                     locale_info = i[i.find('LANG=') + 5:i.find('.')].split('_')
                     if len(locale_info) == 2:
                         os_language = locale_info[0]
-                        os_country = locale_info[1]
+                        os_country_code = locale_info[1]
     except FileNotFoundError:
         pass
     try:
