@@ -56,12 +56,13 @@ def get_os_info():
     os_timezone = None
     try:
         with open('/etc/default/locale', 'r') as f:
-            for i in  f.read().split('\n'):
+            for i in  f.read().replace('"', '').split('\n'):
                 if 'LANG=' in i:
                     locale_info = i[i.find('LANG=') + 5:i.find('.')].split('_')
                     if len(locale_info) == 2:
                         os_language = locale_info[0]
                         os_country_code = locale_info[1]
+                    break
     except FileNotFoundError:
         pass
     try:
