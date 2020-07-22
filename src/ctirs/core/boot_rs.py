@@ -83,7 +83,6 @@ class StipRsBoot(AppConfig):
         from ctirs.core.taxii.taxii import Client
         # schedulerを起動
         # mongoに格納されている全TaxiiClientsドキュメントについて
-
         for doc in TaxiiClients.objects:
             taxii_client = Client(taxii_id=doc.id)
             # 各job設定ごとに
