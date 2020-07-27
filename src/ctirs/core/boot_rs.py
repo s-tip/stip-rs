@@ -55,6 +55,19 @@ class StipRsBoot(AppConfig):
         init_mongo()
         # taxii client のスケジューラー起動
         self.init_taxii_client_scheduler()
+        self.set_user_country()
+
+    def set_user_country(self):
+        import os
+        from ctirs.models.rs.models import STIPUser, COUNTRY_CODE_LIST, get_os_info
+        for user in STIPUser.objects.all():
+            if not user.country_code:
+                if os.name == 'posix':
+                    _, os_country_code, _ = get_os_info()
+                    user.country_code = os_country_code
+                else:
+                    user.country_code = 'US'
+                user.save()
 
     # scheduler 起動
     def boot_scheduler(self, job, taxii_client):
