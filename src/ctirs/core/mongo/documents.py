@@ -521,13 +521,15 @@ class TaxiiClients(Document):
         t.path = path
         t.collection = collection
         t.login_id = login_id
-        if login_password is not None and len(login_password) != 0:
+        if login_password:
             t.login_password = login_password
         t.community = community
         t.is_use_cert = ca
-        if ca is True:
-            t.key_file = key_file
-            t.cert_file = cert_file
+        if ca:
+            if key_file:
+                t.key_file = key_file
+            if cert_file:
+                t.cert_file = cert_file
         else:
             t.key_file = None
             t.cert_file = None
@@ -602,7 +604,7 @@ class Taxii2Clients(Document):
         t.api_root = api_root
         t.collection = collection
         t.login_id = login_id
-        if login_password is not None and len(login_password) != 0:
+        if login_password:
             t.login_password = login_password
         t.community = community
         t.protocol_version = protocol_version

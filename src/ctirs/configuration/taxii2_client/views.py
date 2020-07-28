@@ -75,13 +75,13 @@ def create(request):
         return error_page_inactive(request)
     try:
         setting_name = get_taxii2_client_create_display_name(request)
-        if(setting_name is None or len(setting_name) == 0):
+        if not setting_name:
             return error_page_free_format(request, 'No Display Name.')
         api_root = get_taxii2_client_create_api_root(request)
-        if(api_root is None or len(api_root) == 0):
+        if not api_root:
             return error_page_free_format(request, 'No API Root.')
         collection = get_taxii2_client_create_collection(request)
-        if(collection is None or len(collection) == 0):
+        if not collection:
             return error_page_free_format(request, 'No Collection.')
         login_id = get_taxii2_client_create_login_id(request)
         login_password = get_taxii2_client_create_login_password(request)

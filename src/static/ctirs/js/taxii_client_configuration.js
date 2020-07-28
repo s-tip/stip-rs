@@ -77,16 +77,6 @@ $(function(){
         }
         //Use Certificate Authencationチェック時
         if($('#create-ca').prop('checked') == true){
-            var certificate = $('#create-certificate').val();
-            if(certificate.length == 0){
-                modify_taxii_error('Enter Certificate');
-                return;
-            }
-            var private_key = $('#create-private-key').val();
-            if(private_key.length == 0){
-                modify_taxii_error('Enter Private Key');
-                return;
-            }
             if($('#create-ssl').prop('checked') == false){
                 modify_taxii_error('Not checked  Use SSL.');
                 return;
@@ -98,6 +88,10 @@ $(function(){
                 modify_taxii_error('Enter Login ID');
                 return;
             }
+            // certificate
+            $('#create-certificate').val('');
+            // private_key
+            $('#create-private-key').val('');
         }
     	//Community check
         var community = $('#create-community-id').val();
