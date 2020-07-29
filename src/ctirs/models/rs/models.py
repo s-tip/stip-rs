@@ -101,7 +101,7 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     timezone = models.CharField(max_length=128, default='UTC')
     is_modified_password = models.BooleanField(default=False)
     is_buildin = models.BooleanField(default=False)
-    totp_secret = models.CharField(max_length=16, default=None, null=True)
+    totp_secret = models.CharField(max_length=32, default=None, null=True)
 
     # RS/StipUser から移動
     location = models.CharField(max_length=50, null=True, blank=True)
