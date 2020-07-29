@@ -30,7 +30,7 @@ def login(request):
         # ログイン
         django.contrib.auth.login(request, user)
         if not user.is_active:
-            replace_dict['error_msg'] = 'Your account has been disabled.'
+            replace_dict['error_msg'] = 'Login Failed'
         else:
             # 認証成功(初期画面のdashboardへredirect)
             if not user.is_modified_password:
@@ -40,7 +40,7 @@ def login(request):
                 return HttpResponseRedirect('/dashboard/')
     else:
         # user/passwordが一致しない
-        replace_dict['error_msg'] = 'Your username and password were incorrect.'
+        replace_dict['error_msg'] = 'Login Failed'
 
     # エラー表示(ログイン画面へ)
     return render(request, 'cover.html', replace_dict)
