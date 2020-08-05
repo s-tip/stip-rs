@@ -48,6 +48,8 @@ def change_auth(request):
         elif(key == 'is_admin'):
             u.is_admin = value
             u.is_superuser = value
+        elif(key == 'totp_sercet'):
+            u.totp_secret = None
         # 変更を保存
         u.save()
         r = {'status': 'OK',

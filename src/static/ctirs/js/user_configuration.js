@@ -82,12 +82,12 @@ $(function(){
             dataType: 'json',
         }).done(function(r,textStatus,jqXHR){
             if(r['status'] != 'OK'){
-                alert('change_auth failed:' + r['message'], 'Error!');
+                toastr['error']('change_auth failed:' + r['message'], 'Error!');
             }else{
                 toastr['success']('change_auth successfully.', 'Success!');
             }
         }).fail(function(jqXHR,textStatus,errorThrown){
-            alert('Error has occured:change_auth:' + textStatus + ':' + errorThrown);
+            toastr['error']('Error has occured:change_auth:' + textStatus + ':' + errorThrown, 'Error!');
             //失敗
         }).always(function(data_or_jqXHR,textStatus,jqHXR_or_errorThrown){
             //done fail後の共通処理
@@ -104,5 +104,59 @@ $(function(){
         elem.value = $(this).attr('username');
         f.append(elem);
         f.submit();
+    });
+
+    $('#disable-2fa-dialog').dialog({
+        autoOpen: false,
+        modal: true,
+        open: function(){
+            $('.ui-dialog-titlebar').hide();
+            $('.ui-dialog-titlebar-close').hide();
+        },
+        buttons: [
+            {
+                text: 'Yes',
+                click: function(){
+                    var dialog_this = $(this);
+                    var d = {
+                        'username': dialog_this.attr('username'),
+                        'key': dialog_this.attr('config_name'),
+                    };
+                    $.ajax({
+                        type: 'GET',
+                        url: '/configuration/user/ajax/change_auth',
+                        timeout: 100 * 1000,
+                        cache: true,
+                        data: d,
+                        dataType: 'json'
+                    }).done(function(r,textStatus,jqXHR){
+                        if(r['status'] != 'OK'){
+                            toastr['error']('change_auth failed:' + r['message'], 'Error!');
+                        }else{
+                            toastr['success']('Disable 2FA successfully.', 'Success!');
+                            document.getElementById('disable-' + dialog_this.attr('username')).setAttribute('disabled', true);
+                        }
+                    }).fail(function(jqXHR,textStatus,errorThrown){
+                        toastr['error']('Error has occured:change_auth:' + textStatus + ':' + errorThrown, 'Error!')
+                    }).always(function(data_or_jqXHR,textStatus,jqHXR_or_errorThrown){
+                        dialog_this.dialog('close');
+                    });
+                }
+            },
+            {
+                text: 'No',
+                click: function(){
+                    $(this).dialog('close');
+                }
+            }
+        ]
+    });
+
+    $('.disable-2fa').click(function(){
+        $("#disable-2fa-dialog").dialog('open');
+        $("#disable-2fa-dialog").attr({
+            'username': $(this).attr('username'),
+            'config_name': $(this).attr('config_name')
+        });
     });
 });
