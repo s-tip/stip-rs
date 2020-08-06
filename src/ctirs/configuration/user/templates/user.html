@@ -122,7 +122,7 @@
         <a class="change-password" username="{{each_user}}">Change</a>
     </td>
     <td>
-        <button type="button"  class="disable-2fa btn btn-danger" id="disable-{{ each_user }}" username="{{ each_user }}" config_name="totp_sercet" {% if not each_user.totp_secret %} disabled="true"{% endif %}>Disable</button>
+        <button type="button" class="disable-2fa btn btn-danger" id="disable-{{ each_user }}" username="{{ each_user }}" config_name="totp_sercet" {% if not each_user.totp_secret %} disabled="true"{% endif %}>Disable</button>
     </td>
     </tr>
     {% endfor %}
@@ -133,8 +133,7 @@
 </div> <!--  <div class="container"> -->
 </form>
 <div id="disable-2fa-dialog" username="" config_name="">
-    <br>
-    <p>Disable 2FA?</p>
+    <p id="dialog-message">Disable 2FA?</p>
 </div>
 </body>
 </html>
