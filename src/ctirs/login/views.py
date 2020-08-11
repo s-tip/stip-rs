@@ -1,10 +1,10 @@
 import django.contrib.auth
+import pyotp
 from django.shortcuts import render
 from django.http.response import HttpResponseRedirect
 from ctirs.core.common import get_text_field_value
 from ctirs.profile.views import top as profile_top
 from ctirs.models import STIPUser
-import pyotp
 
 def get_login_username(request):
     return get_text_field_value(request, 'username', default_value='')
