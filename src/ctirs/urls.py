@@ -1,5 +1,5 @@
 from django.conf.urls import include, url
-from ctirs.login.views import login
+from ctirs.login.views import login, login_totp
 from ctirs.logout.views import logout
 import ctirs.dashboard.views as dashboard
 import ctirs.dashboard.urls
@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^configuration/', include(ctirs.configuration.urls)),
     url(r'^profile/', include(ctirs.profile.urls)),
     url(r'^login/$', login, name='login'),
+    url(r'^login_totp/$', login_totp, name='login_totp'),
     url(r'^logout/$', logout),
     url(r'^api/', include(ctirs.api.urls)),
     url(r'^taxii/', ctirs.taxii2_server.views.top_taxii),
