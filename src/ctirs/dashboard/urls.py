@@ -5,7 +5,7 @@ import ctirs.dashboard.ajax.urls
 
 urlpatterns = [
     # dashboard top
-    url(r'^$', dashboard.top),
+    url(r'^$', dashboard.top, name='dashboard'),
     # dashboard ajax
     url(r'^ajax/', include(ctirs.dashboard.ajax.urls)),
 ]
