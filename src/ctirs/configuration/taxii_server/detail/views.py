@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from stip.common import get_text_field_value
 from ctirs.configuration.taxii_server.views import restart_taxii_server
-from ctirs.core.common import get_text_field_value, get_common_replace_dict
+from ctirs.core.common import get_common_replace_dict
 from ctirs.core.mongo.documents import TaxiiServers, InformationSources
 from ctirs.error.views import error_page, error_page_no_view_permission, error_page_inactive
 

@@ -3,8 +3,8 @@ import pytz
 from mongoengine import DoesNotExist
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from stip.common import get_text_field_value
 from ctirs.models.rs.models import STIPUser
-from ctirs.core.common import get_text_field_value
 from ctirs.error.views import error_page, error_page_no_view_permission, error_page_free_format, error_page_inactive
 from ctirs.core.mongo.documents import OtxAdapter, Communities
 from ctirs.core.adapter.otx.otx import OtxAdapterControl

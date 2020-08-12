@@ -1,8 +1,9 @@
 from django.shortcuts import render
-from ctirs.core.common import get_text_field_value, get_common_replace_dict
+from django.contrib.auth.decorators import login_required
+from stip.common import get_text_field_value
+from ctirs.core.common import get_common_replace_dict
 from ctirs.error.views import error_page, error_page_inactive
 from ctirs.models import STIPUser
-from django.contrib.auth.decorators import login_required
 
 
 def get_profile_change_password_old_password(request):
