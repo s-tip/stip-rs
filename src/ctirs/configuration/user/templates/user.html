@@ -98,6 +98,9 @@
     <td>
         Password
     </td>
+    <td>
+        2FA
+    </td>
     </tr>
     </thead>
     <tbody>
@@ -118,6 +121,9 @@
     <td>
         <a class="change-password" username="{{each_user}}">Change</a>
     </td>
+    <td>
+        <button type="button" class="disable-2fa btn btn-danger" id="disable-{{ each_user }}" username="{{ each_user }}" config_name="totp_sercet" {% if not each_user.totp_secret %} disabled="true"{% endif %}>Disable</button>
+    </td>
     </tr>
     {% endfor %}
     </tbody>
@@ -126,5 +132,8 @@
     <hr/>
 </div> <!--  <div class="container"> -->
 </form>
+<div id="disable-2fa-dialog" username="" config_name="">
+    <p id="dialog-message">Disable 2FA?</p>
+</div>
 </body>
 </html>
