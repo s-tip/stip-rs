@@ -80,7 +80,6 @@ $(function(){
             }
         }).fail(function(jqXHR,textStatus,errorThrown){
             toastr['error']('Error has occured:change_auth:' + textStatus + ':' + errorThrown, 'Error!');
-        }).always(function(data_or_jqXHR,textStatus,jqHXR_or_errorThrown){
         });
     });
 
@@ -105,7 +104,6 @@ $(function(){
             }
         }).fail(function(jqXHR,textStatus,errorThrown){
             toastr['error']('Error has occured:change_active:' + textStatus + ':' + errorThrown, 'Error!');
-        }).always(function(data_or_jqXHR,textStatus,jqHXR_or_errorThrown){
         });
     });
 
