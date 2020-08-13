@@ -1,7 +1,7 @@
 from django.http.response import JsonResponse
-from ctirs.core.common import get_text_field_value
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
+from stip.common import get_text_field_value
 from ctirs.models.rs.models import STIPUser
 
 

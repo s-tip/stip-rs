@@ -2,10 +2,11 @@ import tempfile
 from django.shortcuts import render
 from django.utils.datastructures import MultiValueDictKeyError
 from django.contrib.auth.decorators import login_required
+from stip.common import get_text_field_value
 from ctirs.core.stix.regist import regist
 from ctirs.core.mongo.documents import Communities, Vias
 from ctirs.error.views import error_page, error_page_no_view_permission, error_page_inactive
-from ctirs.core.common import get_text_field_value, get_common_replace_dict
+from ctirs.core.common import get_common_replace_dict
 
 
 def get_upload_upload_community_id(request):

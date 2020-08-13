@@ -4,10 +4,10 @@ from mongoengine.errors import DoesNotExist
 from django.http import HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.http.response import JsonResponse
+from stip.common import get_text_field_value
 import ctirs.api as api_root
 from ctirs.core.mongo.documents import Communities, Vias
 from ctirs.core.mongo.documents_stix import StixFiles
-from ctirs.core.common import get_text_field_value
 from ctirs.upload.views import upload_common
 
 

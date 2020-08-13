@@ -3,8 +3,9 @@ import traceback
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http.response import HttpResponse
+from stip.common import get_text_field_value
 from ctirs.error.views import error_page_inactive, error_page_no_view_permission, error_page_free_format, error_page
-from ctirs.core.common import get_common_replace_dict, get_text_field_value
+from ctirs.core.common import get_common_replace_dict
 from ctirs.core.mongo.documents_stix import StixFiles
 
 
