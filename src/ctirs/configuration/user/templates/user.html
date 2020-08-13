@@ -113,7 +113,7 @@
         {{ each_user.screen_name }}
     </td>
     <td>
-        <input class="change-auth" type="checkbox" username="{{ each_user }}" config_name="is_active" {% if each_user.is_active %}checked{% endif %} {% if not user.is_superuser %}disabled{% endif %}>
+        <input class="change-active" type="checkbox" username="{{ each_user }}" config_name="is_active" {% if each_user.is_active %}checked{% endif %} {% if not user.is_superuser %}disabled{% endif %}>
     </td>
     <td>
         <input class="change-auth" type="checkbox" username="{{ each_user }}" config_name="is_admin" {% if each_user.is_admin %}checked{% endif %} {% if not user.is_superuser %}disabled{% endif %}>
