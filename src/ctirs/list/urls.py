@@ -5,7 +5,7 @@ import ctirs.list.ajax.urls
 
 urlpatterns = [
     # list top
-    url(r'^$', list_.top),
+    url(r'^$', list_.top, name='list'),
     # list delete
     url(r'^delete$', list_.delete),
     # list download

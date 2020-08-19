@@ -1,6 +1,6 @@
 import os
 import traceback
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http.response import HttpResponse
 from stip.common import get_text_field_value
@@ -49,10 +49,10 @@ def delete(request):
             # ファイル削除
             if os.path.exists(origin_path):
                 os.remove(origin_path)
-        return top(request)
+        return redirect('list')
     except Exception:
         return error_page(request)
-    return top(request)
+    return redirect('list')
 
 
 @login_required
