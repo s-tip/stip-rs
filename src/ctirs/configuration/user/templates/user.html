@@ -122,7 +122,13 @@
         <a class="change-password" username="{{each_user}}">Change</a>
     </td>
     <td>
-        <button type="button" class="disable-2fa btn btn-danger" id="disable-{{ each_user }}" username="{{ each_user }}" config_name="totp_sercet" {% if not each_user.totp_secret %} disabled="true"{% endif %}>Disable</button>
+        {% if each_user.totp_secret %}
+            <div id="disable-{{ each_user }}">
+                <button type="button" class="disable-2fa btn btn-danger" username="{{ each_user }}" config_name="totp_sercet" >Disable</button>
+            </div>
+        {% else %}
+            Disabled
+        {% endif %}
     </td>
     </tr>
     {% endfor %}

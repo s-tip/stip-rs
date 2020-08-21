@@ -145,7 +145,7 @@ $(function(){
                             toastr['error']('unset_mfa failed:' + r['message'], 'Error!');
                         }else{
                             toastr['success']('Disable 2FA successfully.', 'Success!');
-                            document.getElementById('disable-' + dialog_this.attr('username')).setAttribute('disabled', true);
+                            document.getElementById('disable-' + dialog_this.attr('username')).textContent = 'Disabled';
                         }
                     }).fail(function(jqXHR,textStatus,errorThrown){
                         toastr['error']('Error has occured:unset_mfa:' + textStatus + ':' + errorThrown, 'Error!')
