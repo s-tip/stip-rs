@@ -163,6 +163,8 @@ $(function(){
         $('#create-push').prop("checked",push_flag);
         $('#create-uploader-id').val(tr.find('.uploader-id').val());
         $('#create-uploader-dropdown-button').text(tr.find('.uploader').text());
+        $('#create-can-read').prop("checked",tr.find('.can-read').prop("checked"));
+        $('#create-can-write').prop("checked",tr.find('.can-write').prop("checked"));
     });
     
     //Use Certificate Authenticationクリック

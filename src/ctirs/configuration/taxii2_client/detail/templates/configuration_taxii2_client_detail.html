@@ -2,19 +2,19 @@
 <head>
 <!--  for configuration taxii client detail -->
 <link href="/static/ctirs/css/configuration_taxii_cilent_detail.css" rel="stylesheet">
-<script type="text/javascript" src="/static/ctirs/js/configuration_taxii_client_detail.js"></script>
+<script type="text/javascript" src="/static/ctirs/js/configuration_taxii2_client_detail.js"></script>
 </head>
 
 <body>
 {% include 'nav_header.html' %}
-<form name="delete" id="configuration-taxii-client-job-delete" action="/configuration/taxii_client/detail" method="GET"></form>
-<form name="start" id="configuration-taxii-client-job-start" action="/configuration/taxii_client/detail" method="GET"></form>
-<form name="stop" id="configuration-taxii-client-job-stop" action="/configuration/taxii_client/detail" method="GET"></form>
-<form name="interval" id="configuration-taxii-client-interval" action="/configuration/taxii_client/detail/{{client.id}}/interval" method="GET"></form>
-<form name="create" id="configuration-taxii-client-detail-create" action="/configuration/taxii_client/detail/{{client.id}}/create" method="POST">{% csrf_token %}
+<form name="delete" id="configuration-taxii2-client-job-delete" action="/configuration/taxii2_client/detail" method="GET"></form>
+<form name="start" id="configuration-taxii2-client-job-start" action="/configuration/taxii2_client/detail" method="GET"></form>
+<form name="stop" id="configuration-taxii2-client-job-stop" action="/configuration/taxii2_client/detail" method="GET"></form>
+<form name="interval" id="configuration-taxii2-client-interval" action="/configuration/taxii2_client/detail/{{client.id}}/interval" method="GET"></form>
+<form name="create" id="configuration-taxii2-client-detail-create" action="/configuration/taxii2_client/detail/{{client.id}}/create" method="POST">{% csrf_token %}
 <div class="container">
     <br/>
-    <h1>TAXII Client (1.x)</h1>
+    <h1>TAXII Client (2.x)</h1>
     <br/>
     <hr/>
     <h2>Poll Interval Configuration</h2>
@@ -57,7 +57,7 @@
     <br/>
     <div class="form-group">
         <div class="row">
-            <button type="button" id="create-taxii-schedule-submit" class="btn btn-default">Create Or Modify</button>
+            <button type="button" id="create-taxii2-schedule-submit" class="btn btn-default">Create Or Modify</button>
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
     <hr/>
@@ -88,7 +88,7 @@
     <tr class="configure-tr">
     <td>
         <div class="form-group">
-            <button class="btn btn-default configuration-taxii-client-delete-button btn-sm" type="button" taxii_client_id="{{ client.id }}"  job_id="{{job.id}}" >Delete</button>
+            <button class="btn btn-default configuration-taxii2-client-delete-button btn-sm" type="button" taxii2_client_id="{{ client.id }}"  job_id="{{job.id}}" >Delete</button>
         </div><!-- <div class="form-group"> -->
     </td>
     <td>
@@ -99,12 +99,12 @@
     </td>
     <td>
         <div class="form-group">
-            <button {% ifequal job.status 'stop' %}{% else %}disabled{% endifequal %} class="btn btn-default configuration-taxii-client-start-button btn-sm" type="button" taxii_client_id="{{ client.id }}"  job_id="{{job.id}}">Start</button>
+            <button {% ifequal job.status 'stop' %}{% else %}disabled{% endifequal %} class="btn btn-default configuration-taxii2-client-start-button btn-sm" type="button" taxii2_client_id="{{ client.id }}"  job_id="{{job.id}}">Start</button>
         </div><!-- <div class="form-group"> -->
     </td>
     <td>
         <div class="form-group">
-            <button {% ifequal job.status 'stop' %}disabled{% else %}{% endifequal %} class="btn btn-default configuration-taxii-client-stop-button btn-sm" type="button" taxii_client_id="{{ client.id }}" job_id="{{job.id}}">Stop</button>
+            <button {% ifequal job.status 'stop' %}disabled{% else %}{% endifequal %} class="btn btn-default configuration-taxii2-client-stop-button btn-sm" type="button" taxii2_client_id="{{ client.id }}" job_id="{{job.id}}">Stop</button>
         </div><!-- <div class="form-group"> -->
     </td>
     </tr>
