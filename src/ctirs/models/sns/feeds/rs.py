@@ -1,23 +1,24 @@
-from ctirs.models.sns.config.models import SNSConfig
 import os
-from pytz import timezone
 import stip.common.const as const
-# InsecureReqeustWarningを非表示にする
 import requests
 import urllib3
+from ctirs.models.sns.config.models import SNSConfig
+from pytz import timezone
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
 
 
 # CTIM-RSに登録する
-def regist_ctim_rs(api_user, package_name, stix_file_path):
+def regist_ctim_rs(api_user, package_name, stix_file_path, community_name=None):
     with open(stix_file_path, 'r', encoding='utf-8') as fp:
         files = {
             'stix': fp,
         }
         headers = _get_ctirs_api_http_headers(api_user)
+        if not community_name:
+            community_name = SNSConfig.get_rs_community_name()
         payload = {
-            'community_name': SNSConfig.get_rs_community_name(),
+            'community_name': community_name,
             'package_name': package_name,
         }
 
