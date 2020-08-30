@@ -1,5 +1,6 @@
 import datetime
 import mongoengine as me
+from ctirs.core.mongo.documents import Communities
 
 
 def get_modified_from_object(object_):
@@ -20,6 +21,7 @@ class StixManifest(me.Document):
     deleted_versions = me.ListField(me.StringField(), default=[])
     deleted = me.BooleanField(required=True, default=False)
     stix_files = me.ListField()
+    community = me.ReferenceField(Communities, required=True)
 
     meta = {
         'db_alias': 'taxii21_alias'
@@ -42,6 +44,7 @@ class StixManifest(me.Document):
         if version_elem not in self.stix_files:
             self.stix_files.append(version_elem)
         self.deleted = False
+        self.community = stix_file.input_community
         self.save()
         return
 
@@ -93,6 +96,7 @@ class StixObject(me.Document):
     relationship_type = me.StringField()
     manifest = me.ReferenceField(StixManifest)
     deleted = me.BooleanField(default=False)
+    community = me.ReferenceField(Communities, required=True)
 
     meta = {
         'db_alias': 'taxii21_alias'
@@ -144,6 +148,7 @@ class StixObject(me.Document):
         if 'relationship_type' in stix_object:
             so.relationship_type = stix_object['relationship_type']
         so.deleted = False
+        so.community = stix_file.input_community
         so.save()
         manifest = StixManifest.update_or_create(so, media_types, stix_file)
         so.manifest = manifest
