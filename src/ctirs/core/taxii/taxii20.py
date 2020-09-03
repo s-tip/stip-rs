@@ -9,9 +9,10 @@ from urllib.parse import urlencode
 from requests.auth import _basic_auth_str
 from stix2 import parse
 from stix2.v21.bundle import Bundle
+from ctirs.core.mongo.documents_taxii21_objects import StixObject
 
 
-TAXII_20_ACCEPT = 'application/vnd.oasis.taxii+json; version=2.0'
+TAXII_20_ACCEPT = 'application/vnd.oasis.stix+json; version=2.0'
 TAXII_21_ACCEPT = 'application/taxii+json; version=2.1'
 TAXII_20_PUBLICATION_CONTENT_TYPE = 'application/vnd.oasis.stix+json; version=2.0'
 TAXII_21_PUBLICATION_CONTENT_TYPE = TAXII_21_ACCEPT
@@ -96,7 +97,12 @@ def _get_objects_21(taxii_client, protocol_version, objects, resp_json):
     for o_dict in resp_json['objects']:
         try:
             o_ = parse(o_dict, version='2.1', allow_custom=True)
-            objects.append(o_)
+            if not StixObject.objects.filter(
+                object_id=o_dict['id'],
+                modified=o_dict['modified']):
+                objects.append(o_)
+            else:
+                print('Skipped! _id:%s/modified:%s has already existed.' % (o_.id, o_dict['modified']))
         except Exception:
             pass
 
