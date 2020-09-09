@@ -73,23 +73,68 @@
 </div> <!--  <div class="col-lg-12"> -->
 
 <div id="publish-taxii-confirm-dialog" title="Choose TAXII Server to publish." style="align:center;display: none;">
+    <i><u>Step 1. Confirm a STIX file below.</u></i>
+    <br/>
+    <br/>
+    <b>Package Name: </b><span id='stix-package-name-confirm'></span>
+    <br/>
+    <b>Package ID: </b><span id='stix-package-id-confirm'></span>
+    <br/>
+    <br/>
+    <div class="md-radio">
+        <i><u>Step 2. Choose a TAXII Severer Version</u></i>
+        <br/>
+        <input class="taxii-version-radio-button" id="taxii-v1-button" type="radio" name="taxii_version" velue="v1" checked>
+        <label for="taxii-v1-button">1.x</label>
+        <input class="taxii-version-radio-button" id="taxii-v2-button" type="radio" name="taxii_version" value="v2">
+        <label for="taxii-v2-button">2.x</label>
+    </div>
+    <br/>
     {% if taxiis %}
-        <div class="dropdown">
+        <div class="dropdown" id="taxii-v1-configuration-div">
+            <i><u> Step3. Choose a TAXII Severer Setting</u></i>
+            <br/>
             <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
             {{ config.default_taxii.name | default:'Choose Taxii' }}
             <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" id="dropdown-choose-taxii">
-            	{% for taxii in taxiis %}
-                    <li><a href="#" data-value="{{taxii.id}}">{{taxii.name}}</a></li>
+                {% for taxii in taxiis %}
+                    {% if taxii.can_write %}
+                    <li><a data-taxii-id="{{taxii.id}}" data-address="{{taxii.address}}" data-collection="{{taxii.collection}}" data-protocol-version="{{taxii.protocol_version}}">{{taxii.name}}</a></li>
+                    {% endif %}
             	{% endfor %}
             </ul>
-            <input type="hidden"  id="hidden-stix-id" name="stix_id" value=""/>
-            <input type="hidden"  id="hidden-taxii-id" name="taxii_id" value=""/>
         </div>
     {% else %}
-    No TAXII Configuration.
+    No TAXII 1.x Configuration.
     {% endif %}
+    {% if taxii2s %}
+        <div class="dropdown" id="taxii-v2-configuration-div">
+            <i><u> Step3. Choose a TAXII Severer Setting</u></i>
+            <br/>
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+            {{ config.default_taxii.name | default:'Choose Taxii' }}
+            <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" id="dropdown-choose-taxii">
+            	{% for taxii in taxii2s %}
+                    {% if taxii.can_write %}
+                    <li><a data-taxii-id="{{taxii.id}}" data-address="{{taxii.api_root}}" data-collection="{{taxii.collection}}" data-protocol-version="{{taxii.protocol_version}}">{{taxii.name}}</a></li>
+                    {% endif %}
+            	{% endfor %}
+            </ul>
+        </div>
+    {% else %}
+    No TAXII 2.x Configuration.
+    {% endif %}
+    <br/>
+    <b>Address: </b><span id='taxii-address-confirm'></span>
+    <br/>
+    <b>Collection: </b><span id='taxii-collection-confirm'></span>
+    <input type="hidden"  id="hidden-stix-id" name="stix_id" value=""/>
+    <input type="hidden"  id="hidden-taxii-id" name="taxii_id" value=""/>
+    <input type="hidden"  id="hidden-protocol-version" name="protocol_version" value=""/>
 </div>
 
 

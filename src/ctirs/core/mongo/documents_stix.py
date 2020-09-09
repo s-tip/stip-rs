@@ -23,11 +23,14 @@ from cybox.objects.network_connection_object import NetworkConnection
 from ctirs.core.mongo.documents import Communities, Vias, InformationSources
 from ctirs.models.rs.models import System
 from ctirs.models.sns.feeds.models import Feed
+from ctirs.core.mongo.documents_taxii21_objects import StixObject as TXS21_SO
+from ctirs.core.mongo.documents_taxii21_objects import get_modified_from_object, StixManifest
 from stip.common.tld import TLD
 from stip.common.x_stip_sns import StipSns  # noqa
 
+DESCRIPTION_LENGTH = 10240
 
-# STIX2 で使われる時間文字列から datetime に変換する
+
 def stix2_str_to_datetime(s):
     try:
         return datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=pytz.utc)
@@ -36,7 +39,6 @@ def stix2_str_to_datetime(s):
 
 
 class StixFiles(Document):
-    # STIX 2.0->1.2 変換時の名前空間
     NS_S_TIP_NAME = 's-tip'
 
     VERSION_CHOICES = (
@@ -46,7 +48,6 @@ class StixFiles(Document):
         ('2.1', '2.1'),
     )
 
-    # S-TIP SNS 作成の STIX タイプを返却
     STIP_SNS_TYPE_ORIGIN = 'origin'
     STIP_SNS_TYPE_V2_POST = const.STIP_STIX2_SNS_POST_TYPE_POST
     STIP_SNS_TYPE_LIKE = 'like'
@@ -94,6 +95,7 @@ class StixFiles(Document):
     sns_type = fields.StringField(max_length=16, choices=SNS_TYPE_CHOICES, default=STIP_SNS_TYPE_UNDEFINED)
     information_source = fields.ReferenceField(InformationSources, default=None)
     post = fields.StringField(default=None)
+    taxii2_stix_objects = fields.ListField(fields.ReferenceField(TXS21_SO, dbref=True))
 
     meta = {
         'indexes': [
@@ -122,7 +124,6 @@ class StixFiles(Document):
 
     @classmethod
     def rebuild_cache(cls):
-        # drop
         StixIndicators.drop_collection()
         StixObservables.drop_collection()
         StixCampaigns.drop_collection()
@@ -135,22 +136,38 @@ class StixFiles(Document):
         ExploitTargetCaches.drop_collection()
         SimilarScoreCache.drop_collection()
 
-        # rebuild
+        StixAttackPatterns.drop_collection()
+        StixCampaignsV2.drop_collection()
+        StixCoursesOfActionV2.drop_collection()
+        StixIdentities.drop_collection()
+        StixIntrusionSets.drop_collection()
+        StixLocations.drop_collection()
+        StixMalwares.drop_collection()
+        StixNotes.drop_collection()
+        StixOpinions.drop_collection()
+        StixReports.drop_collection()
+        StixThreatActorsV2.drop_collection()
+        StixTools.drop_collection()
+        StixVulnerabilities.drop_collection()
+        StixRelationships.drop_collection()
+        StixSightings.drop_collection()
+        StixLanguageContents.drop_collection()
+        StixOthers.drop_collection()
+
+        TXS21_SO.drop_collection()
+        StixManifest.drop_collection()
+
         for stix in StixFiles.objects.all().timeout(False):
             stix.split_child_nodes()
-            # produced が指定なしの場合は格納する
             if stix.produced is None:
                 stix_package = STIXPackage.from_xml(stix.origin_path)
-                # STIX Pacakge のタイムスタンプがあれば採用
                 if stix_package.timestamp:
                     stix.produced = stix_package.timestamp
                 else:
-                    # なければcreatedと同じ
                     stix.produced = stix.created
                 stix.save()
         return
 
-    # STIX が v2 であるか判断する
     def is_stix_v2(self):
         return self.version.startswith('2.')
 
@@ -174,7 +191,6 @@ class StixFiles(Document):
         else:
             document.package_name = package_bean.package_id
         document.generation.append(document.content.grid_id)
-        # producedの指定がある場合はその時間。存在しない場合はcreatedと同様の時間を格納
         if package_bean.produced is None:
             document.produced = document.created
         else:
@@ -192,38 +208,36 @@ class StixFiles(Document):
         document.sns_type = package_bean.sns_type
         document.post = package_bean.description
         document.save()
-        # information_source を設定する
         document.set_information_source()
         return document
 
+    def delete_by_stix_file(self):
+        for so in self.taxii2_stix_objects:
+            so.delete(self)
+        self.delete()
+        return
+
     @classmethod
     def delete_by_id(cls, id_):
-        # documentを削除し、origin_pathを返却
         o = StixFiles.objects.get(id=id_)
-        package_id = o.package_id
-        o.delete()
+        o.delete_by_stix_file()
 
-        # MySQLのレコードを削除
-        Feed.delete_record_related_packages(package_id)
+        Feed.delete_record_related_packages(o.package_id)
         return o.origin_path
 
     @classmethod
     def delete_by_package_id(cls, package_id):
-        # documentを削除し、origin_pathを返却
         o = StixFiles.objects.get(package_id=package_id)
-        o.delete()
+        o.delete_by_stix_file()
 
-        # MySQLのレコードを削除
-        Feed.delete_record_related_packages(package_id)
+        Feed.delete_record_related_packages(o.package_id)
         return o.origin_path
 
     @classmethod
     def delete_by_related_packages(cls, package_id):
-        # 連携するdocumentを削除し、origin_pathのリストを返却
         origin_path_list = []
         remove_package_ids = []
 
-        # package_idのrelated_packagesにあるdocumentを削除
         o = StixFiles.objects.get(package_id=package_id)
         related_packages = o.related_packages
         if related_packages:
@@ -234,7 +248,6 @@ class StixFiles(Document):
                 remove_package_ids.append(related_package)
 
         remove_related_packages = []
-        # related_packageにpackage_idを含むdocumentを削除
         objs = StixFiles.objects.filter(related_packages=[package_id])
         for obj in objs:
             remove_related_packages.append(obj.package_id)
@@ -242,30 +255,24 @@ class StixFiles(Document):
             remove_package_ids.append(obj.package_id)
         objs.delete()
 
-        # 最後にdocumentを削除
         o.delete()
         origin_path_list.append(o.origin_path)
         remove_package_ids.append(package_id)
 
-        # MySQLのrelated_packagesを削除
         if related_packages:
             for related_package in related_packages:
                 Feed.delete_record_related_packages(related_package)
 
-        # MySQLのremove_related_packagesを削除
         if remove_related_packages:
             for remove_related_package in remove_related_packages:
                 Feed.delete_record_related_packages(remove_related_package)
 
-        # MySQLのレコードを削除
         Feed.delete_record_related_packages(package_id)
         return origin_path_list, remove_package_ids
 
-    # Instance名とunique名の複合文字列を返却する
     def get_unique_name(self):
         if self.sns_instance is None:
             return self.sns_user_name
-        # 半角空白を挟んだ文字列とする
         return '%s %s' % (self.sns_instance, self.sns_user_name)
 
     def get_stix_package(self):
@@ -276,27 +283,22 @@ class StixFiles(Document):
         except BaseException:
             return None
 
-    # 子ノード情報分割とキャッシュ作成
-    # origin_pathがあることが前提
     def split_child_nodes(self):
-        # stix_packageを取得する
         stix_package = self.get_stix_package()
-        # None以外の場合は STIX 1.x 系
         if stix_package:
             self.split_child_nodes_stix_1_x(stix_package)
         else:
             self.split_child_nodes_stix_2_x()
         return
 
-    # stix 2.x 系の分解
     def split_child_nodes_stix_2_x(self):
         try:
             f = open(self.origin_path, 'r', encoding='utf-8')
             j = json.load(f)
             objects = j['objects']
+            self.taxii2_stix_objects = []
             for object_ in objects:
                 type_ = object_['type']
-                # Attack Pattern
                 if type_ == 'attack-pattern':
                     StixAttackPatterns.create(object_, self)
                 elif type_ == 'campaign':
@@ -335,104 +337,96 @@ class StixFiles(Document):
                     StixLanguageContents.create(object_, self)
                 else:
                     StixOthers.create(object_, self)
+
+                media_types = ["application/stix+json;version=2.1"]
+                object_id = object_['id']
+                modified = get_modified_from_object(object_)
+                try:
+                    txs21_so = TXS21_SO.objects.get(object_id=object_id, modified=modified)
+                    txs21_so.append_stix_file(self)
+                except DoesNotExist:
+                    txs21_so = TXS21_SO.create(object_, media_types, self)
+                self.taxii2_stix_objects.append(txs21_so)
+            self.save()
             f.close()
         except Exception:
             import traceback
             traceback.print_exc()
             return None
 
-    # stix 1.x 系の分解
     def split_child_nodes_stix_1_x(self, stix_package):
-        # indicators の中の Observable を追加
         indicators = stix_package.indicators
         if indicators:
-            # indicator の 回数だけ繰り返す
             for indicator in indicators:
                 if indicator:
-                    # StixIndicatorとキャッシュを作成する
                     try:
                         StixIndicators.create(indicator, self)
                     except NotUniqueError:
                         pass
 
-        # Observables の中の Observable を追加
         observables = stix_package.observables
         if observables:
             for observable in observables:
                 if observable:
                     try:
-                        # StixObservableとキャッシュを作成する
                         StixObservables.create(observable, self)
                     except NotUniqueError:
                         pass
 
-        # Campaigns の中の Campaign を追加
         campaigns = stix_package.campaigns
         if campaigns:
             for campaign in campaigns:
                 if campaign:
                     try:
-                        # StixCampaignsを作成する
                         StixCampaigns.create(campaign, self)
                     except NotUniqueError:
                         pass
 
-        # Incidents の中の Incident を追加
         incidents = stix_package.incidents
         if incidents:
             for incident in incidents:
                 if incident:
                     try:
-                        # StixIncidentsを作成する
                         StixIncidents.create(incident, self)
                     except NotUniqueError:
                         pass
 
-        # ThreatActors の中の ThreatActor を追加
         threat_actors = stix_package.threat_actors
         if threat_actors:
             for threat_actor in threat_actors:
                 if threat_actor:
                     try:
-                        # StixThreatActorsを作成する
                         StixThreatActors.create(threat_actor, self)
                     except NotUniqueError:
                         pass
 
-        # ExpoitTargets の中の ExploitTarget を追加
         exploit_targets = stix_package.exploit_targets
         if exploit_targets:
             for exploit_target in exploit_targets:
                 if exploit_target:
                     try:
-                        # StixExploitTargetsとキャッシュを作成する
                         StixExploitTargets.create(exploit_target, self)
                     except NotUniqueError:
                         pass
 
-        # CoursesOfactions の中の CoursesOfaction を追加
         courses_of_action = stix_package.courses_of_action
         if courses_of_action:
             for course_of_action in courses_of_action:
                 if course_of_action:
                     try:
-                        # StixCoursesOfActionを作成する
                         StixCoursesOfAction.create(course_of_action, self)
                     except NotUniqueError:
                         pass
 
-        # TTPs の中の TTP を追加
         ttps = stix_package.ttps
         if ttps:
             for ttp in ttps:
                 if ttp:
                     try:
-                        # StixTTPsを作成する
                         StixTTPs.create(ttp, self)
                     except NotUniqueError:
                         pass
 
-    # REST APIで返却するjson documentを取得
     def get_rest_api_document_info(self, required_comment=False):
         d = {}
         d['id'] = str(self.id)
@@ -450,7 +444,6 @@ class StixFiles(Document):
             d['comment'] = self.comment
         return d
 
-    # Pakcage_name_listで返却する名前を取得
     def get_rest_api_package_name_info(self):
         d = {}
         d['package_id'] = self.package_id
@@ -460,15 +453,12 @@ class StixFiles(Document):
     def get_rest_api_document_content(self):
         return {'content': self.content.read()}
 
-    # WebHook返却するjson documentを取得
     def get_webhook_document(self):
         return self.get_rest_api_document_info()
 
     def get_datetime_string(self, d):
         return str(d)
 
-    # STIX version 2.0 のドキュメントを 1.x にして中身を返却
-    # 2.0以外の場合は None を返却
     def get_slide_12(self):
         if self.version.startswith('2.'):
             stix2slider.convert_stix._ID_NAMESPACE = self.NS_S_TIP_NAME
@@ -476,16 +466,12 @@ class StixFiles(Document):
             return stix2slider.slide_file(self.origin_path)
         return None
 
-    # STIX version 1.x のドキュメントを 2.0 にして中身を返却
-    # 1.0以外の場合は None を返却
     def get_elevate_20(self):
         if self.version.startswith('1.'):
             el_init()
             return elevate_file(self.origin_path)
         return None
 
-    # STIX version 1.x のドキュメントを 2.1 にして中身を返却
-    # 1.0以外の場合は None を返却
     def get_elevate_21(self):
         if self.version.startswith('1.'):
             el_init()
@@ -495,7 +481,6 @@ class StixFiles(Document):
             return step_file(self.origin_path)
         return None
 
-    # InformationSource を設定する
     def set_information_source(self):
         if self.sns_instance is None:
             return
@@ -523,11 +508,10 @@ class StixFiles(Document):
         return d
 
 
-# IndicatorsV2Cachees
 class IndicatorV2Caches(Document):
     indicator_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     pattern = fields.StringField(max_length=1024)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
@@ -559,9 +543,7 @@ class IndicatorV2Caches(Document):
         return document
 
 
-# ###################### STIX 2.x  #######################
 class Stix2Base(Document):
-    # STIX 2.x 規定の共通プロパティ
     type_ = fields.StringField(max_length=16)
     spec_version = fields.StringField(max_length=16)
     object_id_ = fields.StringField(max_length=100)
@@ -576,7 +558,6 @@ class Stix2Base(Document):
     object_marking_refs = fields.ListField()
     granular_markings = fields.ListField()
 
-    # S-TIP 独自共通プロパティ
     object_ = fields.DictField()
     stix_file = fields.ReferenceField(StixFiles, reverse_delete_rule=CASCADE)
     package_name = fields.StringField(max_length=1024)
@@ -633,11 +614,9 @@ class Stix2Base(Document):
         return document
 
 
-# attack-pattern
 class StixAttackPatterns(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     kill_chain_phases = fields.ListField()
 
     meta = {
@@ -660,11 +639,9 @@ class StixAttackPatterns(Stix2Base):
         return document
 
 
-# campaign (STIX 2.0)
 class StixCampaignsV2(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     aliases = fields.ListField()
     first_seen = fields.DateTimeField()
     last_seen = fields.DateTimeField()
@@ -696,12 +673,9 @@ class StixCampaignsV2(Stix2Base):
         return document
 
 
-# courses-of-action (STIX 2.0)
 class StixCoursesOfActionV2(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
-    # RESERVED
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     action = fields.StringField(max_length=10240)
 
     meta = {
@@ -722,11 +696,9 @@ class StixCoursesOfActionV2(Stix2Base):
         return document
 
 
-# Identity
 class StixIdentities(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     identity_class = fields.StringField(max_length=1024)
     sectors = fields.ListField()
     contact_information = fields.StringField(max_length=1024)
@@ -755,11 +727,9 @@ class StixIdentities(Stix2Base):
         return document
 
 
-# indicator (STIX 2.0)
 class StixIndicatorsV2(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     pattern = fields.StringField(max_length=10240)
     valid_from = fields.DateTimeField()
     valid_until = fields.DateTimeField()
@@ -791,11 +761,9 @@ class StixIndicatorsV2(Stix2Base):
         return document
 
 
-# intrusion-set
 class StixIntrusionSets(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     aliases = fields.ListField()
     first_seen = fields.DateTimeField()
     last_seen = fields.DateTimeField()
@@ -836,10 +804,8 @@ class StixIntrusionSets(Stix2Base):
         return document
 
 
-# location
 class StixLocations(Stix2Base):
-    # STIX 2.1 規定の独自プロパティ
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     latitude = fields.FloatField()
     longitude = fields.FloatField()
     precision = fields.FloatField()
@@ -884,11 +850,9 @@ class StixLocations(Stix2Base):
         return document
 
 
-# malware
 class StixMalwares(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     kill_chain_phases = fields.ListField()
 
     meta = {
@@ -911,9 +875,7 @@ class StixMalwares(Stix2Base):
         return document
 
 
-# note
 class StixNotes(Stix2Base):
-    # STIX 2.01規定の独自プロパティ
     abstract = fields.StringField(max_length=1024)
     content = fields.StringField(max_length=10240)
     authors = fields.ListField()
@@ -941,9 +903,7 @@ class StixNotes(Stix2Base):
         return document
 
 
-# observed-data
 class StixObservedData(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     first_observed = fields.DateTimeField(default=datetime.datetime.now)
     last_observed = fields.DateTimeField(default=datetime.datetime.now)
     number_observed = fields.IntField()
@@ -971,9 +931,7 @@ class StixObservedData(Stix2Base):
         return document
 
 
-# opinion
 class StixOpinions(Stix2Base):
-    # STIX 2.1 規定の独自プロパティ
     explanation = fields.StringField(max_length=10240)
     authors = fields.ListField()
     object_refs = fields.ListField()
@@ -1001,11 +959,9 @@ class StixOpinions(Stix2Base):
         return document
 
 
-# report
 class StixReports(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     published = fields.DateTimeField()
     object_refs = fields.ListField()
 
@@ -1031,11 +987,9 @@ class StixReports(Stix2Base):
         return document
 
 
-# threat-actor (STIX 2.0)
 class StixThreatActorsV2(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     aliases = fields.ListField()
     roles = fields.ListField()
     goals = fields.ListField()
@@ -1079,11 +1033,9 @@ class StixThreatActorsV2(Stix2Base):
         return document
 
 
-# tool
 class StixTools(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     kill_chain_phases = fields.ListField()
     tool_version = fields.StringField(max_length=1024)
 
@@ -1109,13 +1061,10 @@ class StixTools(Stix2Base):
         return document
 
 
-# Vulnerablity
 class StixVulnerabilities(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     name = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
 
-    # S-TIP 独自共通プロパティ
     cves = fields.ListField()
 
     meta = {
@@ -1123,7 +1072,6 @@ class StixVulnerabilities(Stix2Base):
     }
 
     @classmethod
-    # cve_id単位で追加する
     def create(cls, object_, stix_file):
         if object_ is None:
             return None
@@ -1133,7 +1081,6 @@ class StixVulnerabilities(Stix2Base):
             document.name = object_['name']
         if ('description' in object_):
             document.description = object_['description']
-        # external_references の中から CVE 情報を抽出
         if ('external_references' in object_):
             cves = []
             for external_reference in object_['external_references']:
@@ -1143,16 +1090,13 @@ class StixVulnerabilities(Stix2Base):
                             cves.append(external_reference['external_id'])
             document.cves = cves
         document.save()
-        # cache 登録する
         ExploitTargetCaches.create_2_x(document)
         return document
 
 
-# relationship
 class StixRelationships(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     relationship_type = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=1024)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     source_ref = fields.StringField(max_length=1024)
     target_ref = fields.StringField(max_length=1024)
 
@@ -1178,9 +1122,7 @@ class StixRelationships(Stix2Base):
         return document
 
 
-# sighting
 class StixSightings(Stix2Base):
-    # STIX 2.0 規定の独自プロパティ
     first_seen = fields.DateTimeField()
     last_seen = fields.DateTimeField()
     count = fields.IntField()
@@ -1194,14 +1136,11 @@ class StixSightings(Stix2Base):
     }
 
     @classmethod
-    # Observed-data 指定の sighting 情報から作成する
-    # STIX File regist 経由ではないので file 情報はない
     def create_by_observed_id(cls, first_seen, last_seen, count, observed_data_id, uploader):
         SIGHTING_IDENTITY_NAME = 'Fujitsu System Integration Laboratories.'
         SIGHTING_IDENTITY_IDENTITY_CLASS = 'organization'
         stix_file_path = None
         try:
-            # sighting の identity を追加する
             sighting_identity = stix2.Identity(
                 name=SIGHTING_IDENTITY_NAME,
                 identity_class=SIGHTING_IDENTITY_IDENTITY_CLASS,
@@ -1219,38 +1158,29 @@ class StixSightings(Stix2Base):
                     last_seen=last_seen,
                     created_by_ref=sighting_identity,
                     sighting_of_ref=observed_data_id)
-            # 指定の obserbed_data_id から observable-data,最新の一つを取得する
             observed_data_document = next(StixObservedData.objects.filter(object_id_=observed_data_id).order_by('modified').limit(1))
             observed_data = stix2.parse(json.dumps(observed_data_document.object_))
 
-            # observed_data に created_by_ref があれば追加する
             observed_data_identity = None
             if hasattr(observed_data, 'created_by_ref'):
                 try:
-                    # 最新の一つを取得する
                     identity_document = next(StixIdentities.objects.filter(identity_id=observed_data.created_by_ref).order_by('modified').limit(1))
                     observed_data_identity = stix2.parse(json.dumps(identity_document.object_))
                 except BaseException:
-                    # identity が見つからない場合はパスする　
                     pass
 
-            # bundle 作成
             if observed_data_identity:
                 bundle = stix2.Bundle(observed_data, sighting, observed_data_identity, sighting_identity)
             else:
                 bundle = stix2.Bundle(observed_data, sighting, sighting_identity)
 
             from ctirs.core.stix.regist import regist
-            # 一時ファイルに保存
             _, stix_file_path = tempfile.mkstemp(suffix='.json')
             content = bundle.serialize(indent=4)
             with open(stix_file_path, 'w', encoding='utf-8') as fp:
                 fp.write(content)
-            # bundle を登録
             community = Communities.get_not_assign_community()
             via = Vias.get_not_assign_via(uploader=uploader.id)
-            # regist の中で StixSightings を create する
-            # regist の中でファイルは削除される
             regist(stix_file_path, community, via)
             return sighting.id, json.loads(content)
 
@@ -1283,9 +1213,7 @@ class StixSightings(Stix2Base):
         return document
 
 
-# Language-Content
 class StixLanguageContents(Stix2Base):
-    # STIX 2.1規定の独自プロパティ
     object_ref = fields.StringField(max_length=1024)
     object_modified = fields.DateTimeField(default=datetime.datetime.now)
     contents = fields.DictField()
@@ -1308,14 +1236,12 @@ class StixLanguageContents(Stix2Base):
         return document
 
 
-# その他
 class StixOthers(Stix2Base):
     meta = {
         'collection': 'stix_others'
     }
 
     @classmethod
-    # cve_id単位で追加する
     def create(cls, object_, stix_file):
         if object_ is None:
             return None
@@ -1329,12 +1255,10 @@ class StixOthers(Stix2Base):
         return document
 
 
-# ###################### STIX 1.x  #######################
-# StixIndicators
 class StixIndicators(Document):
     indicator_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1356,17 +1280,14 @@ class StixIndicators(Document):
             document.description = indicator.description.value
         document.object_ = indicator.to_dict()
         document.stix_file = stix_file
-        # Timestamp指定がある場合はその時間を格納
         if indicator.timestamp:
             document.created = indicator.timestamp
             document.modified = indicator.timestamp
         document.save()
-        # ObservableCaches作成
         ObservableCaches.create(indicator.observable, stix_file, indicator.id_)
         return
 
     @classmethod
-    # STIX 2.x 系
     def create_2_x(cls, indicator, stix_file):
         v2_indicator = StixIndicatorsV2.create(indicator, stix_file)
         document = StixIndicators()
@@ -1392,16 +1313,14 @@ class StixIndicators(Document):
         document.stix_file = stix_file
         document.v2_indicator = v2_indicator
         document.save()
-        # IndicatorCaches作成
         IndicatorV2Caches.create(indicator, stix_file, indicator['id'])
         return
 
 
-# StixObservables
 class StixObservables(Document):
     observable_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1427,20 +1346,16 @@ class StixObservables(Document):
             document.object_ = None
         document.stix_file = stix_file
         document.save()
-        # ObservableCaches作成
         if document.object_:
             ObservableCaches.create(observable, stix_file, observable.id_)
         return
 
     @classmethod
-    # STIX 2.x 系
     def create_2_x(cls, observable, stix_file):
         v2_observed_data = StixObservedData.create(observable, stix_file)
         document = StixObservables()
         if ('id' in observable):
             document.observable_id = observable['id']
-            # document.v2_observable_id = observable['id']
-            # STIX 2.x の observed-data には title, descriptionがないので id をいれる
             document.title = observable['id']
             document.description = observable['id']
         document.object_ = observable
@@ -1460,16 +1375,14 @@ class StixObservables(Document):
         document.v2_observed_data = v2_observed_data
         document.save()
 
-        # ObservableCaches 作成
         ObservableCaches.create_2_x(observable, stix_file, observable['id'])
         return
 
 
-# StixCampaigns
 class StixCampaigns(Document):
     campaign_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1494,11 +1407,10 @@ class StixCampaigns(Document):
         return
 
 
-# StixIncident
 class StixIncidents(Document):
     incident_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1523,11 +1435,10 @@ class StixIncidents(Document):
         return
 
 
-# StixThreatActors
 class StixThreatActors(Document):
     ta_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1552,11 +1463,10 @@ class StixThreatActors(Document):
         return
 
 
-# StixExploitTargets
 class StixExploitTargets(Document):
     et_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1585,16 +1495,14 @@ class StixExploitTargets(Document):
                     pass
         document.stix_file = stix_file
         document.save()
-        # ExploitTargetCaches作成
         ExploitTargetCaches.create(et, stix_file, et.id_)
         return
 
 
-# StixCoursesOfAction
 class StixCoursesOfAction(Document):
     coa_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1619,11 +1527,10 @@ class StixCoursesOfAction(Document):
         return
 
 
-# StixTtps
 class StixTTPs(Document):
     ttp_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1646,14 +1553,12 @@ class StixTTPs(Document):
         document.object_ = ttp.to_dict()
         document.stix_file = stix_file
         document.save()
-        # ExploitTargetCaches作成
         if ttp.exploit_targets:
             for et in ttp.exploit_targets:
                 ExploitTargetCaches.create(et.item, stix_file, ttp.id_)
         return
 
 
-# ExpoitTargetCaches
 class ExploitTargetCaches(Document):
     TYPE_CHOICES = (
         ('cve_id', 'cve_id'),
@@ -1661,7 +1566,7 @@ class ExploitTargetCaches(Document):
     type = fields.StringField(max_length=16, choices=TYPE_CHOICES)
     et_id = fields.StringField(max_length=100, unique=True)
     title = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
     stix_file = fields.ReferenceField(StixFiles, reverse_delete_rule=CASCADE)
@@ -1677,15 +1582,12 @@ class ExploitTargetCaches(Document):
     }
 
     @classmethod
-    # cve_id単位で追加する
     def create(cls, et, stix_file, node_id):
-        # vulerabilities がない場合は何もしない
         if 'vulnerabilities' not in dir(et):
             return
         if et.vulnerabilities is None:
             return
         for vulnerability in et.vulnerabilities:
-            # CVE情報がなかったら何もしない
             if vulnerability.cve_id is None:
                 continue
             document = ExploitTargetCaches()
@@ -1704,14 +1606,11 @@ class ExploitTargetCaches(Document):
 
     @classmethod
     def create_2_x(cls, stix_vulnerability):
-        # cve が含まれていない場合は何もしない
         if stix_vulnerability.cves is None:
             return
         if len(stix_vulnerability.cves) == 0:
             return
-        # cves の要素だけ cache 作成する
         for cve in stix_vulnerability.cves:
-            # node_id = u'%s-%s' % (stix_vulnerability.vulnerability_id,cve)
             node_id = '%s-%s' % (stix_vulnerability.object_id_, cve)
             document = ExploitTargetCaches()
             document.type = 'cve_id'
@@ -1728,7 +1627,6 @@ class ExploitTargetCaches(Document):
         return
 
 
-# ObseravbleCache
 class ObservableCaches(Document):
     TYPE_CHOICES = (
         ('uri', 'uri'),
@@ -1753,7 +1651,7 @@ class ObservableCaches(Document):
     observable_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
     value = fields.StringField(max_length=1024)
-    description = fields.StringField(max_length=10240)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)
@@ -1761,20 +1659,16 @@ class ObservableCaches(Document):
     package_name = fields.StringField(max_length=1024)
     package_id = fields.StringField(max_length=100)
     node_id = fields.StringField(max_length=100)
-    # IPv4 の場合だけ使用
     ipv4_1_3 = fields.StringField(max_length=12, null=True)
     ipv4_4 = fields.IntField(default=-1)
-    # domainの場合だけ使用
     domain_tld = fields.StringField(max_length=50, null=True)
     domain_last = fields.StringField(max_length=1024, null=True)
     domain_without_tld = fields.StringField(max_length=1024, null=True)
-    # STIX 2.0 の場合だけ使用
     first_observed = fields.StringField(default=None, null=True)
     last_observed = fields.StringField(default=None, null=True)
     number_observed = fields.IntField(default=1)
 
     @classmethod
-    # すでにstix_fileにはorigin_pathが格納されている状態とする
     def get_stix_package(cls, stix_file):
         if stix_file is None:
             return None
@@ -1786,8 +1680,9 @@ class ObservableCaches(Document):
     def create_2_x(cls, observable, stix_file, node_id):
         if observable is None:
             return
+        if 'objects' not in observable:
+            return
         for object_key, object_value in observable['objects'].items():
-            # 種別ごとにチェック
             object_type = object_value['type']
             if object_type == 'file':
                 if ('hashes' in object_value):
@@ -1807,20 +1702,14 @@ class ObservableCaches(Document):
             elif object_type == 'url':
                 ObservableCaches.create_2_x_per_data(observable, object_value, stix_file, node_id, object_key, 'uri', object_value['value'])
             else:
-                # 他の properties は対象外とする
-                # print '他の properties は対象外とする: ' + str(object_type)
                 pass
         return
 
-    # type_, value が決定次第格納する
     @classmethod
     def create_2_x_per_data(cls, observable, object_, stix_file, node_id, object_key, type_, value):
         document = ObservableCaches()
-        # 1 つの Observed-Data に複数の object が入ることがある
-        # 個々の object_node_id の命名規約は {node_id}_{object_key}
         object_node_id = '%s_%s' % (node_id, object_key)
         document.observable_id = node_id
-        # title は node_id と object_key の連結
         document.title = object_node_id
         document.description = object_node_id
         document.stix_file = stix_file
@@ -1828,15 +1717,12 @@ class ObservableCaches(Document):
         document.package_id = stix_file.package_id
         document.node_id = object_node_id
         document.object_ = object_
-        # ipアドレスを分割して保存
         if type_ == 'ipv4':
             document.ipv4_1_3, document.ipv4_4 = cls.split_ipv4_value(value)
         if type_ == 'domain_name':
-            # ドメイン名を分割して保存
             rs_system = System.objects.get()
             tld = TLD(rs_system.public_suffix_list_file_path)
             document.domain_without_tld, document.domain_tld = tld.split_domain(value)
-            # さらに xxx.yyy.com の yyyの部分を独立して保存
             if document.domain_without_tld:
                 document.domain_last = document.domain_without_tld.split('.')[-1]
         document.type = type_
@@ -1848,7 +1734,6 @@ class ObservableCaches(Document):
         return
 
     @classmethod
-    # observable単位で追加する
     def create(cls, observable, stix_file, node_id):
         if observable is None:
             return
@@ -1878,7 +1763,6 @@ class ObservableCaches(Document):
                     else:
                         print('File else')
                         return
-                    # 値が None の場合は対象外
                     if document.value is None:
                         print('Hashvalue is None')
                         return
@@ -1888,56 +1772,45 @@ class ObservableCaches(Document):
                     if document.value is None:
                         print('Domain is None')
                         return
-                    # ドメイン名を分割して保存
                     rs_system = System.objects.get()
                     tld = TLD(rs_system.public_suffix_list_file_path)
                     document.domain_without_tld, document.domain_tld = tld.split_domain(properties.value.value)
-                    # さらに xxx.yyy.com の yyyの部分を独立して保存
                     if document.domain_without_tld:
                         document.domain_last = document.domain_without_tld.split('.')[-1]
                 elif isinstance(properties, URI):
-                    # type が URL だけ対象
                     if properties.type_ == 'URL':
                         document.type = 'uri'
                         document.value = properties.value.value
-                    # None のときはURIとみなす
                     elif properties.type_ is None:
                         document.type = 'uri'
                         document.value = properties.value.value
                     else:
                         print('URI else')
                         return
-                    # 値が None の場合は対象外
                     if document.value is None:
                         print('URI is None')
                         return
-                    # 値が list の場合は対象外
                     if isinstance(document.value, list):
                         print('URI is list')
                         return
                 elif isinstance(properties, Address):
-                    # Address Objectから取得する
                     type_, value = cls.create_address_object(properties)
                     if type_ is None:
                         print('Address else')
                         return
                     document.type = type_
                     document.value = value
-                    # 値が None の場合は対象外
                     if document.value is None:
                         print('Address is None')
                         return
-                    # ipアドレスを分割して保存
                     if type_ == 'ipv4':
                         try:
                             document.ipv4_1_3, document.ipv4_4 = cls.split_ipv4_value(value)
                         except Exception:
-                            # ip address のフォーマットが異なる
                             return
                 elif isinstance(properties, Mutex):
                     document.type = 'mutex'
                     document.value = properties.name.value
-                    # 値が None の場合は対象外
                     if document.value is None:
                         print('Mutex is None')
                         return
@@ -1946,28 +1819,19 @@ class ObservableCaches(Document):
                     type_, value = cls.create_from_socket_object(socket)
                     document.type = type_
                     document.value = value
-                    # 値が None の場合は対象外
                     if document.value is None:
                         print('IPAddress is None')
                         return
-                    # ipアドレスを分割して保存
                     if type_ == 'ipv4':
                         try:
                             document.ipv4_1_3, document.ipv4_4 = cls.split_ipv4_value(value)
                         except Exception:
-                            # ip address のフォーマットが異なる
                             return
                 else:
-                    # 他の properties は対象外とする
-                    # print '他の properties は対象外とする'
                     return
             else:
-                # properties is None
-                # print 'properties is None'
                 return
         else:
-            # object_ is None
-            # print 'object_ is None'
             return
         document.stix_file = stix_file
         document.package_name = stix_file.package_name
@@ -1982,7 +1846,6 @@ class ObservableCaches(Document):
         ipv4_4 = int(octets[3])
         return (ipv4_1_3, ipv4_4)
 
-    # Socket Object から type, value を取得
     @classmethod
     def create_from_socket_object(cls, socket):
         if socket:
@@ -1990,12 +1853,10 @@ class ObservableCaches(Document):
         else:
             return (None, None)
 
-    # Address Object から type, value を取得
     @classmethod
     def create_address_object(cls, address):
         type_ = None
         value = None
-        # category が ipv4-addr だけ対象
         if address.category == 'ipv4-addr':
             type_ = 'ipv4'
             value = address.address_value.value
@@ -2050,7 +1911,6 @@ class SimilarScoreCache(Document):
     }
 
     @classmethod
-    # observable単位で追加する
     def create(cls, type_, start_cache, end_cache, edge_type):
         document = SimilarScoreCache()
         document.type = type_

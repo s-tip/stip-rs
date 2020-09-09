@@ -1,5 +1,4 @@
 $(function(){
-    //toastr設定
     toastr.options = {
         'closeButton': false,
         'debug': false,
@@ -18,13 +17,11 @@ $(function(){
         'hideMethod': 'fadeOut'
     };
 
-    // Delete列の表示設定
     var delete_visible = false;
     if($('input[name="delete-visible"]').val() == "True"){         
         delete_visible　= true
     }
 
-    //DataTable初期化
     table = $('#cti-table').DataTable({
         searching: true,
         paging: true,
@@ -32,7 +29,6 @@ $(function(){
         bProcessing: true,
         bServerSide : true,
         sAjaxSource : '/list/ajax/get_table_info',
-        //デフォルトは1番目のカラム(Created At)を昇順(desc)で
         order: [[1,'desc']],
         columns:[
         	{width:'4%'},	//#
@@ -68,19 +64,14 @@ $(function(){
     			deleteList.push(delete_id);
     		}
     	});
-    	//check されていない
     	if(deleteList.length == 0){
     		alert('No file is checked.');
     		return;
     	}
-    	
-        //確認ダイアログ
         var msg = 'Are you sure you want to delete ' + deleteList.length + ' files?';
         if(confirm(msg) == false){
             return;
         }
-
-        //CGI送信
         var f = $('#stix-delete-form');
         var elem = document.createElement('input');
         elem.type = 'hidden';
@@ -90,20 +81,19 @@ $(function(){
     	f.submit();
     });
 
-    //全チェックつけアイコン
     $('#select-all-icon').on('click',function(){
     	$('.delete-checkbox').prop('checked',true);
     });
-    //全チェック外しアイコン
+
     $('#deselect-all-icon').on('click',function(){
     	$('.delete-checkbox').prop('checked',false);
     });
 
-    //TAXII送信ダイアログ
+
     var publishTaxiiDialog = $('#publish-taxii-confirm-dialog');
     publishTaxiiDialog.dialog({
-        width: 400,
-        height: 400,
+        width: 800,
+        height: 600,
         resizable: true,
         autoOpen: false,
         modal: true,
@@ -112,17 +102,16 @@ $(function(){
                 $( this ).dialog('close');
             },
             Publish: function() {
-            	//publish する
             	var taxii_id = $('#hidden-taxii-id').val();
             	var stix_id = $('#hidden-stix-id').val();
-            	//何も選択されていない場合はalert表示
+                var protocol_version = $('#hidden-protocol-version').val();
             	if (taxii_id.length == 0){
             		alert('Choose TAXII Server to Publish.');
             	}else{
-            		// publish して閉じる
                     var d = {
                             'taxii_id' : taxii_id,
                             'stix_id' : stix_id,
+                            'protocol_version' : protocol_version,
                     };
                     var msg = '';
                     $.ajax({
@@ -134,43 +123,55 @@ $(function(){
                         dataType: 'json',
                     }).done(function(r,textStatus,jqXHR){
                     	if(r['status'] == 'OK'){
-                    		//成功
-                    		msg = 'publish finished. Message: ' + r['message'];
+                    		msg = 'Publish finished successfully!!\nMessage:\n' + r['message'];
                     	}else{
-                    		//失敗
-                    		msg = 'publish failed. Message: ' + r['message'];
+                    		msg = 'Publish failed. Message: ' + r['message'];
                     	}
                     }).fail(function(jqXHR,textStatus,errorThrown){
-                        //失敗
                         msg = 'publish error has occured: ' + textStatus + ': ' + errorThrown;
                     }).always(function(data_or_jqXHR,textStatus,jqHXR_or_errorThrown){
-                        //done fail後の共通処理
                     	alert(msg);
                     });            		
-                    // Dialog 閉じる
                 	$( this ).dialog('close');
             	}
             },
         },
     });
-    //choose-taxiiのドロップダウンメニュー
+
     $('#dropdown-choose-taxii li a').click(function(){
         $(this).parents('.dropdown').find('.dropdown-toggle').html($(this).text() + ' <span class="caret"></span>');
-        $(this).parents('.dropdown').find('input[id="hidden-taxii-id"]').val($(this).attr('data-value'));
+        $('#hidden-taxii-id').val($(this).data('taxii-id'));
+        $('#hidden-protocol-version').val($(this).data('protocol-version'));
+        $('#taxii-address-confirm').text($(this).data('address'));
+        $('#taxii-collection-confirm').text($(this).data('collection'));
     })
 
-    //publish icon click
     $(document).on('click','.publish-share-alt-icon',function(){
-    	//file_id 取得
-    	var file_id = $(this).attr('file_id');
-    	//hidden に STIX ID 追加
-    	$('#hidden-stix-id').val(file_id);
+    	var file_id = $(this).data('file-id');
+    	var package_id = $(this).data('package-id');
+    	var package_name = $(this).data('package-name');
+        $('#hidden-stix-id').val(file_id);
+        $('#stix-package-name-confirm').text(package_name);
+        $('#stix-package-id-confirm').text(package_id);
+        toggle_display_taxii_setting();
     	publishTaxiiDialog.dialog('open');
     });
 
-    //MISP import icon
+    $(document).on('change','.taxii-version-radio-button',function(){
+       toggle_display_taxii_setting();
+    });
+
+    function toggle_display_taxii_setting(){
+        if($('#taxii-v1-button').prop('checked')){
+            $('#taxii-v1-configuration-div').show();
+            $('#taxii-v2-configuration-div').hide();
+        }else{
+            $('#taxii-v1-configuration-div').hide();
+            $('#taxii-v2-configuration-div').show();
+        }
+    };
+
     $(document).on('click','.misp-import-icon',function(){
-    	//package_id 取得
     	var package_id = $(this).attr('package_id');
     	var d = {
     			'package_id' : package_id
@@ -185,22 +186,17 @@ $(function(){
             dataType: 'json',
         }).done(function(r,textStatus,jqXHR){
         	if(r['status'] == 'OK'){
-        		//成功
         		toastr['success']('MISP upload success!', 'Success!');
         	}else{
-        		//失敗
         		msg = 'MISP import failed. Message: ' + r['message'];
         	}
         }).fail(function(jqXHR,textStatus,errorThrown){
-            //失敗
             msg = 'MISP import error has occured: ' + textStatus + ': ' + errorThrown;
         }).always(function(data_or_jqXHR,textStatus,jqHXR_or_errorThrown){
-            //done fail後の共通処理
         	alert(msg);
         });
     });
 
-   // auto reload
     var reload_time = 60000;
     var reload_event;
     set_reload();
