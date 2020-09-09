@@ -512,7 +512,7 @@ class IndicatorV2Caches(Document):
     indicator_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
     description = fields.StringField(max_length=DESCRIPTION_LENGTH)
-    pattern = fields.StringField(max_length=1024)
+    pattern = fields.StringField(max_length=10240)
     object_ = fields.DictField()
     created = fields.DateTimeField(default=datetime.datetime.now)
     modified = fields.DateTimeField(default=datetime.datetime.now)

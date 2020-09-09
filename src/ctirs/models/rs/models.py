@@ -50,13 +50,14 @@ class STIPUserManager(BaseUserManager):
         user = self.create_user(username=username, screen_name=username, password=password, is_admin=True)
         return user
 
+
 def get_os_info():
     os_language = None
     os_country_code = None
     os_timezone = None
     try:
         with open('/etc/default/locale', 'r') as f:
-            for i in  f.read().replace('"', '').split('\n'):
+            for i in f.read().replace('"', '').split('\n'):
                 if 'LANG=' in i:
                     locale_info = i[i.find('LANG=') + 5:i.find('.')].split('_')
                     if len(locale_info) == 2:
@@ -70,7 +71,8 @@ def get_os_info():
             os_timezone = f.read().split('\n')[0]
     except FileNotFoundError:
         pass
-    return (os_language, os_country_code,  os_timezone)
+    return (os_language, os_country_code, os_timezone)
+
 
 class STIPUser(AbstractBaseUser, PermissionsMixin):
     # get_full_name/get_short_nameは必須メソッド
