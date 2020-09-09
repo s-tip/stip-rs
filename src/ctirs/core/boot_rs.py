@@ -52,7 +52,7 @@ class StipRsBoot(AppConfig):
 
     def set_user_country(self):
         import os
-        from ctirs.models.rs.models import STIPUser, COUNTRY_CODE_LIST, get_os_info
+        from ctirs.models.rs.models import STIPUser, get_os_info
         for user in STIPUser.objects.all():
             if not user.country_code:
                 if os.name == 'posix':
@@ -96,11 +96,11 @@ def init_mongo():
     MONGO_DEFAULT_HOST_NAME = 'localhost'
     MONGO_DEFAULT_PORT = 27017
 
+    from ctirs.models.rs.models import MongoConfig
+    config = MongoConfig.objects.get()
     try:
-        from ctirs.models.rs.models import MongoConfig
-        config = MongoConfig.objects.get()
         connect(config.db, host=config.host, port=int(config.port))
-        connect(config.db_taxii21, host=config.host, port=int(config.port), alias='taxii21_alias')
+        connect(MONGO_DEFAULT_TXS21_DB_NAME, host=config.host, port=int(config.port), alias='taxii21_alias')
     except BaseException:
         connect(MONGO_DEFAULT_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT)
         connect(MONGO_DEFAULT_TXS21_DB_NAME, host=MONGO_DEFAULT_HOST_NAME, port=MONGO_DEFAULT_PORT, alias='taxii21_alias')
