@@ -12,11 +12,6 @@ from ctirs.models.sns.core.models import Region
 import stip.common.const as const
 
 
-COUNTRY_CODE_LIST = list(set([country_code_list['country_code'] for country_code_list in Region.objects.values('country_code')]))
-LANGUAGE_LIST = [language_info[0] for language_info in const.LANGUAGES]
-
-
-#####################
 class STIPUserManager(BaseUserManager):
     def create_user(self, username, screen_name, password, is_admin=False):
         if not username:
@@ -35,6 +30,9 @@ class STIPUserManager(BaseUserManager):
             user.role = 'user'
             user.is_superuser = False
         user.sns_profile = Profile.create_first_login()
+
+        COUNTRY_CODE_LIST = list(set([country_code_list['country_code'] for country_code_list in Region.objects.values('country_code')]))
+        LANGUAGE_LIST = [language_info[0] for language_info in const.LANGUAGES]
         if os.name == 'posix':
             os_language, os_country_code, os_timezone = get_os_info()
             if os_country_code in COUNTRY_CODE_LIST:
