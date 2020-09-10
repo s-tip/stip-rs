@@ -84,7 +84,7 @@ class OtxAdapterControl(object):
                 # 取得したSTIXを登録
                 _regist_stix(content, community, via)
                 count += 1
-            except Exception as e:
+            except Exception:
                 # エラーが発生した場合はログを表示して処理は実行する
                 traceback.print_exc()
         # 件数を返却
