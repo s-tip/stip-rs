@@ -114,10 +114,6 @@ def is_exist_objects(selector, o_):
             return o_[selector]
 
 
-def get_selector_trimed_last_index(selector):
-    elems = selector.split('')
-
-
 # language_contents 作成
 def post_language_contents(request, object_ref, ctirs_auth_user):
     try:
@@ -185,6 +181,7 @@ def post_language_contents(request, object_ref, ctirs_auth_user):
         community = Communities.get_default_community()
         # stixファイルを一時ファイルに出力
         stix_file_path = tempfile.mktemp(suffix='.json')
+        print(type(bundle.serialize(indent=4, ensure_ascii=False)))
         with open(stix_file_path, 'wb+') as fp:
             fp.write(bundle.serialize(indent=4, ensure_ascii=False)).encode()
         # 登録処理
@@ -204,8 +201,7 @@ def get_language_contents(request, object_ref):
         # 表示する長さ
         object_modified = request.GET['object_modified']
         objects = StixLanguageContents.objects.filter(
-            Q(object_ref=object_ref)
-            & Q(object_modified=object_modified)).order_by('-modified')
+            Q(object_ref=object_ref) & Q(object_modified=object_modified)).order_by('-modified')
         language_contents = []
         for o_ in objects:
             language_contents.append(o_.object_)
