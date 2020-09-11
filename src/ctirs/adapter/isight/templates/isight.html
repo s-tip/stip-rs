@@ -109,8 +109,9 @@
     <p id="info-msg">{{ info_msg_get |default:'' }}</p>
     <div class="form-group">
         <div class="row">
-            <div class="col-xs-2">
-                Start this datetime (UTC).
+            <div class="col-xs-3">
+                Start this datetime (UTC)
+                <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" title="Dateformat" data-content="YYYY/mm/dd HH:MM:SS" data-placement="bottom"></span>
             </div>
             <div class="col-xs-6">
                 <input id="modify-isight-start-time" type="text" name="start_time" class="form-control" value="{%if isight.last_requested %}{{ isight.last_requested|date:'Y/m/d H:i:s'}}{% endif %}" placeholder="Ex: 2017/01/01 00:00:00"'/>
@@ -119,8 +120,9 @@
     </div><!-- <div class="form-group"> -->
     <div class="form-group">
         <div class="row">
-            <div class="col-xs-2">
-                End this datetime (UTC).
+            <div class="col-xs-3">
+                End this datetime (UTC)
+                <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" title="Dateformat" data-content="YYYY/mm/dd HH:MM:SS" data-placement="bottom"></span>
             </div>
             <div class="col-xs-6">
                 <input id="modify-isight-end-time" type="text" name="end_time" class="form-control" placeholder="Ex: 2017/01/01 00:00:00"'/>

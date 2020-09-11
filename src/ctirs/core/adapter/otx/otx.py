@@ -84,7 +84,7 @@ class OtxAdapterControl(object):
                 # 取得したSTIXを登録
                 _regist_stix(content, community, via)
                 count += 1
-            except Exception as e:
+            except Exception:
                 # エラーが発生した場合はログを表示して処理は実行する
                 traceback.print_exc()
         # 件数を返却
@@ -159,16 +159,3 @@ class OtxAdapterControl(object):
         # スケジューラからjob削除
         self._schedule.remove_job(schedule_job)
         self._interval_job = None
-
-    '''
-    #stixファイルの登録
-    def _regist_otx_stix(self,content,community,via):
-        #stixファイルを一時ファイルに出力
-        stix_file_path = tempfile.mktemp(suffix='.xml')
-        with open(stix_file_path,'wb+') as fp:
-            #cb.contentがstixの中身(contentの型はstr)
-            fp.write(content)
-        #登録
-        regist(stix_file_path,community,via)
-        return
-    '''

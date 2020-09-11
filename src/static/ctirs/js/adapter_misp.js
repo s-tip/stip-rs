@@ -1,4 +1,5 @@
 $(function(){
+    $('[data-toggle="popover"]').popover();
     function modify_misp_submit(){
         var f = $('#modify-misp-form');
         f.submit();

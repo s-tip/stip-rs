@@ -1,4 +1,5 @@
 $(function(){
+    $('[data-toggle="popover"]').popover();
     function modify_otx_submit(){
         var f = $('#modify-otx-form');
         f.submit();
