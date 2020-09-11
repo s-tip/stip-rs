@@ -1,4 +1,5 @@
 $(function(){
+    $('[data-toggle="popover"]').popover();
     function modify_isight_submit(){
         var f = $('#modify-isight-form');
         f.submit();

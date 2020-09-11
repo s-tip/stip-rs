@@ -140,7 +140,8 @@
     <div class="form-group">
         <div class="row">
             <div class="col-xs-2">
-                Start this date .
+                Start this date
+                <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" title="Dateformat" data-content="YYYY/mm/dd" data-placement="bottom"></span>
             </div>
             <div class="col-xs-6">
                 <input id="modify-misp-start-date" type="text" name="start_date" class="form-control" value="{%if misp.last_requested %}{{ misp.last_requested|date:'Y/m/d '}}{% endif %}" placeholder="Ex: 2017/01/01"'/>
@@ -150,7 +151,8 @@
     <div class="form-group">
         <div class="row">
             <div class="col-xs-2">
-                End this date.
+                End this date
+                <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" title="Dateformat" data-content="YYYY/mm/dd" data-placement="bottom"></span>
             </div>
             <div class="col-xs-6">
                 <input id="modify-misp-end-time" type="text" name="end_date" class="form-control" placeholder="Ex: 2017/01/01"'/>

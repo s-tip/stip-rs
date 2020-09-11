@@ -98,8 +98,9 @@
     <p id="info-msg">{{ info_msg_get |default:'' }}</p>
     <div class="form-group">
         <div class="row">
-            <div class="col-xs-2">
-                From this datetime (UTC).
+            <div class="col-xs-4">
+                From this datetime (UTC)
+                <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" title="Dateformat" data-content="YYYY/mm/dd HH:MM:SS" data-placement="bottom"></span>
             </div>
             <div class="col-xs-6">
                 <input id="modify-otx-last-requested" type="text" name="start" class="form-control" value="{%if otx.last_requested %}{{ otx.last_requested|date:'Y/m/d H:i:s'}}{% endif %}" placeholder="Ex: 2017/01/01 00:00:00"'/>
