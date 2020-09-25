@@ -12,7 +12,7 @@
 <form name="create_taxii_client" id="create-taxii-client-form" action="/configuration/taxii_client/create" method="POST">{% csrf_token %}
 <div class="container">
     <br/>
-    <h1>TAXII Client</h1>
+    <h1>TAXII Client (1.x)</h1>
     <br/>
     <hr/>
     <h2>Create or Modify TAXII Client Setting</h2>
@@ -219,6 +219,28 @@
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
 
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                For Poll Collection
+            </div>
+            <div class="col-xs-4" >
+                <input id="create-can-read" type="checkbox" name="can_read"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                For Inbox Collection
+            </div>
+            <div class="col-xs-4" >
+                <input id="create-can-write" type="checkbox" name="can_write"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+
     <br/>
     <div class="form-group">
         <div class="row">
@@ -257,6 +279,12 @@
     </td>
     <td>
         Collection
+    </td>
+    <td>
+        For Poll
+    </td>
+    <td>
+        For Inbox
     </td>
     <td>
         Login ID
@@ -314,6 +342,12 @@
     </td>
     <td>
         <p class="collection" style="word-wrap: break-word;">{{ taxii_client.collection }}</p>
+    </td>
+    <td>
+        <input type="checkbox" disabled {% if taxii_client.can_read %}checked{% endif %} class="can-read"/> 
+    </td>
+    <td>
+        <input type="checkbox" disabled {% if taxii_client.can_write %}checked{% endif %} class="can-write"/> 
     </td>
     <td>
         <p class="login-id" style="word-wrap: break-word;">{{ taxii_client.login_id }}</p>

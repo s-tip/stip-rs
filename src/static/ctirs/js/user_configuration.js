@@ -1,5 +1,4 @@
 $(function(){
-    //toastr設定
     toastr.options = {
         'closeButton': false,
         'debug': false,
@@ -19,14 +18,12 @@ $(function(){
     };
 
     function create_user_submit(){
-        //passwordフィールドを作成
         var f = $('#create-user-form');
         var elem = document.createElement('input');
         elem.type = 'hidden';
         elem.name = 'password';
         elem.value = $('#password-1').val();
         f.append(elem);
-        //screee_nameフィールドを作成
         elem = document.createElement('input');
         elem.type = 'hidden';
         elem.name = 'screen_name';
@@ -35,13 +32,11 @@ $(function(){
         f.submit();
     }
 
-    //error_msg表示
     function create_user_error(msg){
         $('#error-msg').text(msg);
         $('#info-msg').text('');
     }
 
-    //loginボタンクリック
     $('#create-user-submit').click(function(){
         var username = $('#username').val();
         if(username.length == 0){
@@ -65,14 +60,11 @@ $(function(){
         create_user_submit();
     });
 
-    //User Configurationのチェックボックスon/off
     $('.change-auth').change(function(){
         var d = {
                 'username' : $(this).attr('username'),
-                'key' : $(this).attr('config_name'),
                 'value' : $(this).is(':checked'),
         };
-        //ajax呼び出し
         $.ajax({
             type: 'GET',
             url: '/configuration/user/ajax/change_auth',
@@ -82,19 +74,39 @@ $(function(){
             dataType: 'json',
         }).done(function(r,textStatus,jqXHR){
             if(r['status'] != 'OK'){
-                alert('change_auth failed:' + r['message'], 'Error!');
+                toastr['error']('change_auth failed:' + r['message'], 'Error!');
             }else{
                 toastr['success']('change_auth successfully.', 'Success!');
             }
         }).fail(function(jqXHR,textStatus,errorThrown){
-            alert('Error has occured:change_auth:' + textStatus + ':' + errorThrown);
-            //失敗
-        }).always(function(data_or_jqXHR,textStatus,jqHXR_or_errorThrown){
-            //done fail後の共通処理
+            toastr['error']('Error has occured:change_auth:' + textStatus + ':' + errorThrown, 'Error!');
         });
     });
 
-    //change-password link クリック
+
+    $('.change-active').change(function(){
+        var d = {
+                'username' : $(this).attr('username'),
+                'value' : $(this).is(':checked'),
+        };
+        $.ajax({
+            type: 'GET',
+            url: '/configuration/user/ajax/change_active',
+            timeout: 100 * 1000,
+            cache: true,
+            data: d,
+            dataType: 'json',
+        }).done(function(r,textStatus,jqXHR){
+            if(r['status'] != 'OK'){
+                toastr['error']('change_active failed:' + r['message'], 'Error!');
+            }else{
+                toastr['success']('change_active successfully.', 'Success!');
+            }
+        }).fail(function(jqXHR,textStatus,errorThrown){
+            toastr['error']('Error has occured:change_active:' + textStatus + ':' + errorThrown, 'Error!');
+        });
+    });
+
     $('.change-password').click(function(){
         var user = $(this).attr('username');
         var f = $('#change-password-top-form');
@@ -104,5 +116,58 @@ $(function(){
         elem.value = $(this).attr('username');
         f.append(elem);
         f.submit();
+    });
+
+    $('#disable-2fa-dialog').dialog({
+        autoOpen: false,
+        modal: true,
+        open: function(){
+            $('.ui-dialog-titlebar').hide();
+            $('.ui-dialog-titlebar-close').hide();
+        },
+        buttons: [
+            {
+                text: 'Yes',
+                click: function(){
+                    var dialog_this = $(this);
+                    var d = {
+                        'username': dialog_this.attr('username'),
+                    };
+                    $.ajax({
+                        type: 'GET',
+                        url: '/configuration/user/ajax/unset_mfa',
+                        timeout: 100 * 1000,
+                        cache: true,
+                        data: d,
+                        dataType: 'json'
+                    }).done(function(r,textStatus,jqXHR){
+                        if(r['status'] != 'OK'){
+                            toastr['error']('unset_mfa failed:' + r['message'], 'Error!');
+                        }else{
+                            toastr['success']('Disable 2FA successfully.', 'Success!');
+                            document.getElementById('disable-' + dialog_this.attr('username')).textContent = 'Disabled';
+                        }
+                    }).fail(function(jqXHR,textStatus,errorThrown){
+                        toastr['error']('Error has occured:unset_mfa:' + textStatus + ':' + errorThrown, 'Error!')
+                    }).always(function(data_or_jqXHR,textStatus,jqHXR_or_errorThrown){
+                        dialog_this.dialog('close');
+                    });
+                }
+            },
+            {
+                text: 'No',
+                click: function(){
+                    $(this).dialog('close');
+                }
+            }
+        ]
+    });
+
+    $('.disable-2fa').click(function(){
+        $("#disable-2fa-dialog").dialog('open');
+        $("#disable-2fa-dialog").attr({
+            'username': $(this).attr('username'),
+            'config_name': $(this).attr('config_name')
+        });
     });
 });

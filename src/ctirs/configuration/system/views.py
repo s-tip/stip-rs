@@ -1,8 +1,9 @@
 from django.shortcuts import render
-from ctirs.core.common import get_text_field_value, get_common_replace_dict
+from django.contrib.auth.decorators import login_required
+from stip.common import get_text_field_value
+from ctirs.core.common import get_common_replace_dict
 from ctirs.error.views import error_page, error_page_no_view_permission, error_page_free_format, error_page_inactive
 from ctirs.models.rs.models import System
-from django.contrib.auth.decorators import login_required
 from ctirs.core.mongo.documents_stix import StixFiles
 
 

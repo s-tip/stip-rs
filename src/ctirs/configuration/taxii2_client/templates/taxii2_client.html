@@ -1,0 +1,303 @@
+{% include 'header.html' %}
+<head>
+<!--  for taxii2_client_configurations -->
+<link href="/static/ctirs/css/profile_configuration_common.css" rel="stylesheet">
+<script type="text/javascript" src="/static/ctirs/js/taxii2_client_configuration.js"></script>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<form name="delete_taxii2_client" id="delete-taxii2-client-form" action="/configuration/taxii2_client/delete" method="GET"></form>
+<form name="conifuration_taxii2_client_detail" id="configuration-taxii2-client-detail" action="/configuration/taxii2_client/detail/" method="GET"></form>
+<form name="create_taxii2_client" id="create-taxii2-client-form" action="/configuration/taxii2_client/create" method="POST">{% csrf_token %}
+<div class="container">
+    <br/>
+    <h1>TAXII Client (2.x)</h1>
+    <br/>
+    <hr/>
+    <h2>Create or Modify TAXII Client Setting</h2>
+    <div class="form-group">
+    <p id="error-msg">{{ error_msg |default:'' }}</p>
+    <p id="info-msg">{{ info_msg |default:'' }}</p>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Display Name
+            </div>
+            <div class="col-xs-4">
+                <input id="create-display-name" type="text" name="display_name" class="form-control"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Protocol Version
+            </div>
+            <div class="col-xs-4">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" id="create-protocol-version-dropdown-button" type="button" data-toggle="dropdown">
+                        Choose Protocol Version
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="dropdown-protocol-version">
+            	        {% if protocol_versions %}
+                    	{% for protocol_version in protocol_versions %}
+                        <li><a data-value="{{protocol_version}}">{{protocol_version}}</a></li>
+            	        {% endfor %}
+                    	{% endif %}
+                    </ul>
+                    <input type="hidden" id="create-protocol-version" name="protocol_version" value="">
+                </div>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                API Root
+            </div>
+            <div class="col-xs-4">
+                <input id="create-api-root" type="text" name="api_root" class="form-control"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Collection
+            </div>
+            <div class="col-xs-4">
+                <input id="create-collection" type="text" name="collection" class="form-control"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Login ID
+            </div>
+            <div class="col-xs-4">
+                <input id="create-login-id" type="text" name="login_id" class="form-control"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Login Password
+            </div>
+            <div class="col-xs-4">
+                <input id="create-login-password" type="password" name="login_password" class="form-control"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Push on Adding Files
+            </div>
+            <div class="col-xs-4" >
+                <input id="create-push" type="checkbox" name="push"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Community
+            </div>
+            <div class="col-xs-4">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" id="create-community-dropdown-button" type="button" data-toggle="dropdown">
+                        Choose Communtiy
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="dropdown-menu-community-name">
+            	        {% if communities %}
+                    	{% for community in communities %}
+                        <li><a data-value="{{community.id}}">{{community.name}}</a></li>
+            	        {% endfor %}
+                    	{% endif %}
+                    </ul>
+                    <input type="hidden" id="create-community-id" name="community_id" value="{{community.id}}">
+                </div>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Uploader
+            </div>
+            <div class="col-xs-4">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" id="create-uploader-dropdown-button" type="button" data-toggle="dropdown">
+                        Choose Uploader
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="dropdown-menu-uploader">
+            	        {% if users %}
+                    	{% for user in users %}
+                        <li><a data-value="{{user.id}}">{{user.username}}</a></li>
+            	        {% endfor %}
+                    	{% endif %}
+                    </ul>
+                    <input type="hidden" id="create-uploader-id" name="uploader_id">
+                </div>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                For Consume Collection
+            </div>
+            <div class="col-xs-4" >
+                <input id="create-can-read" type="checkbox" name="can_read"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                For Publish Collection
+            </div>
+            <div class="col-xs-4" >
+                <input id="create-can-write" type="checkbox" name="can_write"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+
+    <br/>
+    <div class="form-group">
+        <div class="row">
+            <button type="button" id="create-taxii2-client-submit" class="btn btn-default">Create Or Modify</button>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <hr/>
+    <h2>TAXII Client Configuration</h2>
+    {% if taxii2_clients %}
+    <table class="table table-striped table-hover" style="table-layout: fixed;">
+    <thead>
+    <tr>
+    <td>
+        Delete
+    </td>
+    <td>
+        Modify
+    </td>
+    <td>
+        Detail
+    </td>
+    <td>
+        Display Name
+    </td>
+    <td>
+        Protocol Version
+    </td>
+    <td>
+        API Root
+    </td>
+    <td>
+        Collection
+    </td>
+    <td>
+        For Consume
+    </td>
+    <td>
+        For Publish
+    </td>
+    <td>
+        Login ID
+    </td>
+    <td>
+        Login Password
+    </td>
+    <td>
+        Push on Adding Files
+    </td>
+    <td>
+        Community
+    </td>
+    <td>
+        Uploader
+    </td>
+    </tr>
+    </thead>
+    <tbody>
+    {% for taxii2_client in taxii2_clients %}
+    <tr class="configure-tr">
+    <td>
+        <div class="form-group">
+            <button class="btn btn-default delete-taxii2-client-button btn-sm" type="button" display_name="{{ taxii2_client.name }}" >Delete</button>
+        </div><!-- <div class="form-group"> -->
+    </td>
+    <td>
+        <div class="form-group">
+            <button class="btn btn-default modify-taxii2-client-button btn-sm" type="button" display_name="{{ taxii2_client.name }}" >Modify</button>
+        </div><!-- <div class="form-group"> -->
+    </td>
+    <td>
+        <div class="form-group">
+            <button class="btn btn-default detail-taxii2-client-button btn-sm" type="button" display_name="{{ taxii2_client.name }}" taxii2_client_id="{{ taxii2_client.id }}">Detail</button>
+    <td>
+        <p class="display-name" style="word-wrap: break-word;">{{ taxii2_client.name }}</p>
+    </td>
+    <td>
+        <p class="protocol-version">{{ taxii2_client.protocol_version }}</p>
+    </td>
+    <td>
+        <p class="api-root" style="word-wrap: break-word;">{{ taxii2_client.api_root }}</p>
+    </td>
+    <td>
+        <p class="collection" style="word-wrap: break-word;">{{ taxii2_client.collection }}</p>
+    </td>
+    <td>
+        <input type="checkbox" disabled {% if taxii2_client.can_read %}checked{% endif %} class="can-read"/> 
+    </td>
+    <td>
+        <input type="checkbox" disabled {% if taxii2_client.can_write %}checked{% endif %} class="can-write"/> 
+    </td>
+    <td>
+        <p class="login-id" style="word-wrap: break-word;">{{ taxii2_client.login_id }}</p>
+    </td>
+    <td>
+        <p class="login-password">xxx</p>
+    </td>
+    <td>
+        <input type="checkbox" disabled {% if taxii2_client.push %}checked{% endif %} class="push"/> 
+    </td>
+    <td>
+    	{% if taxii2_client.is_exist_community %}
+        <p class="community" style="word-wrap: break-word;">{{ taxii2_client.community.name}}</p>
+        <input type="hidden" class="community-id" value="{{taxii2_client.community.id}}"/>
+    	{% else %}
+        <p class="community" style="word-wrap: break-word;">&lt;undefined&gt;</p>
+        <input type="hidden" class="community-id" value=""/>
+    	{% endif %}
+    </td>
+    <td>
+    	{% if taxii2_client.uploader %}
+		<p class="uploader" style="word-wrap: break-word;">{{ taxii2_client.uploader_name }}</p>
+        <input type="hidden" class="uploader-id" value="{{taxii2_client.uploader}}"/>
+    	{% else %}
+        <p class="uploader" style="word-wrap: break-word;">&lt;undefined&gt;</p>
+        <input type="hidden" class="uploader-id" value=""/>
+		{% endif %}
+    </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    {% endif %}
+    </table>
+    <hr/>
+</div> <!--  <div class="container"> -->
+</form>
+</body>
+</html>

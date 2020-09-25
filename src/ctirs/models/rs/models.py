@@ -2,6 +2,7 @@ import os
 import hmac
 import uuid
 import hashlib
+import pytz
 from django.db import models
 from django.db.models.signals import pre_save
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
@@ -11,7 +12,6 @@ from ctirs.models.sns.core.models import Region
 import stip.common.const as const
 
 
-#####################
 class STIPUserManager(BaseUserManager):
     def create_user(self, username, screen_name, password, is_admin=False):
         if not username:
@@ -30,12 +30,46 @@ class STIPUserManager(BaseUserManager):
             user.role = 'user'
             user.is_superuser = False
         user.sns_profile = Profile.create_first_login()
+
+        COUNTRY_CODE_LIST = list(set([country_code_list['country_code'] for country_code_list in Region.objects.values('country_code')]))
+        LANGUAGE_LIST = [language_info[0] for language_info in const.LANGUAGES]
+        if os.name == 'posix':
+            os_language, os_country_code, os_timezone = get_os_info()
+            if os_country_code in COUNTRY_CODE_LIST:
+                user.country_code = os_country_code
+            if os_language in LANGUAGE_LIST:
+                user.language = os_language
+            if os_timezone in pytz.all_timezones:
+                user.timezone = os_timezone
         user.save(using=self._db)
         return user
 
     def create_superuser(self, username, password):
         user = self.create_user(username=username, screen_name=username, password=password, is_admin=True)
         return user
+
+
+def get_os_info():
+    os_language = None
+    os_country_code = None
+    os_timezone = None
+    try:
+        with open('/etc/default/locale', 'r') as f:
+            for i in f.read().replace('"', '').split('\n'):
+                if 'LANG=' in i:
+                    locale_info = i[i.find('LANG=') + 5:i.find('.')].split('_')
+                    if len(locale_info) == 2:
+                        os_language = locale_info[0]
+                        os_country_code = locale_info[1]
+                    break
+    except FileNotFoundError:
+        pass
+    try:
+        with open('/etc/timezone', 'r') as f:
+            os_timezone = f.read().split('\n')[0]
+    except FileNotFoundError:
+        pass
+    return (os_language, os_country_code, os_timezone)
 
 
 class STIPUser(AbstractBaseUser, PermissionsMixin):
@@ -67,6 +101,7 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     timezone = models.CharField(max_length=128, default='UTC')
     is_modified_password = models.BooleanField(default=False)
     is_buildin = models.BooleanField(default=False)
+    totp_secret = models.CharField(max_length=32, default=None, null=True)
 
     # RS/StipUser から移動
     location = models.CharField(max_length=50, null=True, blank=True)
@@ -77,12 +112,12 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     description = models.CharField(max_length=1024, null=True, blank=True)
     tlp = models.CharField(max_length=10, choices=const.TLP_CHOICES, default="AMBER")
     region = models.ForeignKey(Region, null=True)
-    country_code = models.TextField(max_length=8, default=None, null=True)
+    country_code = models.TextField(max_length=8, default='US', null=True)
     administrative_code = models.TextField(max_length=8, default=None, null=True)
     administrative_area = models.TextField(max_length=128, default=None, null=True)
     sector = models.CharField(max_length=128, choices=const.SECTOR_GROUP_CHOICES, null=True)
     ci = models.CharField(max_length=128, choices=const.CRITICAL_INFRASTRUCTURE_CHOICES, null=True)
-    language = models.CharField(max_length=4, choices=const.LANGUAGES, default='en')
+    language = models.CharField(max_length=16, choices=const.LANGUAGES, default='en')
     role = models.CharField(max_length=10, choices=const.ROLE_CHOICES, default="user")
     gv_auth_user = models.ForeignKey(GVAuthUser, on_delete=models.CASCADE, default=1)
     sns_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, default=1)

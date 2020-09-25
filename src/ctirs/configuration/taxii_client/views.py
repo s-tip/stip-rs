@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from ctirs.core.common import get_text_field_value, get_common_replace_dict
-from ctirs.error.views import error_page, error_page_no_view_permission, error_page_free_format, error_page_inactive
 from django.contrib.auth.decorators import login_required
+from stip.common import get_text_field_value
+from ctirs.core.common import get_common_replace_dict
+from ctirs.error.views import error_page, error_page_no_view_permission, error_page_free_format, error_page_inactive
 from ctirs.models.rs.models import STIPUser
 from ctirs.core.mongo.documents import TaxiiClients, Communities
 
@@ -43,11 +44,11 @@ def get_taxii_client_create_ca(request):
 
 
 def get_taxii_client_create_certificate(request):
-    return get_text_field_value(request, 'certificate', default_value=None)
+    return get_text_field_value(request, 'certificate', default_value='')
 
 
 def get_taxii_client_create_private_key(request):
-    return get_text_field_value(request, 'private_key', default_value=None)
+    return get_text_field_value(request, 'private_key', default_value='')
 
 
 def get_taxii_client_create_community_id(request):
@@ -68,6 +69,14 @@ def get_taxii_client_create_uploader_id(request):
 
 def get_taxii_client_delete_display_name(request):
     return get_text_field_value(request, 'display_name', default_value='')
+
+
+def get_taxii_client_can_read(request):
+    return 'can_read' in request.POST
+
+
+def get_taxii_client_can_write(request):
+    return 'can_write' in request.POST
 
 
 @login_required
@@ -96,10 +105,10 @@ def create(request):
         return error_page_inactive(request)
     try:
         setting_name = get_taxii_client_create_display_name(request)
-        if(setting_name is None or len(setting_name) == 0):
+        if not setting_name:
             return error_page_free_format(request, 'No Display Name.')
         address = get_taxii_client_create_address(request)
-        if(address is None or len(address) == 0):
+        if not address:
             return error_page_free_format(request, 'No Address.')
         try:
             port = get_taxii_client_create_port(request)
@@ -108,10 +117,10 @@ def create(request):
         except ValueError:
             return error_page_free_format(request, 'Invalid port.')
         path = get_taxii_client_create_path(request)
-        if(path is None or len(path) == 0):
+        if not path:
             return error_page_free_format(request, 'No Path.')
         collection = get_taxii_client_create_collection(request)
-        if(collection is None or len(collection) == 0):
+        if not collection:
             return error_page_free_format(request, 'No Collection.')
         login_id = get_taxii_client_create_login_id(request)
         login_password = get_taxii_client_create_login_password(request)
@@ -123,15 +132,13 @@ def create(request):
         protocol_version = get_taxii_client_create_protocol_version(request)
         push = get_taxii_client_create_push(request)
         uploader_id = int(get_taxii_client_create_uploader_id(request))
-        if(ca):
-            if certificate is None:
-                return error_page_free_format(request, 'No Certificate.')
-            if private_key is None:
-                return error_page_free_format(request, 'No Private Key.')
-            if ssl is not True:
+        can_read = get_taxii_client_can_read(request)
+        can_write = get_taxii_client_can_write(request)
+        if ca:
+            if not ssl:
                 return error_page_free_format(request, 'Use SSL.')
         else:
-            if(login_id is None or len(login_id) == 0):
+            if not login_id:
                 return error_page_free_format(request, 'No Login ID.')
 
         # taxii作成
@@ -149,7 +156,9 @@ def create(request):
                             key_file=private_key,
                             protocol_version=protocol_version,
                             push=push,
-                            uploader_id=uploader_id)
+                            uploader_id=uploader_id,
+                            can_read=can_read,
+                            can_write=can_write)
         replace_dict = get_taxii_client_common_replace_dict(request)
         replace_dict['info_msg'] = 'Create or Modify Success!!'
         # レンダリング

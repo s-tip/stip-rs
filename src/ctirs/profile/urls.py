@@ -8,7 +8,7 @@ urlpatterns = [
     # profile top
     url(r'^$', profile.top),
     # profile change_password
-    url(r'^change_password$', profile.change_password),
+    url(r'^change_password$', profile.change_password, name='password_modified'),
     # profile change_screen_name
     url(r'^change_screen_name$', profile.change_screen_name),
     # profile ajax

@@ -98,6 +98,9 @@
     <td>
         Password
     </td>
+    <td>
+        2FA
+    </td>
     </tr>
     </thead>
     <tbody>
@@ -110,13 +113,22 @@
         {{ each_user.screen_name }}
     </td>
     <td>
-        <input class="change-auth" type="checkbox" username="{{ each_user }}" config_name="is_active" {% if each_user.is_active %}checked{% endif %} {% if not user.is_superuser %}disabled{% endif %}>
+        <input class="change-active" type="checkbox" username="{{ each_user }}" config_name="is_active" {% if each_user.is_active %}checked{% endif %} {% if not user.is_superuser %}disabled{% endif %}>
     </td>
     <td>
         <input class="change-auth" type="checkbox" username="{{ each_user }}" config_name="is_admin" {% if each_user.is_admin %}checked{% endif %} {% if not user.is_superuser %}disabled{% endif %}>
     </td>
     <td>
         <a class="change-password" username="{{each_user}}">Change</a>
+    </td>
+    <td>
+        {% if each_user.totp_secret %}
+            <div id="disable-{{ each_user }}">
+                <button type="button" class="disable-2fa btn btn-danger" username="{{ each_user }}" config_name="totp_sercet" >Disable</button>
+            </div>
+        {% else %}
+            Disabled
+        {% endif %}
     </td>
     </tr>
     {% endfor %}
@@ -126,5 +138,8 @@
     <hr/>
 </div> <!--  <div class="container"> -->
 </form>
+<div id="disable-2fa-dialog" username="" config_name="">
+    <p id="dialog-message">Disable 2FA?</p>
+</div>
 </body>
 </html>

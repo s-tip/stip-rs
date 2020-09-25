@@ -6,8 +6,9 @@ from stix2.v21.bundle import Bundle
 from django.http import HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.http.response import JsonResponse
+from stip.common import get_text_field_value
+from stip.common.stip_stix2 import _get_stip_identname
 from ctirs.api import error, get_normal_response_json, authentication
-from ctirs.core.common import get_text_field_value
 from mongoengine import DoesNotExist
 from mongoengine.queryset.visitor import Q
 from ctirs.core.mongo.documents_stix import StixAttackPatterns, StixCampaignsV2,\
@@ -18,7 +19,6 @@ from ctirs.core.mongo.documents_stix import StixAttackPatterns, StixCampaignsV2,
     StixVulnerabilities, StixRelationships, StixSightings, StixLanguageContents, StixOthers
 from ctirs.core.mongo.documents import Vias, Communities
 from ctirs.core.stix.regist import regist
-from stip.common.stip_stix2 import _get_stip_identname
 
 
 def get_api_stix_files_v2_sighting_first_seen(request):
@@ -114,10 +114,6 @@ def is_exist_objects(selector, o_):
             return o_[selector]
 
 
-def get_selector_trimed_last_index(selector):
-    elems = selector.split('')
-
-
 # language_contents 作成
 def post_language_contents(request, object_ref, ctirs_auth_user):
     try:
@@ -185,6 +181,7 @@ def post_language_contents(request, object_ref, ctirs_auth_user):
         community = Communities.get_default_community()
         # stixファイルを一時ファイルに出力
         stix_file_path = tempfile.mktemp(suffix='.json')
+        print(type(bundle.serialize(indent=4, ensure_ascii=False)))
         with open(stix_file_path, 'wb+') as fp:
             fp.write(bundle.serialize(indent=4, ensure_ascii=False)).encode()
         # 登録処理
@@ -204,8 +201,7 @@ def get_language_contents(request, object_ref):
         # 表示する長さ
         object_modified = request.GET['object_modified']
         objects = StixLanguageContents.objects.filter(
-            Q(object_ref=object_ref)
-            & Q(object_modified=object_modified)).order_by('-modified')
+            Q(object_ref=object_ref) & Q(object_modified=object_modified)).order_by('-modified')
         language_contents = []
         for o_ in objects:
             language_contents.append(o_.object_)

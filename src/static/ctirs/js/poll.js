@@ -8,10 +8,16 @@ $(function(){
     //pollボタンクリック
     $('.poll-detail-button').click(function(){
     	var id = $(this).attr('taxii_client_id');
+    	var protocol_version = $(this).attr('taxii_client_protocol_version');
     	var f = $('#poll-detail');
-    	var action = f.attr('action');
+        var action = f.attr('action');
     	//actionにidを付加する
-    	f.attr('action',action + id);
+        f.attr('action',action + id);
+        var elem = document.createElement('input');
+        elem.type = 'hidden';
+        elem.name = 'protocol_version';
+        elem.value = protocol_version;
+        f.append(elem);
     	f.submit();
     });
 

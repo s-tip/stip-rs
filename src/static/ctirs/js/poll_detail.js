@@ -1,4 +1,5 @@
 $(function(){
+    $('[data-toggle="popover"]').popover();
     //error_msg表示
     function modify_taxii_error(msg){
         $('#error-msg').text(msg);
