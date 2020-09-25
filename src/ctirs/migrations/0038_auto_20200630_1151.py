@@ -13,8 +13,18 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
+            model_name='feed',
+            name='sharing_range_type',
+            field=models.CharField(choices=[('all', 'With all'), ('group', 'With a group'), ('people', 'With people')], default='all', max_length=10),
+        ),
+        migrations.AlterField(
             model_name='stipuser',
             name='language',
             field=models.CharField(choices=[('en', 'English'), ('pt-br', 'Portuguese'), ('es', 'Spanish'), ('ja', 'Japanese'), ('fr', 'French'), ('zh-cn', 'Chinese')], default='en', max_length=16),
+        ),
+        migrations.AlterField(
+            model_name='group',
+            name='locale',
+            field=models.CharField(choices=[('en', 'English'), ('pt-br', 'Portuguese'), ('es', 'Spanish'), ('ja', 'Japanese'), ('fr', 'French'), ('zh-cn', 'Chinese')], default='en', max_length=4),
         ),
     ]
