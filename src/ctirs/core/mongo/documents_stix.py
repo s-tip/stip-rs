@@ -1220,6 +1220,7 @@ class StixLanguageContents(Stix2Base):
     meta = {
         'collection': 'stix_language_contents',
     }
+
     @classmethod
     def create(cls, object_, stix_file):
         if object_ is None:
@@ -1923,3 +1924,33 @@ class SimilarScoreCache(Document):
     start_cache = fields.ReferenceField(ObservableCaches, reverse_delete_rule=CASCADE)
     end_cache = fields.ReferenceField(ObservableCaches, reverse_delete_rule=CASCADE)
     edge_type = fields.StringField(max_length=32)
+
+
+class Tags(Document):
+    tag = fields.StringField(max_length=100, unique=True)
+    object_ids = fields.ListField()
+
+    @classmethod
+    def create(cls, tag, object_ids):
+        document = Tags()
+        document.tag = tag
+        document.object_ids = object_ids
+        document.save()
+        return
+
+    @classmethod
+    def append(cls, tag, object_id):
+        try:
+            document = Tags.objects.get(tag=tag)
+        except DoesNotExist:
+            document = Tags()
+            document.tag = tag
+            document.object_ids = [object_id]
+            document.save()
+            return
+        ids = document.object_ids
+        ids.append(object_id)
+        ids = sorted(set(ids), key=ids.index)
+        document.object_ids = ids
+        document.save()
+        return
