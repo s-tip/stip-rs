@@ -133,6 +133,7 @@ class StixFiles(Document):
         StixCoursesOfAction.drop_collection()
         StixTTPs.drop_collection()
         ObservableCaches.drop_collection()
+        Tags.drop_collection()
         ExploitTargetCaches.drop_collection()
         SimilarScoreCache.drop_collection()
 
@@ -299,6 +300,9 @@ class StixFiles(Document):
             self.taxii2_stix_objects = []
             for object_ in objects:
                 type_ = object_['type']
+                if type_ != 'x-stip-sns':
+                    if 'labels' in object_:
+                        Tags.append_by_object(object_)
                 if type_ == 'attack-pattern':
                     StixAttackPatterns.create(object_, self)
                 elif type_ == 'campaign':
@@ -1954,3 +1958,8 @@ class Tags(Document):
         document.object_ids = ids
         document.save()
         return
+
+    @classmethod
+    def append_by_object(cls, object_):
+        for label in object_['labels']:
+            Tags.append(label, object_['id'])
