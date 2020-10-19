@@ -1,5 +1,7 @@
 import pytz
 import datetime
+import re
+import string
 from mongoengine.errors import DoesNotExist
 from mongoengine.queryset.visitor import Q
 from django.http import HttpResponseNotAllowed
@@ -12,6 +14,7 @@ from ctirs.core.adapter.misp.upload.control import MispUploadAdapterControl
 from stix.data_marking import MarkingSpecification
 from stix.extensions.marking.simple_marking import SimpleMarkingStructure
 import stip.common.const as const
+import stip.common.tag as tag
 
 DEFAULT_RETURN_FEEDS_NUM = 10
 STIP_SNS_COMMENT_TITLE_PREFIX = 'Comment to '
@@ -281,22 +284,30 @@ def feeds(request):
         if range_small_datetime is not None:
             QQ &= Q(produced__gte=range_small_datetime)
 
-        # package_name か post に query_string が含まれているか (大文字小文字区別せず)
         if query_string is not None:
             # 空白スペース区切りで分割
             query_strings = query_string.split(' ')
-            # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名)
+            # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
             if len(query_strings) == 1:
-                QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
+                if check_symbols(query_strings[0]) and tag.is_tag(query_strings[0]):
+                    QQ &= (Q(sns_tags__in=query_strings))
+                else:
+                    QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
+            # 空白スペース区切りの場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
             else:
                 f_flag = True
                 for q in query_strings:
                     if f_flag:
-                        # 空白スペース区切りの場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名)
-                        query = Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
+                        if check_symbols(q) and tag.is_tag(q):
+                            query = Q(sns_tags__in=[q])
+                        else:
+                            query = Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
                         f_flag = False
                     else:
-                        query &= Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
+                        if check_symbols(q) and tag.is_tag(q):
+                            query &= Q(sns_tags__in=[q])
+                        else:
+                            query &= Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
                 QQ &= (query)
 
         # user_id が指定の場合はその user_id の投稿のみを抽出
@@ -543,20 +554,28 @@ def query(request):
 
         # 空白スペース区切りで分割
         query_strings = query_string.split(' ')
-        # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名)(大文字小文字区別せず)
+        # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
         if len(query_strings) == 1:
-            QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
+            if check_symbols(query_strings[0]) and tag.is_tag(query_strings[0]):
+                QQ &= (Q(sns_tags__in=query_strings))
+            else:
+                QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
+        # 空白スペース区切りの場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
         else:
             f_flag = True
             for q in query_strings:
                 if f_flag:
-                    # 空白スペース区切りの場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名)(大文字小文字区別せず)
-                    query = Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
+                    if check_symbols(q) and tag.is_tag(q):
+                        query = Q(sns_tags__in=[q])
+                    else:
+                        query = Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
                     f_flag = False
                 else:
-                    query &= Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
+                    if check_symbols(q) and tag.is_tag(q):
+                        query &= Q(sns_tags__in=[q])
+                    else:
+                        query &= Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
             QQ &= (query)
-
         stix_files = set([])
         # Query
         for stix_file in StixFiles.objects(QQ).order_by('-produced').timeout(False):
@@ -639,3 +658,13 @@ def is_stip_sns_stix(stix_package):
         return False
     except BaseException:
         return False
+
+
+def check_symbols(word):
+    delimiter_string = string.punctuation.translate(str.maketrans({'#':'', '_':''})) + string.whitespace
+    word_list = re.split('([' + delimiter_string + '])', word)
+    if len(word_list) == 1:
+        return True
+    else:
+        return False
+
