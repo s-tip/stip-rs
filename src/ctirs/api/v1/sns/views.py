@@ -287,13 +287,15 @@ def feeds(request):
         if query_string is not None:
             # 空白スペース区切りで分割
             query_strings = query_string.split(' ')
-            # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
+            # 空白スペース区切りで検索文字列が指定されていない場合
+            # (検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
             if len(query_strings) == 1:
                 if check_symbols(query_strings[0]) and tag.is_tag(query_strings[0]):
-                    QQ &= (Q(sns_tags__in=query_strings))
+                    QQ &= Q(sns_tags__in=query_strings)
                 else:
-                    QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
-            # 空白スペース区切りの場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
+                    QQ &= Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0])
+            # 空白スペース区切りの場合
+            # (検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
             else:
                 f_flag = True
                 for q in query_strings:
@@ -308,7 +310,7 @@ def feeds(request):
                             query &= Q(sns_tags__in=[q])
                         else:
                             query &= Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
-                QQ &= (query)
+                QQ &= query
 
         # user_id が指定の場合はその user_id の投稿のみを抽出
         from ctirs.models.rs.models import STIPUser
@@ -554,13 +556,15 @@ def query(request):
 
         # 空白スペース区切りで分割
         query_strings = query_string.split(' ')
-        # 空白スペース区切りで検索文字列が指定されていない場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
+        # 空白スペース区切りで検索文字列が指定されていない場合
+        # (検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
         if len(query_strings) == 1:
             if check_symbols(query_strings[0]) and tag.is_tag(query_strings[0]):
-                QQ &= (Q(sns_tags__in=query_strings))
+                QQ &= Q(sns_tags__in=query_strings)
             else:
-                QQ &= (Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0]))
-        # 空白スペース区切りの場合(検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
+                QQ &= Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0])
+        # 空白スペース区切りの場合
+        # (検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
         else:
             f_flag = True
             for q in query_strings:
@@ -575,7 +579,7 @@ def query(request):
                         query &= Q(sns_tags__in=[q])
                     else:
                         query &= Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
-            QQ &= (query)
+            QQ &= query
         stix_files = set([])
         # Query
         for stix_file in StixFiles.objects(QQ).order_by('-produced').timeout(False):
