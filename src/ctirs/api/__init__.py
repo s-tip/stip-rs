@@ -70,9 +70,9 @@ class JsonResponse(HttpResponse):
 def error(e):
     d = {}
     d['return_code'] = '1'
-    try:
-        d['userMessage'] = e.message
-    except AttributeError:
+    if isinstance(e, Exception):
+        d['userMessage'] = str(e)
+    else:
         d['userMessage'] = 'No error message'
     return JsonResponse(d, status=500, safe=False)
 
