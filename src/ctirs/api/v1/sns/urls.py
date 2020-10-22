@@ -6,6 +6,8 @@ import ctirs.api.v1.sns.views as sns
 urlpatterns = [
     # feeds取得
     url(r'feeds$', sns.feeds),
+    # tags取得
+    url(r'feeds/tags$', sns.tags),
     # attaches(添付ファイル取得)
     url(r'attaches$', sns.attaches),
     # related_packages(comment,like,unlike取得)

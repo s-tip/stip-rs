@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http.response import JsonResponse, HttpResponseNotFound
 from ctirs.api import error
 from ctirs.core.mongo.documents import Vias, MispAdapter
-from ctirs.core.mongo.documents_stix import StixFiles, ObservableCaches
+from ctirs.core.mongo.documents_stix import StixFiles, ObservableCaches, Tags
 from ctirs.core.adapter.misp.upload.control import MispUploadAdapterControl
 from stix.data_marking import MarkingSpecification
 from stix.extensions.marking.simple_marking import SimpleMarkingStructure
@@ -23,7 +23,8 @@ STIP_SNS_UNLIKE_TITLE_PREFIX = 'Unlike to '
 STIP_SNS_TOOL_NAME_VALUE = 'S-TIP'
 STIP_SNS_TOOL_VENDOR_VALUE = 'Fujitsu'
 STIP_SNS_USER_NAME_PREFIX = 'User Name: '
-
+SUGGEST_LIMIT = 5
+SUGGEST_MIN_LENGTH = 2 
 
 # 共通
 #     : 指定文字列は str(datetime) / 2018-02-22 08:54:47.187184 形式で GMT のタイムゾーン時間帯で送る
@@ -318,9 +319,9 @@ def feeds(request):
             stip_user = STIPUser.objects.get(id=user_id)
             QQ &= (
                 # SNS 産 STIX なら instance 名とユーザ名が一致した
-                (Q(is_created_by_sns=True) & Q(sns_user_name=stip_user.username) & Q(sns_instance=instance)) |
+                (Q(is_created_by_sns=True) & Q(sns_user_name=stip_user.username) & Q(sns_instance=instance))
                 # SNS 産以外の STIX なら ユーザ名が一致した
-                (Q(is_created_by_sns__ne=True) & Q(sns_user_name=stip_user.username))
+                | (Q(is_created_by_sns__ne=True) & Q(sns_user_name=stip_user.username))
             )
 
         else:
@@ -350,6 +351,7 @@ def feeds(request):
         traceback.print_exc()
         return error(e)
 
+
 # GET /api/v1/sns/attaches
 @csrf_exempt
 def attaches(request):
@@ -376,6 +378,7 @@ def attaches(request):
         traceback.print_exc()
         return error(e)
 
+
 # GET /api/v1/sns/related_packages
 @csrf_exempt
 def related_packages(request):
@@ -397,6 +400,7 @@ def related_packages(request):
         import traceback
         traceback.print_exc()
         return error(e)
+
 
 # GET /api/v1/sns/content
 @csrf_exempt
@@ -470,6 +474,7 @@ def comments(request):
         traceback.print_exc()
         return error(e)
 
+
 # GET /api/v1/sns/likers
 @csrf_exempt
 def likers(request):
@@ -510,6 +515,7 @@ def likers(request):
         traceback.print_exc()
         return error(e)
 
+
 # GET /api/v1/sns/share_misp
 @csrf_exempt
 def share_misp(request):
@@ -534,6 +540,7 @@ def share_misp(request):
         import traceback
         traceback.print_exc()
         return error(e)
+
 
 # GET /api/v1/sns/query
 @csrf_exempt
@@ -665,10 +672,34 @@ def is_stip_sns_stix(stix_package):
 
 
 def check_symbols(word):
-    delimiter_string = string.punctuation.translate(str.maketrans({'#':'', '_':''})) + string.whitespace
+    delimiter_string = string.punctuation.translate(str.maketrans({'#': '', '_': ''})) + string.whitespace
     word_list = re.split('([' + delimiter_string + '])', word)
     if len(word_list) == 1:
         return True
     else:
         return False
 
+
+# GET /api/v1/sns/feeds/tags
+@csrf_exempt
+def tags(request):
+    try:
+        suggest_list = []
+        # GET 以外はエラー
+        if request.method != 'GET':
+            return HttpResponseNotAllowed(['GET'])
+        word = request.GET.get('word')
+        if not word or len(word) < SUGGEST_MIN_LENGTH:
+            return JsonResponse(suggest_list, safe=False)
+        if word[0] != '#':
+            return JsonResponse(suggest_list, safe=False)
+        # Get the top 5(SUGGEST_LIMIT) results, Alphabet ascending order.
+        tags = Tags.objects.filter(tag__startswith=word).order_by('tag').limit(SUGGEST_LIMIT)
+        for tag in tags:
+            value = {"value": tag.tag}
+            suggest_list.append(value)
+        return JsonResponse(suggest_list, safe=False)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return error(e)
