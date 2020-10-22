@@ -23,7 +23,8 @@ STIP_SNS_UNLIKE_TITLE_PREFIX = 'Unlike to '
 STIP_SNS_TOOL_NAME_VALUE = 'S-TIP'
 STIP_SNS_TOOL_VENDOR_VALUE = 'Fujitsu'
 STIP_SNS_USER_NAME_PREFIX = 'User Name: '
-
+SUGGEST_LIMIT = 5
+SUGGEST_MIN_LENGTH = 2 
 
 # 共通
 #     : 指定文字列は str(datetime) / 2018-02-22 08:54:47.187184 形式で GMT のタイムゾーン時間帯で送る
@@ -683,18 +684,19 @@ def check_symbols(word):
 @csrf_exempt
 def tags(request):
     try:
+        suggest_list = []
         # GET 以外はエラー
         if request.method != 'GET':
             return HttpResponseNotAllowed(['GET'])
         word = request.GET.get('word')
-        if not word or len(word) < 1:
-            raise Exception("Parameter Error")
+        if not word or len(word) < SUGGEST_MIN_LENGTH:
+            return JsonResponse(suggest_list, safe=False)
+        if word[0] != '#':
+            return JsonResponse(suggest_list, safe=False)
         # Get the top 5(SUGGEST_LIMIT) results, Alphabet ascending order.
-        tags = Tags.objects.filter(tag__startswith=word).order_by('tag')
-        suggest_list = []
+        tags = Tags.objects.filter(tag__startswith=word).order_by('tag').limit(SUGGEST_LIMIT)
         for tag in tags:
             value = {"value": tag.tag}
-            print(value)
             suggest_list.append(value)
         return JsonResponse(suggest_list, safe=False)
     except Exception as e:
