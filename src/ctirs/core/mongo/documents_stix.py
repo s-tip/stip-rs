@@ -27,6 +27,8 @@ from ctirs.core.mongo.documents_taxii21_objects import StixObject as TXS21_SO
 from ctirs.core.mongo.documents_taxii21_objects import get_modified_from_object, StixManifest
 from stip.common.tld import TLD
 from stip.common.x_stip_sns import StipSns  # noqa
+from stip.common.label import sanitize_id
+
 
 DESCRIPTION_LENGTH = 10240
 
@@ -134,6 +136,7 @@ class StixFiles(Document):
         StixCoursesOfAction.drop_collection()
         StixTTPs.drop_collection()
         ObservableCaches.drop_collection()
+        LabelCaches.drop_collection()
         Tags.drop_collection()
         ExploitTargetCaches.drop_collection()
         SimilarScoreCache.drop_collection()
@@ -303,6 +306,7 @@ class StixFiles(Document):
                 type_ = object_['type']
                 if type_ != 'x-stip-sns':
                     if 'labels' in object_:
+                        LabelCaches.create(object_, self)
                         Tags.append_by_object(object_)
                         self.sns_tags.extend(object_['labels'])
                         self.sns_tags = list(set(self.sns_tags))
@@ -513,6 +517,30 @@ class StixFiles(Document):
             'comment': self.comment,
         }
         return d
+
+
+class LabelCaches(Document):
+    label = fields.StringField(max_length=1024)
+    node_id = fields.StringField(max_length=100)
+    package_id = fields.StringField(max_length=1024)
+    stix_file = fields.ReferenceField(StixFiles, reverse_delete_rule=CASCADE)
+
+    @classmethod
+    def create(cls, object_, stix_file):
+        if object_ is None:
+            return
+        if 'labels' not in object_:
+            return
+        for label in object_['labels']:
+            if len(label) == 0:
+                return
+            document = LabelCaches()
+            document.stix_file = stix_file
+            document.label = label
+            document.package_id = stix_file.package_id
+            document.node_id = '%s--%s' % (sanitize_id(label), object_['id'])
+            document.save()
+        return document
 
 
 class IndicatorV2Caches(Document):
