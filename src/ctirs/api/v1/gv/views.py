@@ -14,7 +14,8 @@ from ctirs.api import error, authentication, get_normal_response_json
 from ctirs.core.mongo.documents import Communities
 from ctirs.core.mongo.documents_stix import ObservableCaches, SimilarScoreCache, StixFiles, \
     StixCampaigns, StixIncidents, StixIndicators, StixObservables, StixThreatActors, \
-    StixExploitTargets, StixCoursesOfAction, StixTTPs, ExploitTargetCaches, IndicatorV2Caches, StixLanguageContents
+    StixExploitTargets, StixCoursesOfAction, StixTTPs, ExploitTargetCaches, \
+    IndicatorV2Caches, StixLanguageContents, LabelCaches
 from stip.common.tld import TLD
 from mongoengine import DoesNotExist
 from .stix2_indicator import _get_observed_data
@@ -319,6 +320,14 @@ def _get_exact_matched_info(package_id):
             # start_node の検索先は ObservableCaches or ExploitTargetCaches
             exact.start_collection = IndicatorV2Caches
             # 格納するのは (指定の package_id) の Indicator v2 にマッチする (指定の package_id 以外に)IndicatorV2Cache
+            ret_observable_cashes.append(exact)
+
+    label_caches = LabelCaches.objects.filter(package_id=package_id)
+    for label_cache in label_caches:
+        exacts = LabelCaches.objects.filter(
+            Q(label__iexact=label_cache.label)
+            & Q(package_id__ne=package_id))
+        for exact in exacts:
             ret_observable_cashes.append(exact)
     return ret_observable_cashes
 
@@ -658,17 +667,19 @@ def contents_and_edges(request):
                     # 指定がない場合は end_info と同じ
                     collection = type(end_info)
                 # コレクションから終点情報に合致する始点を検索
-                if collection != IndicatorV2Caches:
-                    # IndicatorV2Caches 以外
+                if collection == IndicatorV2Caches:
+                    start_caches = collection.objects.filter(
+                        package_id=package_id,
+                        pattern=end_info.pattern)
+                elif collection == LabelCaches:
+                    start_caches = collection.objects.filter(
+                        package_id=package_id,
+                        label__iexact=end_info.label)
+                else:
                     start_caches = collection.objects.filter(
                         package_id=package_id,
                         type=end_info.type,
                         value=end_info.value)
-                else:
-                    # IndicatorV2Caches
-                    start_caches = collection.objects.filter(
-                        package_id=package_id,
-                        pattern=end_info.pattern)
                 # 開始位置情報と線情報を格納する
                 for start_cache in start_caches:
                     start_node = {
