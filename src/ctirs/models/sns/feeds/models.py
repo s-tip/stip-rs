@@ -51,7 +51,7 @@ class Feed(models.Model):
     user = models.ForeignKey(STIPUser)
     date = models.DateTimeField(null=True)
     post = models.TextField(max_length=1024)
-    post_org = models.TextField(max_length=1024)
+    post_org = models.TextField(max_length=1024, default='')
     likes = models.IntegerField(default=0)
     comments = models.IntegerField(default=0)
     files = models.ManyToManyField(AttachFile)
