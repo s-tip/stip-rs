@@ -492,10 +492,8 @@ class Feed(models.Model):
         if stip_sns:
             if 'description' in stip_sns:
                 feed.post_org = stip_sns['description']
-                feed.post = stip_sns['description']
             else:
                 feed.post_org = ''
-                feed.post = ''
             if 'name' in stip_sns:
                 feed.title = stip_sns['name']
             else:
@@ -532,14 +530,6 @@ class Feed(models.Model):
                     break
             if not feed.post_org:
                 feed.post_org = 'Post, %s' % (feed.package_id)
-            feed.post = None
-            for report in reports:
-                if 'description' in report:
-                    feed.post = report['description']
-                    break
-            if not feed.post:
-                feed.post = 'Post, %s' % (feed.package_id)
-
             feed.title = None
             for report in reports:
                 if 'name' in report:
@@ -670,9 +660,6 @@ class Feed(models.Model):
         feed.post_org = stix_package.stix_header.description
         if feed.post_org is None:
             feed.post_org = ''
-        feed.post = stix_package.stix_header.description
-        if feed.post is None:
-            feed.post = ''
 
         if Feed.is_stip_sns_stix_package_v1(stix_package):
             if stix_package.related_packages is not None:
