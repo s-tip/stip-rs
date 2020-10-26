@@ -99,6 +99,7 @@ class StixFiles(Document):
     post = fields.StringField(default=None)
     taxii2_stix_objects = fields.ListField(fields.ReferenceField(TXS21_SO, dbref=True))
     sns_tags = fields.ListField(default=[])
+    sns_lower_tags = fields.ListField(default=[])
 
     meta = {
         'indexes': [
@@ -310,6 +311,7 @@ class StixFiles(Document):
                         Tags.append_by_object(object_)
                         self.sns_tags.extend(object_['labels'])
                         self.sns_tags = list(set(self.sns_tags))
+                        self.sns_lower_tags = list(set(map(str.lower, self.sns_tags)))
                 if type_ == 'attack-pattern':
                     StixAttackPatterns.create(object_, self)
                 elif type_ == 'campaign':
