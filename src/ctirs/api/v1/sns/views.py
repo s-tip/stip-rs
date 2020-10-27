@@ -292,7 +292,7 @@ def feeds(request):
             # (検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
             if len(query_strings) == 1:
                 if check_symbols(query_strings[0]) and tag.is_tag(query_strings[0]):
-                    QQ &= Q(sns_tags__in=query_strings)
+                    QQ &= Q(sns_lower_tags__in=[query_strings[0].lower()])
                 else:
                     QQ &= Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0])
             # 空白スペース区切りの場合
@@ -302,13 +302,13 @@ def feeds(request):
                 for q in query_strings:
                     if f_flag:
                         if check_symbols(q) and tag.is_tag(q):
-                            query = Q(sns_tags__in=[q])
+                            query = Q(sns_lower_tags__in=[q.lower()])
                         else:
                             query = Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
                         f_flag = False
                     else:
                         if check_symbols(q) and tag.is_tag(q):
-                            query &= Q(sns_tags__in=[q])
+                            query &= Q(sns_lower_tags__in=[q.lower()])
                         else:
                             query &= Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
                 QQ &= query
@@ -567,7 +567,7 @@ def query(request):
         # (検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
         if len(query_strings) == 1:
             if check_symbols(query_strings[0]) and tag.is_tag(query_strings[0]):
-                QQ &= Q(sns_tags__in=query_strings)
+                QQ &= Q(sns_lower_tags__in=[query_strings[0].lower()])
             else:
                 QQ &= Q(package_name__icontains=query_strings[0]) | Q(post__icontains=query_strings[0]) | Q(sns_user_name__icontains=query_strings[0]) | Q(sns_screen_name__icontains=query_strings[0])
         # 空白スペース区切りの場合
@@ -577,13 +577,13 @@ def query(request):
             for q in query_strings:
                 if f_flag:
                     if check_symbols(q) and tag.is_tag(q):
-                        query = Q(sns_tags__in=[q])
+                        query = Q(sns_lower_tags__in=[q.lower()])
                     else:
                         query = Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
                     f_flag = False
                 else:
                     if check_symbols(q) and tag.is_tag(q):
-                        query &= Q(sns_tags__in=[q])
+                        query &= Q(sns_lower_tags__in=[q.lower()])
                     else:
                         query &= Q(package_name__icontains=q) | Q(post__icontains=q) | Q(sns_user_name__icontains=q) | Q(sns_screen_name__icontains=q)
             QQ &= query
@@ -694,7 +694,7 @@ def tags(request):
         if word[0] != '#':
             return JsonResponse(suggest_list, safe=False)
         # Get the top 5(SUGGEST_LIMIT) results, Alphabet ascending order.
-        tags = Tags.objects.filter(tag__startswith=word).order_by('tag').limit(SUGGEST_LIMIT)
+        tags = Tags.objects.filter(tag__istartswith=word).order_by('tag').limit(SUGGEST_LIMIT)
         for tag in tags:
             value = {"value": tag.tag}
             suggest_list.append(value)
