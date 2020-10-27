@@ -491,8 +491,10 @@ class Feed(models.Model):
 
         if stip_sns:
             if 'description' in stip_sns:
+                feed.post = stip_sns['description']
                 feed.post_org = stip_sns['description']
             else:
+                feed.post = ''
                 feed.post_org = ''
             if 'name' in stip_sns:
                 feed.title = stip_sns['name']
@@ -523,6 +525,13 @@ class Feed(models.Model):
                 feed.tlp = None
                 sharing_range_info = None
         else:
+            feed.post = None
+            for report in reports:
+                if 'description' in report:
+                    feed.post = report['description']
+                    break
+            if not feed.post:
+                feed.post = 'Post, %s' % (feed.package_id)
             feed.post_org = None
             for report in reports:
                 if 'description' in report:
@@ -657,6 +666,9 @@ class Feed(models.Model):
                     Feed.set_screen_value_from_local_db(feed, bean)
 
         feed.date = Feed.get_datetime_from_string(produced_str)
+        feed.post = stix_package.stix_header.description
+        if feed.post is None:
+            feed.post = ''
         feed.post_org = stix_package.stix_header.description
         if feed.post_org is None:
             feed.post_org = ''
