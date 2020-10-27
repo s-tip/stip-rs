@@ -51,6 +51,7 @@ class Feed(models.Model):
     user = models.ForeignKey(STIPUser)
     date = models.DateTimeField(null=True)
     post = models.TextField(max_length=1024)
+    post_org = models.TextField(max_length=1024, default='')
     likes = models.IntegerField(default=0)
     comments = models.IntegerField(default=0)
     files = models.ManyToManyField(AttachFile)
@@ -490,10 +491,9 @@ class Feed(models.Model):
 
         if stip_sns:
             if 'description' in stip_sns:
-                feed.post = stip_sns['description']
+                feed.post_org = feed.post = stip_sns['description']
             else:
-                feed.post = ''
-
+                feed.post_org = feed.post = ''
             if 'name' in stip_sns:
                 feed.title = stip_sns['name']
             else:
@@ -523,14 +523,15 @@ class Feed(models.Model):
                 feed.tlp = None
                 sharing_range_info = None
         else:
-            feed.post = None
+            feed.post_org = feed.post = None
             for report in reports:
                 if 'description' in report:
-                    feed.post = report['description']
+                    feed.post_org = feed.post = report['description']
                     break
+            if not feed.post_org:
+                feed.post_org = 'Post, %s' % (feed.package_id)
             if not feed.post:
                 feed.post = 'Post, %s' % (feed.package_id)
-
             feed.title = None
             for report in reports:
                 if 'name' in report:
@@ -658,8 +659,10 @@ class Feed(models.Model):
                     Feed.set_screen_value_from_local_db(feed, bean)
 
         feed.date = Feed.get_datetime_from_string(produced_str)
-        feed.post = stix_package.stix_header.description
-        if feed.post is None:
+        feed.post_org = feed.post = stix_package.stix_header.description
+        if not feed.post_org:
+            feed.post_org = ''
+        if not feed.post:
             feed.post = ''
 
         if Feed.is_stip_sns_stix_package_v1(stix_package):
