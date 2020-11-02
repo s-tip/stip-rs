@@ -696,8 +696,7 @@ def tags(request):
         # Get the top 5(SUGGEST_LIMIT) results, Alphabet ascending order.
         tags = Tags.objects.filter(tag__istartswith=word).order_by('tag').limit(SUGGEST_LIMIT)
         for tag in tags:
-            value = {"value": tag.tag}
-            suggest_list.append(value)
+            suggest_list.append(tag.tag)
         return JsonResponse(suggest_list, safe=False)
     except Exception as e:
         import traceback
