@@ -287,7 +287,7 @@ def feeds(request):
 
         if query_string is not None:
             # 空白スペース区切りで分割
-            query_strings = query_string.split(' ')
+            query_strings = re.split('[ ,　]', query_string)
             # 空白スペース区切りで検索文字列が指定されていない場合
             # (検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
             if len(query_strings) == 1:
@@ -562,7 +562,7 @@ def query(request):
         QQ = Q(is_post_sns__ne=False) & Q(version__ne='2.0')
 
         # 空白スペース区切りで分割
-        query_strings = query_string.split(' ')
+        query_strings = re.split('[ ,　]', query_string)
         # 空白スペース区切りで検索文字列が指定されていない場合
         # (検索対象: 投稿/タイトル/ユーザ名/スクリーン名/タグ)(タグ以外は大文字小文字区別せず)
         if len(query_strings) == 1:
