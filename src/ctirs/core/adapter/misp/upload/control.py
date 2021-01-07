@@ -22,7 +22,11 @@ class MispUploadAdapterControl(object):
         url = misp_conf.url
         scheme = urllib.parse.urlparse(url).scheme
         host = urllib.parse.urlparse(url).hostname
-        url = '%s://%s/%s' % (scheme, host, 'events')
+        port = urllib.parse.urlparse(url).port
+        if port:
+            url = '%s://%s:%d/%s' % (scheme, host, port, 'events')
+        else:
+            url = '%s://%s/%s' % (scheme, host, 'events')
         self.py_misp = PyMISP(url=url, key=misp_conf.apikey, ssl=False, proxies=System.get_request_proxies())
         return
 
