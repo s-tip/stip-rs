@@ -18,6 +18,7 @@ from ctirs.core.mongo.documents_stix import StixAttackPatterns, StixCampaignsV2,
     StixVulnerabilities, StixRelationships, StixSightings, StixLanguageContents, StixOthers, StixFiles
 from ctirs.core.mongo.documents import Vias, Communities
 from ctirs.core.stix.regist import regist
+from ctirs.api.v1.package_id.views import delete_stix_file_package_id_document_info
 
 
 def get_api_stix_files_v2_sighting_first_seen(request):
@@ -180,21 +181,45 @@ def get_language_contents(request, object_ref):
         traceback.print_exc()
         return error(e)
 
+
 # /api/v1/stix_files_v2/object/<object_id>
 @csrf_exempt
-def get_object_main(request, object_id):
+def object_main(request, object_id):
     ctirs_auth_user = authentication(request)
     if not ctirs_auth_user:
         return error(Exception('You have no permission for this operation.'))
     try:
-        if request.method != 'GET':
-            return HttpResponseNotAllowed(['GET'])
-        object_ = get_object(object_id)
+        if request.method == 'GET':
+            return _get_object_main(request, object_id)
+        if request.method == 'DELETE':
+            return _delete_object_main(request, object_id)
+        return HttpResponseNotAllowed(['GET', 'DELETE'])
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return error(e)
+
+
+# GET /api/v1/stix_files_v2/object/<object_id>
+def _get_object_main(request, object_id):
+    object_ = get_object(object_id)
+    resp = get_normal_response_json()
+    if object_:
+        resp['data'] = object_
+    else:
+        resp['data'] = None
+    return JsonResponse(resp, status=200, safe=False)
+
+
+# DELETE /api/v1/stix_files_v2/object/<object_id>
+def _delete_object_main(request, object_id):
+    doc = _get_document(object_id)
+    if not doc:
+        return error(Exception(object_id + ' does not exist.'))
+    try: 
+        remove_package_ids = delete_stix_file_package_id_document_info(doc.package_id)
         resp = get_normal_response_json()
-        if object_:
-            resp['data'] = object_
-        else:
-            resp['data'] = None
+        resp['data'] = {"remove_package_ids": remove_package_ids}
         return JsonResponse(resp, status=200, safe=False)
     except Exception as e:
         import traceback
