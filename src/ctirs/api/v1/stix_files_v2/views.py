@@ -216,7 +216,7 @@ def _delete_object_main(request, object_id):
     doc = _get_document(object_id)
     if not doc:
         return error(Exception(object_id + ' does not exist.'))
-    try: 
+    try:
         remove_package_ids = delete_stix_file_package_id_document_info(doc.package_id)
         resp = get_normal_response_json()
         resp['data'] = {"remove_package_ids": remove_package_ids}
