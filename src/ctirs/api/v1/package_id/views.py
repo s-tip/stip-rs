@@ -19,8 +19,8 @@ def stix_files_package_id(request, package_id):
             return get_stix_file_package_id_document_info(request, package_id)
         elif request.method == 'DELETE':
             # STIX ファイル情報削除
-            remove_package_ids = delete_stix_file_package_id_document_info(package_id)
-            return api_root.get_delete_normal_status({"remove_package_ids": remove_package_ids})
+            delete_stix_file_package_id_document_info(package_id)
+            return api_root.get_delete_normal_status({'remove_package_id': package_id})
         else:
             return HttpResponseNotAllowed(['GET', 'DELETE'])
     except Exception as e:
@@ -41,8 +41,7 @@ def get_stix_file_package_id_document_info(request, package_id):
 # DELETE /api/v1/stix_files_package_id/<package_id>
 def delete_stix_file_package_id_document_info(package_id):
     try:
-        remove_package_ids = api_root.delete_stix_related_document(package_id=package_id)
-        return remove_package_ids
+        api_root.delete_stix_document(package_id=package_id)
     except Exception as e:
         return api_root.error(e)
 
