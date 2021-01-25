@@ -301,6 +301,10 @@ class StixFiles(Document):
         try:
             f = open(self.origin_path, 'r', encoding='utf-8')
             j = json.load(f)
+            if 'objects' not in j:
+                self.save()
+                f.close()
+                return
             objects = j['objects']
             self.taxii2_stix_objects = []
             for object_ in objects:
@@ -464,7 +468,7 @@ class StixFiles(Document):
         return d
 
     def get_rest_api_document_content(self):
-        return {'content': self.content.read()}
+        return {'content': self.content.read().decode('utf-8')}
 
     def get_webhook_document(self):
         return self.get_rest_api_document_info()
