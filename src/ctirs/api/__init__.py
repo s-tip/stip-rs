@@ -1,12 +1,8 @@
 import os
 import json
 from django.http.response import HttpResponse
-from ctirs.models.rs.models import STIPUser
 from ctirs.core.mongo.documents_stix import StixFiles
-
-# apikey認証
-# 認証されない場合はNoneを返却
-# 認証された場合はCtirsAuthUserを返却
+from stip.common.rest_api_auth import auth_by_api_key
 
 
 def authentication(request):
@@ -14,20 +10,7 @@ def authentication(request):
     api_key = _get_api_api_key(request)
     if ((username is None) or (api_key is None)):
         return None
-    try:
-        user_doc = STIPUser.objects.get(username=username)
-    except Exception:
-        return None
-    if user_doc is None:
-        return None
-    if user_doc.api_key != api_key:
-        return None
-    return user_doc
-
-# http_headerに
-# username=<username>
-# apkey=<apikey>
-# を格納する
+    return auth_by_api_key(username, api_key)
 
 
 def _get_api_user(request):
