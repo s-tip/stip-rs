@@ -442,7 +442,8 @@ class Feed(models.Model):
         stix_file_path = rs.get_stix_file_path(api_user, package_id)
         with open(stix_file_path, 'r', encoding='utf-8') as fp:
             bundle = json.load(fp)
-
+        if 'objects' not in bundle:
+            return None
         if not feed:
             feed = Feed()
         feed.stix_version = version
@@ -765,7 +766,8 @@ class Feed(models.Model):
         packages_from_rs = rs.query(api_user, query_string, size)
         for package_from_rs in packages_from_rs:
             feed = Feed.get_feeds_from_package_from_rs(api_user, package_from_rs)
-            feeds_.append(feed)
+            if feed:
+                feeds_.append(feed)
         return feeds_
 
     @staticmethod
@@ -808,7 +810,8 @@ class Feed(models.Model):
         feeds_ = []
         for package_from_rs in packages_from_rs:
             feed = Feed.get_feeds_from_package_from_rs(api_user, package_from_rs)
-            feeds_.append(feed)
+            if feed:
+                feeds_.append(feed)
         return Feed.get_filter_query_set(None, api_user, feeds_=feeds_)
 
     @staticmethod
