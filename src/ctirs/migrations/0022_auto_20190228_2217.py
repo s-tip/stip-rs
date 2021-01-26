@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='snsconfig',
             name='stix_ns_url',
-            field=models.TextField(default=b'http://fsi.fujitsu.com', max_length=128),
+            field=models.TextField(default=b'http://s-tip.cloud', max_length=128),
         ),
         migrations.AlterField(
             model_name='group',

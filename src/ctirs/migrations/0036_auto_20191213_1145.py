@@ -221,7 +221,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='snsconfig',
             name='stix_ns_url',
-            field=models.TextField(default='http://fsi.fujitsu.com', max_length=128),
+            field=models.TextField(default='http://s-tip.cloud', max_length=128),
         ),
         migrations.AlterField(
             model_name='stipuser',
