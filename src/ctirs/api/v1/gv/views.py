@@ -210,7 +210,7 @@ def _get_exact_matched_info(package_id):
     ret_observable_cashes = []
 
     cache_collections = [
-        ObservableCaches,  # STIX 1.x/2.x の Observables
+        ObservableCaches,
         ExploitTargetCaches,
     ]
 
