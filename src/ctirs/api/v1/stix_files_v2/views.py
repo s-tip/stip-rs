@@ -9,6 +9,7 @@ from django.http.response import JsonResponse
 from stip.common import get_text_field_value
 from stip.common.stip_stix2 import _get_stip_identname
 from ctirs.api import error, get_normal_response_json, authentication
+from ctirs.api.v1.decolators import api_key_auth
 from mongoengine.queryset.visitor import Q
 from ctirs.core.mongo.documents_stix import StixAttackPatterns, StixCampaignsV2,\
     StixCoursesOfActionV2, StixIdentities, StixIndicatorsV2, \
@@ -34,6 +35,7 @@ def get_api_stix_files_v2_sighting_count(request):
 
 # /api/v1/stix_files_v2/<observed_data_id>/sighting
 @csrf_exempt
+@api_key_auth
 def sighting(request, observed_data_id):
     ctirs_auth_user = authentication(request)
     if not ctirs_auth_user:
@@ -64,6 +66,7 @@ def sighting(request, observed_data_id):
 
 # /api/v1/stix_files_v2/<object_ref>/language_contents
 @csrf_exempt
+@api_key_auth
 def language_contents(request, object_ref):
     ctirs_auth_user = authentication(request)
     if not ctirs_auth_user:
@@ -184,10 +187,8 @@ def get_language_contents(request, object_ref):
 
 # /api/v1/stix_files_v2/object/<object_id>
 @csrf_exempt
+@api_key_auth
 def object_main(request, object_id):
-    ctirs_auth_user = authentication(request)
-    if not ctirs_auth_user:
-        return error(Exception('You have no permission for this operation.'))
     try:
         if request.method == 'GET':
             return _get_object_main(request, object_id)
@@ -251,11 +252,9 @@ def _get_document(object_id):
 
 
 # /api/v1/stix_files_v2/search_bundle
+@api_key_auth
 def search_bundle(request):
     SEARCH_KEY_OBJECT_ID = 'match[object_id]'
-    ctirs_auth_user = authentication(request)
-    if ctirs_auth_user is None:
-        return error(Exception('You have no permission for this operation.'))
     try:
         if request.method != 'GET':
             return HttpResponseNotAllowed(['GET'])
