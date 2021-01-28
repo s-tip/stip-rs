@@ -22,7 +22,7 @@ class SNSConfig(models.Model):
     DEFAULT_GV_L2_URL = ''
     DEFAULT_RS_COMMUNITY_NAME = 'Default Community'
     DEFAULT_SMTP_PORT = 25
-    DEFAULT_NS_URL = 'http://fsi.fujitsu.com'
+    DEFAULT_NS_URL = 'http://s-tip.cloud'
     DEFAULT_NS_NAME = 's-tip'
     DEFAULT_SLACK_BOT_CHANNEL = '#s-tip'
     DEFAULT_PAHNTOM_SOURCE_NAME = 'local'

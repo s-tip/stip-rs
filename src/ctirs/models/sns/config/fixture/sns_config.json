@@ -30,7 +30,7 @@
             "jira_type": "",
             "smtp_port": 25,
             "smtp_accept_mail_address": "",
-            "stix_ns_url": "http://fsi.fujitsu.com",
+            "stix_ns_url": "http://s-tip.cloud",
             "stix_ns_name": "s-tip"
         }
     } 
