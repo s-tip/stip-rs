@@ -144,6 +144,7 @@ class StixFiles(Document):
         Tags.drop_collection()
         ExploitTargetCaches.drop_collection()
         IndicatorV2Caches.drop_collection()
+        StipCustomObjectCaches.drop_collection()
         SimilarScoreCache.drop_collection()
 
         StixAttackPatterns.drop_collection()
@@ -163,6 +164,7 @@ class StixFiles(Document):
         StixSightings.drop_collection()
         StixLanguageContents.drop_collection()
         StixOthers.drop_collection()
+        StixStipCustomObjects.drop_collection()
 
         TXS21_SO.drop_collection()
         StixManifest.drop_collection()
@@ -358,6 +360,8 @@ class StixFiles(Document):
                     StixSightings.create(object_, self)
                 elif type_ == 'language-content':
                     StixLanguageContents.create(object_, self)
+                elif type_.startswith('x-'):
+                    StixStipCustomObjects.create(object_, self)
                 else:
                     StixOthers.create(object_, self)
 
@@ -1284,6 +1288,33 @@ class StixLanguageContents(Stix2Base):
         return document
 
 
+class StixStipCustomObjects(Stix2Base):
+    x_stip_value = fields.DictField()
+    object_type = fields.StringField(max_length=128)
+
+    meta = {
+        'collection': 'stix_custom_objects'
+    }
+
+    @classmethod
+    def create(cls, object_, stix_file):
+        if object_ is None:
+            return None
+        if ('x_stip_value' not in object_):
+            return None
+        document = StixStipCustomObjects()
+        document = super(StixStipCustomObjects, cls).create(document, object_, stix_file)
+        if ('name' in object_):
+            document.name = object_['name']
+        if ('description' in object_):
+            document.description = object_['description']
+        document.x_stip_value = object_['x_stip_value']
+        document.object_type = object_['type']
+        document.save()
+        StipCustomObjectCaches.create(document)
+        return document
+
+
 class StixOthers(Stix2Base):
     meta = {
         'collection': 'stix_others'
@@ -1610,6 +1641,46 @@ class StixTTPs(Document):
         return
 
 
+class StipCustomObjectCaches(Document):
+    type = fields.StringField(max_length=128)
+    title = fields.StringField(max_length=1024)
+    description = fields.StringField(max_length=DESCRIPTION_LENGTH)
+    created = fields.DateTimeField(default=datetime.datetime.now)
+    modified = fields.DateTimeField(default=datetime.datetime.now)
+    stix_file = fields.ReferenceField(StixFiles, reverse_delete_rule=CASCADE)
+    package_name = fields.StringField(max_length=1024)
+    package_id = fields.StringField(max_length=100)
+    node_id = fields.StringField(max_length=100, unique=True)
+    value = fields.StringField(max_length=1024)
+
+    meta = {
+        'indexes': [
+            ('#node_id'),
+        ]
+    }
+
+    @classmethod
+    def create(cls, stip_custom_object):
+        if stip_custom_object is None:
+            return
+        if not isinstance(stip_custom_object.x_stip_value, dict):
+            return
+        for prop in stip_custom_object.x_stip_value.keys():
+            v = stip_custom_object.x_stip_value[prop]
+            node_id = '%s-%s' % (stip_custom_object.object_id_, prop)
+            document = StipCustomObjectCaches()
+            document.type = '%s:%s' % (stip_custom_object.object_type, prop)
+            document.title = stip_custom_object.name
+            document.description = stip_custom_object.description
+            document.value = v
+            document.stix_file = stip_custom_object.stix_file
+            document.package_name = stip_custom_object.package_name
+            document.package_id = stip_custom_object.package_id
+            document.node_id = node_id
+            document.save()
+        return
+
+
 class ExploitTargetCaches(Document):
     TYPE_CHOICES = (
         ('cve_id', 'cve_id'),
@@ -1663,6 +1734,8 @@ class ExploitTargetCaches(Document):
             return
         for cve in stix_vulnerability.cves:
             node_id = '%s-%s' % (stix_vulnerability.object_id_, cve)
+            if len(ExploitTargetCaches.objects.filter(et_id=node_id)) != 0:
+                continue
             document = ExploitTargetCaches()
             document.type = 'cve_id'
             document.et_id = node_id
