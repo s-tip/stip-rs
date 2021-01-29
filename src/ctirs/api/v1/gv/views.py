@@ -15,7 +15,7 @@ from ctirs.core.mongo.documents import Communities
 from ctirs.core.mongo.documents_stix import ObservableCaches, SimilarScoreCache, StixFiles, \
     StixCampaigns, StixIncidents, StixIndicators, StixObservables, StixThreatActors, \
     StixExploitTargets, StixCoursesOfAction, StixTTPs, ExploitTargetCaches, \
-    IndicatorV2Caches, StixLanguageContents, LabelCaches
+    IndicatorV2Caches, StixLanguageContents, LabelCaches, StipCustomObjectCaches
 from stip.common.tld import TLD
 from mongoengine import DoesNotExist
 from .stix2_indicator import _get_observed_data
@@ -212,6 +212,7 @@ def _get_exact_matched_info(package_id):
     cache_collections = [
         ObservableCaches,
         ExploitTargetCaches,
+        StipCustomObjectCaches,
     ]
 
     for cache_collection in cache_collections:
