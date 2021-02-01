@@ -140,6 +140,7 @@ class StixFiles(Document):
         LabelCaches.drop_collection()
         Tags.drop_collection()
         ExploitTargetCaches.drop_collection()
+        IndicatorV2Caches.drop_collection()
         SimilarScoreCache.drop_collection()
 
         StixAttackPatterns.drop_collection()
