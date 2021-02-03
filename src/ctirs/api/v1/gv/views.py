@@ -697,6 +697,7 @@ def package_list_for_sharing_table(request):
             r['comment'] = d.comment
             r['package_name'] = d.package_name
             r['package_id'] = d.package_id
+            r['version'] = d.version
             try:
                 r['input_community'] = d.input_community.name
             except BaseException:
