@@ -17,7 +17,7 @@
     "pk": 1,
     "fields": {
       "path_upload_stix_dir": "/opt/s-tip/gv/stix", 
-      "path_sharing_policy_specifications": "/opt/s-tip/gv/conf/SharingPolicySpecifications.txt", 
+      "path_sharing_policy_specifications": "/opt/s-tip/gv/conf/SharingPolicySpecifications.json", 
       "path_bootstrap_css_dir": "/opt/s-tip/gv/src/static/bootstrap/css",
       "default_taxii": "dummy",
       "ctirs_host": "https://localhost:10001/"
