@@ -366,12 +366,12 @@ class Feed(models.Model):
                 bean.tool = None
                 try:
                     bean.instance = cs.identity.specification.party_name.organisation_names[0].name_elements[0].value
-                except AttributeError:
-                    continue
+                except Exception:
+                    pass
                 try:
                     bean.tool = cs.tools[0].metadata[0].value
-                except AttributeError:
-                    continue
+                except Exception:
+                    pass
                 break
         return bean
 
