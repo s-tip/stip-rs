@@ -30,18 +30,18 @@
     </div><!-- <div class="form-group"> -->
     <br/>
 
-    <h2>Choose Information Sources</h2>
-    <a id="all_check_information_sources">Check All</a> / <a id="all_uncheck_information_sources">Uncheck All</a>
+    <h2>Choose Communities</h2>
+    <a id="all_check_communities">Check All</a> / <a id="all_uncheck_communities">Uncheck All</a>
     <br/>
     <br/>
     <div class="form-group">
         <div class="row">
             <div class="col-xs-4">
-            	{% for information_source in information_sources %}
+            	{% for community in communities %}
             	<div class="chackbox">
             		<label>
-            			<input type="checkbox" id="{{information_source.id}}" class="taxii_server_information_source" value="{{information_source.name}}" {% if information_source in taxii_server.information_sources %}checked=true{% endif %}/>
-            			{{information_source.name}}
+            			<input type="checkbox" id="{{community.id}}" class="taxii_server_community" value="{{community.name}}" {% if community in taxii_server.communities %}checked=true{% endif %}/>
+            			{{community.name}}
             		</label>
             	</div>
             	{% endfor %}
