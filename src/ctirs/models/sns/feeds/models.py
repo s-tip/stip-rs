@@ -5,6 +5,7 @@ import os
 import base64
 import shutil
 import json
+import traceback
 from . import rs
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -367,10 +368,12 @@ class Feed(models.Model):
                 try:
                     bean.instance = cs.identity.specification.party_name.organisation_names[0].name_elements[0].value
                 except Exception:
+                    traceback.print_exc()
                     pass
                 try:
                     bean.tool = cs.tools[0].metadata[0].value
                 except Exception:
+                    traceback.print_exc()
                     pass
                 break
         return bean
