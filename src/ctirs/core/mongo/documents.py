@@ -112,6 +112,7 @@ class TaxiiServers(Document):
     collection_name = fields.StringField(max_length=128, required=True, unique=True, null=False)
     # 中身は InforamtionSources
     information_sources = fields.ListField()
+    communities = fields.ListField(default=[])
 
     @classmethod
     # create 時に設定名とコレクション名が必要
@@ -121,11 +122,6 @@ class TaxiiServers(Document):
         ts.collection_name = collection_name
         ts.save()
         return ts
-
-    # information_sourcesを更新する
-    def modify_information_sources(self, information_sources):
-        self.information_sources = information_sources
-        self.save()
 
 
 # ScheduleCron設定保存クラス　
