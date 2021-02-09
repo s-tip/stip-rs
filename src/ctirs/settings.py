@@ -16,6 +16,7 @@ from logging import config as logging_config
 from logging import disable, WARNING
 from unipath import Path
 from decouple import Csv, config, UndefinedValueError
+from stip.common.stix_customizer import StixCustomizer
 
 try:
     txc2_audit_long_conf_path = config('TXC2_AUDIT_LOG_CONF')
@@ -70,6 +71,11 @@ except UndefinedValueError:
     cookie_domain_name = None
 
 
+stix_customizer = StixCustomizer.get_instance()
+try:
+    stix_customizer.init_customizer_conf(config('STIX_CUSTOMIZER_CONF_PATH'))
+except UndefinedValueError:
+    pass
 # Application definition
 
 INSTALLED_APPS = [
