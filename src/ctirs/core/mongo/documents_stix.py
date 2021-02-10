@@ -31,6 +31,7 @@ from ctirs.core.mongo.documents_taxii21_objects import get_modified_from_object,
 from stip.common.tld import TLD
 from stip.common.x_stip_sns import StipSns  # noqa
 from stip.common.label import sanitize_id
+from stip.common.stix_customizer import StixCustomizer
 
 
 DESCRIPTION_LENGTH = 10240
@@ -144,7 +145,7 @@ class StixFiles(Document):
         Tags.drop_collection()
         ExploitTargetCaches.drop_collection()
         IndicatorV2Caches.drop_collection()
-        StipCustomObjectCaches.drop_collection()
+        CustomObjectCaches.drop_collection()
         SimilarScoreCache.drop_collection()
 
         StixAttackPatterns.drop_collection()
@@ -164,7 +165,7 @@ class StixFiles(Document):
         StixSightings.drop_collection()
         StixLanguageContents.drop_collection()
         StixOthers.drop_collection()
-        StixStipCustomObjects.drop_collection()
+        StixCustomObjects.drop_collection()
 
         TXS21_SO.drop_collection()
         StixManifest.drop_collection()
@@ -361,7 +362,7 @@ class StixFiles(Document):
                 elif type_ == 'language-content':
                     StixLanguageContents.create(object_, self)
                 elif type_.startswith('x-'):
-                    StixStipCustomObjects.create(object_, self)
+                    StixCustomObjects.create(object_, self)
                 else:
                     StixOthers.create(object_, self)
 
@@ -537,7 +538,7 @@ class StixFiles(Document):
 
 class LabelCaches(Document):
     label = fields.StringField(max_length=1024)
-    node_id = fields.StringField(max_length=100)
+    node_id = fields.StringField(max_length=1024)
     package_id = fields.StringField(max_length=1024)
     stix_file = fields.ReferenceField(StixFiles, reverse_delete_rule=CASCADE)
 
@@ -1288,8 +1289,8 @@ class StixLanguageContents(Stix2Base):
         return document
 
 
-class StixStipCustomObjects(Stix2Base):
-    x_stip_value = fields.DictField()
+class StixCustomObjects(Stix2Base):
+    object_ = fields.DictField()
     object_type = fields.StringField(max_length=128)
 
     meta = {
@@ -1300,18 +1301,16 @@ class StixStipCustomObjects(Stix2Base):
     def create(cls, object_, stix_file):
         if object_ is None:
             return None
-        if ('x_stip_value' not in object_):
-            return None
-        document = StixStipCustomObjects()
-        document = super(StixStipCustomObjects, cls).create(document, object_, stix_file)
+        document = StixCustomObjects()
+        document = super(StixCustomObjects, cls).create(document, object_, stix_file)
         if ('name' in object_):
             document.name = object_['name']
         if ('description' in object_):
             document.description = object_['description']
-        document.x_stip_value = object_['x_stip_value']
+        document.object_ = object_
         document.object_type = object_['type']
         document.save()
-        StipCustomObjectCaches.create(document)
+        CustomObjectCaches.create(document)
         return document
 
 
@@ -1641,7 +1640,7 @@ class StixTTPs(Document):
         return
 
 
-class StipCustomObjectCaches(Document):
+class CustomObjectCaches(Document):
     type = fields.StringField(max_length=128)
     title = fields.StringField(max_length=1024)
     description = fields.StringField(max_length=DESCRIPTION_LENGTH)
@@ -1650,7 +1649,7 @@ class StipCustomObjectCaches(Document):
     stix_file = fields.ReferenceField(StixFiles, reverse_delete_rule=CASCADE)
     package_name = fields.StringField(max_length=1024)
     package_id = fields.StringField(max_length=100)
-    node_id = fields.StringField(max_length=100, unique=True)
+    node_id = fields.StringField(max_length=256, unique=True)
     value = fields.StringField(max_length=1024)
 
     meta = {
@@ -1658,24 +1657,50 @@ class StipCustomObjectCaches(Document):
             ('#node_id'),
         ]
     }
+    stix_customizer = StixCustomizer.get_instance()
+    custom_objects_list = stix_customizer.get_custom_object_list()
 
     @classmethod
-    def create(cls, stip_custom_object):
-        if stip_custom_object is None:
+    def create(cls, custom_object):
+        if custom_object is None:
             return
-        if not isinstance(stip_custom_object.x_stip_value, dict):
+        if custom_object.object_type not in cls.custom_objects_list:
             return
-        for prop in stip_custom_object.x_stip_value.keys():
-            v = stip_custom_object.x_stip_value[prop]
-            node_id = '%s-%s' % (stip_custom_object.object_id_, prop)
-            document = StipCustomObjectCaches()
-            document.type = '%s:%s' % (stip_custom_object.object_type, prop)
-            document.title = stip_custom_object.name
-            document.description = stip_custom_object.description
+        custom_properties_list = cls.stix_customizer.get_custom_object_dict()[custom_object.object_type]
+
+        custom_properties = []
+        for prop in custom_object.object_:
+            for item in custom_properties_list:
+                if '/' in item:
+                    c_prop, c_key = item.split('/')
+                    if prop == c_prop:
+                        if c_key in custom_object.object_[prop]:
+                            v = custom_object.object_[prop][c_key]
+                            match_prop = '%s/%s' % (c_prop, c_key)
+                            custom_properties.append((match_prop, v))
+                else:
+                    if prop == item:
+                        v = custom_object.object_[prop]
+                        match_prop = prop
+                        custom_properties.append((prop, v))
+                
+        for custom_prop in custom_properties:
+            match_prop, v = custom_prop
+            node_id = '%s-%s' % (custom_object.object_id_, match_prop)
+            document = CustomObjectCaches()
+            document.type = '%s:%s' % (custom_object.object_type, match_prop)
+            if hasattr(custom_object, 'name'):
+                document.title = custom_object.name
+            else:
+                document.title = custom_object.object_id_
+            if hasattr(custom_object, 'description'):
+                document.description = custom_object.description
+            else:
+                document.description = custom_object.object_id_
             document.value = v
-            document.stix_file = stip_custom_object.stix_file
-            document.package_name = stip_custom_object.package_name
-            document.package_id = stip_custom_object.package_id
+            document.stix_file = custom_object.stix_file
+            document.package_name = custom_object.package_name
+            document.package_id = custom_object.package_id
             document.node_id = node_id
             document.save()
         return
