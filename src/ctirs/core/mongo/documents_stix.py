@@ -1676,7 +1676,7 @@ class CustomObjectCaches(Document):
                     if prop == c_prop:
                         if c_key in custom_object.object_[prop]:
                             v = custom_object.object_[prop][c_key]
-                            match_prop = '%s/%s' % (c_prop, c_key)
+                            match_prop = '%s--%s' % (c_prop, c_key)
                             custom_properties.append((match_prop, v))
                 else:
                     if prop == item:
