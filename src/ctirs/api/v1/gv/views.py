@@ -17,6 +17,7 @@ from ctirs.core.mongo.documents_stix import ObservableCaches, SimilarScoreCache,
     StixExploitTargets, StixCoursesOfAction, StixTTPs, ExploitTargetCaches, \
     IndicatorV2Caches, StixLanguageContents, LabelCaches, CustomObjectCaches
 from stip.common.tld import TLD
+from stip.common.matching_customizer import MatchingCustomizer
 from mongoengine import DoesNotExist
 from .stix2_indicator import _get_observed_data
 from ctirs.models.rs.models import System
@@ -32,6 +33,7 @@ SIMILARTY_6_EDGE_TYPE = 'Similarity: 6'
 SIMILARTY_7_EDGE_TYPE = 'Similarity: 7'
 SIMILARTY_8_EDGE_TYPE = 'Similarity: 8'
 
+matching_patterns = MatchingCustomizer.get_instance().get_matching_patterns()
 
 def get_boolean_value(d, key, default_value):
     if key not in d:
@@ -236,6 +238,20 @@ def _get_exact_matched_info(package_id):
                         indicator_v2_cache.value = cache.value
                         indicator_v2_cache.start_collection = cache_collection
                         ret_observable_cashes.append(indicator_v2_cache)
+
+            if isinstance(cache, CustomObjectCaches):
+                for mp in matching_patterns:
+                    if mp['type'] != 'Exact':
+                        continue
+                    if cache.type not in mp['targets']:
+                        continue
+                    exacts = CustomObjectCaches.objects.filter(
+                        Q(type__in=mp['targets'])
+                        & Q(value__exact=cache.value)
+                        & Q(package_id__ne=package_id))
+                    for exact in exacts:
+                        exact.start_type = cache.type
+                        ret_observable_cashes.append(exact)
 
     indicator_v2_caches = IndicatorV2Caches.objects.filter(package_id=package_id)
     for indicator_v2_cache in indicator_v2_caches:
@@ -570,6 +586,15 @@ def contents_and_edges(request):
                     start_caches = collection.objects.filter(
                         package_id=package_id,
                         label__iexact=end_info.label)
+                elif collection == CustomObjectCaches:
+                    if hasattr(end_info, 'start_type'):
+                        start_type = end_info.start_type
+                    else:
+                        start_type = end_info.type
+                    start_caches = collection.objects.filter(
+                        package_id=package_id,
+                        type=start_type,
+                        value=end_info.value)
                 else:
                     start_caches = collection.objects.filter(
                         package_id=package_id,
