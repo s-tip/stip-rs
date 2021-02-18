@@ -15,6 +15,7 @@ import logging
 from unipath import Path
 from decouple import Csv, config, UndefinedValueError
 from stip.common.stix_customizer import StixCustomizer
+from stip.common.matching_customizer import MatchingCustomizer
 
 logging.disable(logging.WARNING)
 
@@ -68,6 +69,13 @@ try:
     stix_customizer.init_customizer_conf(config('STIX_CUSTOMIZER_CONF_PATH'))
 except UndefinedValueError:
     pass
+
+matching_customizer = MatchingCustomizer.get_instance()
+try:
+    matching_customizer.init_customizer_conf(config('MATCHING_CUSTOMIZER_CONF_PATH'))
+except UndefinedValueError:
+    pass
+
 # Application definition
 
 INSTALLED_APPS = [
