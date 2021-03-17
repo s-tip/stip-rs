@@ -407,7 +407,7 @@ class MispAdapter(Document):
         return misp
 
     @classmethod
-    def modify_settings(cls, url, apikey, stix_id_prefix, identity, community_id, uploader_id, published_only):
+    def modify_settings(cls, url, apikey, stix_id_prefix, identity, community_id, uploader_id, published_only,stix_version):
         community = Communities.objects.get(id=community_id)
         misp = MispAdapter.objects.get()
         misp.community = community
@@ -417,6 +417,7 @@ class MispAdapter(Document):
         misp.identity = identity
         misp.uploader = uploader_id
         misp.published_only = published_only
+        misp.stix_version = stix_version
         misp.save()
 
     @classmethod
@@ -478,6 +479,7 @@ class MispAdapter(Document):
     community = fields.ReferenceField(Communities)
     jobs = fields.ListField()
     interval_schedule_job = fields.ReferenceField(ScheduleJobs)
+    stix_version = fields.StringField(max_length=8, default='1.2')
 
 
 # 起動時に各種アダプタ collectionを check する。存在しない場合は作成してくれる

@@ -124,6 +124,26 @@
     </div><!-- <div class="form-group"> -->
     <div class="form-group">
         <div class="row">
+            <div class="col-xs-2">
+                STIX Version
+            </div>
+            <div class="col-xs-4">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" id="modify-stix-version-dropdown-button" type="button" data-toggle="dropdown">
+                        {{misp.stix_version}}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="dropdown-menu-stix-version">
+                        <li><a data-value="1.2">1.2</a></li>
+                        <li><a data-value="2.1">2.1</a></li>
+                    </ul>
+                    <input type="hidden" id="modify-stix-version" name="stix_version" value="{{misp.stix_version}}"/>
+                </div>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
             <button type="button" id="modify-misp-submit" class="btn btn-default">Modify</button>
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->

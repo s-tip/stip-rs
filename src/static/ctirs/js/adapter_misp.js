@@ -37,7 +37,13 @@ $(function(){
     	if(uploader_id.length == 0){
     		modify_misp_error('Choose Uploader.');
     		return;
-    	}
+        }
+        var stix_version = $('#modify-stix-version').val()
+    	if(stix_version.length == 0){
+    		modify_misp_error('Choose STIX Version.');
+    		return;
+        }
+
         modify_misp_submit();
     });
 
@@ -59,6 +65,10 @@ $(function(){
     	$(this).parents('.dropdown').find('#modify-uploader-id').val($(this).attr("data-value"));
     });
 
+    $("#dropdown-menu-stix-version li a").click(function(){
+    	$(this).parents('.dropdown').find('.dropdown-toggle').html($(this).text() + ' <span class="caret"></span>');
+    	$(this).parents('.dropdown').find('#modify-stix-version').val($(this).attr("data-value"));
+    });
     //detailボタンクリック
     $('#misp-detail-button').click(function(){
         var f = $('#misp-detail');
