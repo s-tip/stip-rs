@@ -20,14 +20,6 @@ def get_adapter_misp_modify_apikey(request):
     return get_text_field_value(request, 'apikey', default_value='')
 
 
-def get_adapter_misp_modify_identity(request):
-    return get_text_field_value(request, 'identity', default_value='')
-
-
-def get_adapter_misp_modify_stix_id_prefix(request):
-    return get_text_field_value(request, 'stix_id_prefix', default_value='')
-
-
 def get_adapter_misp_modify_community_id(request):
     return get_text_field_value(request, 'community_id', default_value=None)
 
@@ -46,6 +38,10 @@ def get_adapter_misp_get_end_date(request):
 
 def get_adapter_misp_get_published_only(request):
     return (get_text_field_value(request, 'published_only', default_value='"false') == 'published_only')
+
+
+def get_adapter_misp_get_stix_version(request):
+    return get_text_field_value(request, 'stix_version', default_value='1.2')
 
 
 # replace辞書取得
@@ -95,15 +91,13 @@ def modify(request):
     try:
         url = get_adapter_misp_modify_url(request)
         apikey = get_adapter_misp_modify_apikey(request)
-        stix_id_prefix = get_adapter_misp_modify_stix_id_prefix(request)
-        print('stix_id_prefix')
-        identity = get_adapter_misp_modify_identity(request)
         community_id = get_adapter_misp_modify_community_id(request)
         uploader_id = int(get_adapter_misp_modify_uploader_id(request))
         published_only = get_adapter_misp_get_published_only(request)
+        stix_version = get_adapter_misp_get_stix_version(request)
         # 設定更新
         # url は sheme と fqdn 名までなので END_POINT を追加する
-        MispAdapter.modify_settings(url, apikey, stix_id_prefix, identity, community_id, uploader_id, published_only)
+        MispAdapter.modify_settings(url, apikey, community_id, uploader_id, published_only, stix_version)
         # レンダリング
         replace_dict = get_replace_dict()
         replace_dict['info_msg_modify'] = 'Modify Success!!'
@@ -132,7 +126,7 @@ def get(request):
         except BaseException:
             # parse不能時は指定なしと同義
             end_date = None
-        count = misp.get_misp_stix(from_dt=start_date, to_dt=end_date, identity=MispAdapter.get().identity)
+        count = misp.get_misp_stix(from_dt=start_date, to_dt=end_date)
         # レンダリング
         replace_dict = get_replace_dict()
         replace_dict['info_msg_get'] = 'Get by Misp Adapter successfully!! (Get %d stix files.)' % (count)
