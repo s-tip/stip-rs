@@ -41,26 +41,6 @@
     <div class="form-group">
         <div class="row">
             <div class="col-xs-2">
-                Identity
-            </div>
-            <div class="col-xs-6">
-                <input id="modify-misp-identity" type="text" name="identity" class="form-control" value="{%if misp.identity %}{{ misp.identity }}{% endif %}"/>
-            </div>
-        </div> <!-- <div class="row">-->
-    </div><!-- <div class="form-group"> -->
-    <div class="form-group">
-        <div class="row">
-            <div class="col-xs-2">
-                STIX ID Prefix
-            </div>
-            <div class="col-xs-6">
-                <input id="modify-misp-stix-id-prefix" type="text" name="stix_id_prefix" class="form-control" value="{%if misp.stix_id_prefix %}{{ misp.stix_id_prefix }}{% endif %}"/>
-            </div>
-        </div> <!-- <div class="row">-->
-    </div><!-- <div class="form-group"> -->
-    <div class="form-group">
-        <div class="row">
-            <div class="col-xs-2">
                 Community
             </div>
             <div class="col-xs-4">
@@ -134,8 +114,8 @@
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" id="dropdown-menu-stix-version">
-                        <li><a data-value="1.2">1.2</a></li>
-                        <li><a data-value="2.1">2.1</a></li>
+                        <li><a data-value="1.1.1">1.1.1</a></li>
+                        <li><a data-value="2.0">2.0</a></li>
                     </ul>
                     <input type="hidden" id="modify-stix-version" name="stix_version" value="{{misp.stix_version}}"/>
                 </div>

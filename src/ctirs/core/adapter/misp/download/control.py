@@ -1,25 +1,14 @@
+import json
 import traceback
 from mongoengine import DoesNotExist
 from ctirs.core.mongo.documents import MispAdapter, Vias, ScheduleJobs
 from ctirs.core.mongo.documents_stix import StixFiles
 from ctirs.core.schedule.schedule import CtirsScheduler
 from ctirs.core.adapter.misp.download.downloader import MISPDownloader
-from ctirs.core.adapter.misp.download.converter import MISP2STIXConverter
 from ctirs.core.adapter import _regist_stix
 
 
 class MispAdapterDownloadControl(object):
-    ns_url = 'http://s-tip.fujtisu.com'
-    ns_name = 's-tip'
-    default_identity_name = 's-tip'
-
-    # MISP2STIX Converter
-    mc = MISP2STIXConverter(
-        identity_name=default_identity_name,
-        ns_url=ns_url,
-        ns_name=ns_name
-    )
-
     # シングルトン
     __instance = None
     # Scheduler
@@ -63,15 +52,16 @@ class MispAdapterDownloadControl(object):
                 self.add_job(misp.interval_schedule_job)
 
     # misp から from_dt から to_dt までのデータを取得する
-    def get_misp_stix(self, from_dt=None, to_dt=None, identity=default_identity_name):
-        # identity を更新
-        self.mc.identity_name = identity
+    def get_misp_stix(self, from_dt=None, to_dt=None):
         # misp アダプタの設定を取得
         misp_conf = MispAdapter.get()
         url = misp_conf.url
-        stix_id_prefix = misp_conf.stix_id_prefix
         apikey = misp_conf.apikey
         published_only = misp_conf.published_only
+        if misp_conf.stix_version.startswith('1.'):
+            stix_version = 'stix'
+        else:
+            stix_version = 'stix2'
         # 登録情報を取得
         community = misp_conf.community
         uploader = misp_conf.uploader
@@ -81,12 +71,13 @@ class MispAdapterDownloadControl(object):
         try:
             if url[-1] != '/':
                 url += '/'
-            url = url + 'events/xml/download.json'
+            url = url + 'events/restSearch'
             md = MISPDownloader(url, apikey)
-            text = md.get(from_dt=from_dt, to_dt=to_dt)
-            if text is None:
-                return 0
-            stix_packages = self.mc.convert(text=text.encode(), published_only=published_only, stix_id_prefix=stix_id_prefix)
+            stix_packages = md.get(
+                from_dt=from_dt,
+                to_dt=to_dt,
+                published_only=published_only,
+                stix_version=stix_version)
         except Exception as e:
             traceback.print_exc()
             raise e
@@ -94,30 +85,46 @@ class MispAdapterDownloadControl(object):
         # last_requested更新
         misp_conf.modify_last_requested()
 
+        if stix_packages is None:
+            return 0
+
         count = 0
         # ひとつずつ取得する
         for stix_package in stix_packages:
             try:
-                # stix一つごとに登録処理
-                # 取得したSTIXを登録
-                try:
-                    StixFiles.objects.get(package_id=stix_package.id_)
-                except DoesNotExist:
-                    # 存在しない場合は登録する
-                    _regist_stix(stix_package.to_xml(), community, via)
+                if misp_conf.stix_version.startswith('1.'):
+                    regist_flag = self._regist_12(stix_package, community, via)
+                elif misp_conf.stix_version.startswith('2.'):
+                    regist_flag = self._regist_20(stix_package, community, via)
+                if regist_flag:
                     count += 1
-            except Exception as e:
+            except Exception:
                 # エラーが発生した場合はログを表示して処理は実行する
                 traceback.print_exc()
 
         # 件数を返却
         return count
 
+    def _regist_12(self, stix_package, community, via):
+        try:
+            StixFiles.objects.get(package_id=stix_package.id_)
+            return False
+        except DoesNotExist:
+            _regist_stix(stix_package.to_xml(), community, via)
+            return True
+
+    def _regist_20(self, stix_package, community, via):
+        try:
+            StixFiles.objects.get(package_id=stix_package['id'])
+            return False
+        except DoesNotExist:
+            _regist_stix(json.dumps(stix_package, indent=4), community, via)
+            return True
+
     # job起動用 misp から last_requested 以降のデータを取得する
     def _get_misp_stix_job(self):
         misp = MispAdapter.objects.get()
         start_time_dt = misp.last_requested
-        print(start_time_dt)
         self.get_misp_stix(from_dt=start_time_dt)
 
     # add job

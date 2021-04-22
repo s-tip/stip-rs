@@ -1,6 +1,7 @@
-#!/usr/bin/python
+import io
 import json
 import requests
+from stix.core.stix_package import STIXPackage
 from ctirs.models.rs.models import System
 
 
@@ -11,36 +12,49 @@ class MISPDownloader(object):
         self.header['Content-Type'] = 'application/json'
         self.header['Authorization'] = api_key
 
-    def get_date_str(self, dt):
+    def _get_date_str(self, dt):
         return dt.strftime('%Y-%m-%d')
 
-    def get(self,
-            from_dt=None,
-            to_dt=None,
-            withAttachment=False):
+    def _get_events(self, from_dt, to_dt, published_only):
         payload = {}
-        payload_request = {}
-        payload_request['eventid'] = False
-        payload_request['withAttachment'] = withAttachment
+        if from_dt is not None:
+            payload['from'] = self._get_date_str(from_dt)
+        if to_dt is not None:
+            payload['to'] = self._get_date_str(to_dt)
+        if published_only:
+            payload['published'] = True
+        resp_text = self._post_misp(self.header, payload)
+        if resp_text is None:
+            return None
+        resp = json.loads(resp_text)
+        events = []
+        for event in resp['response']:
+            events.append(event['Event']['uuid'])
+        return events
 
-        if from_dt is None:
-            payload_request['from'] = False
+    def _get_event(self, uuid, version):
+        payload = {}
+        payload['uuid'] = uuid
+        payload['returnFormat'] = version
+        header = self.header.copy()
+        if version == 'stix':
+            header['Accept'] = 'application/xml'
         else:
-            payload_request['from'] = self.get_date_str(from_dt)
-
-        if to_dt is None:
-            payload_request['to'] = False
+            header['Accept'] = 'application/json'
+        resp_text = self._post_misp(header, payload)
+        if version == 'stix':
+            with io.StringIO(resp_text) as fp:
+                package = STIXPackage.from_xml(fp)
+                return package
         else:
-            payload_request['to'] = self.get_date_str(to_dt)
+            return json.loads(resp_text)
 
-        payload_request['tags'] = []
-        payload['request'] = payload_request
-
+    def _post_misp(self, header, payload):
         proxies = System.get_request_proxies()
         resp = requests.post(
             self.url,
             data=json.dumps(payload),
-            headers=self.header,
+            headers=header,
             verify=False,
             proxies=proxies)
 
@@ -54,3 +68,14 @@ class MISPDownloader(object):
             print('Exit.')
             return None
         return resp.text
+
+    def get(self, from_dt=None, to_dt=None, published_only=False, stix_version='stix2'):
+        events = self._get_events(from_dt, to_dt, published_only)
+        if events is None or len(events) == 0:
+            return None
+        stix_files = []
+        for event in events:
+            stix_file = self._get_event(event, stix_version)
+            if stix_file:
+                stix_files.append(stix_file)
+        return stix_files

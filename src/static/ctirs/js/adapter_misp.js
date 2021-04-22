@@ -23,11 +23,6 @@ $(function(){
     		modify_misp_error('Enter APIKEY.');
     		return;
     	}
-    	var aidengity = $('#modify-misp-identity').val()
-    	if(aidengity.length == 0){
-    		modify_misp_error('Enter Identity.');
-    		return;
-    	}
     	var community_id = $('#modify-community-id').val()
     	if(community_id.length == 0){
     		modify_misp_error('Choose Community.');
