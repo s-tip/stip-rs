@@ -438,7 +438,7 @@ class StixFiles(Document):
 
         ttps = stix_package.ttps
         if ttps:
-            for ttp in ttps:
+            for ttp in ttps.ttp:
                 if ttp:
                     try:
                         StixTTPs.create(ttp, self)
