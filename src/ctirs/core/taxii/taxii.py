@@ -1,4 +1,5 @@
 import pytz
+import traceback
 import libtaxii.clients as clients
 from urllib.parse import urlparse
 from ctirs.core.mongo.documents import Vias, ScheduleJobs
@@ -121,7 +122,10 @@ class Client(object):
     def poll_job(self):
         if self._taxii.last_requested is not None:
             self.set_start_time(self._taxii.last_requested.replace(tzinfo=pytz.utc))
-        self.poll()
+        try:
+            self.poll()
+        except BaseException:
+            traceback.print_exc()
 
     def poll(self):
         if not self._can_read:

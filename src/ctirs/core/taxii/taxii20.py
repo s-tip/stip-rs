@@ -143,13 +143,13 @@ def poll_20(taxii_client, protocol_version='2.0'):
         if taxii_client._community is not None:
             regist(stix_file_path, taxii_client._community, taxii_client._via)
         count += 1
-    except BaseException:
-        traceback.print_exc()
-    finally:
         last_requested = datetime.datetime.now(pytz.utc)
         taxii_client._taxii.last_requested = last_requested
         taxii_client._taxii.save()
         return count
+    except BaseException as e:
+        traceback.print_exc()
+        raise e
 
 
 def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):

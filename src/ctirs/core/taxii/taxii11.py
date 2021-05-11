@@ -69,8 +69,9 @@ def poll_11(taxii_client):
                         taxii_client._community,
                         taxii_client._via)
                 count += 1
-            except BaseException:
+            except BaseException as e:
                 traceback.print_exc()
+                raise e
 
         taxii_client._taxii.last_requested = last_requested
         taxii_client._taxii.save()
