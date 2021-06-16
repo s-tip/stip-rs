@@ -597,7 +597,8 @@ class Feed(models.Model):
     @staticmethod
     def create_feeds_record_v1(api_user, package_id, uploader_id, produced_str, version):
         stix_file_path = rs.get_stix_file_path(api_user, package_id)
-        stix_package = STIXPackage.from_xml(stix_file_path, encoding='utf-8')
+        #stix_package = STIXPackage.from_xml(stix_file_path, encoding='utf-8')
+        stix_package = STIXPackage.from_xml(stix_file_path)
 
         feed = Feed()
         feed.stix_version = version
