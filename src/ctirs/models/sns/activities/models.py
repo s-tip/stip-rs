@@ -1,12 +1,8 @@
-
-
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.html import escape
 from ctirs.models import STIPUser
 
 
-@python_2_unicode_compatible
 class Activity(models.Model):
     FAVORITE = 'F'
     LIKE = 'L'
@@ -17,7 +13,7 @@ class Activity(models.Model):
         (LIKE, 'Like'),
     )
 
-    user = models.ForeignKey(STIPUser)
+    user = models.ForeignKey(STIPUser, on_delete=models.CASCADE)
     activity_type = models.CharField(max_length=1, choices=ACTIVITY_TYPES)
     date = models.DateTimeField(auto_now_add=True)
     feed = models.IntegerField(null=True, blank=True)
@@ -31,7 +27,6 @@ class Activity(models.Model):
         return self.activity_type
 
 
-@python_2_unicode_compatible
 class Notification(models.Model):
     LIKED = 'L'
     COMMENTED = 'C'
@@ -46,8 +41,8 @@ class Notification(models.Model):
     _COMMENTED_TEMPLATE = '<a href="/{0}/">{1}</a> commented on your post: <a href="/feeds/{2}/">{3}</a>'  # noqa: E501
     _ALSO_COMMENTED_TEMPLATE = '<a href="/{0}/">{1}</a> also commentend on the post: <a href="/feeds/{2}/">{3}</a>'  # noqa: E501
 
-    from_user = models.ForeignKey(STIPUser, related_name='+')
-    to_user = models.ForeignKey(STIPUser, related_name='+')
+    from_user = models.ForeignKey(STIPUser, related_name='+', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(STIPUser, related_name='+', on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     package_id = models.CharField(max_length=256, null=True, blank=True)
     notification_type = models.CharField(max_length=1,

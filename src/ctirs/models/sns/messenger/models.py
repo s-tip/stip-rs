@@ -1,19 +1,15 @@
-
-
 from django.db import models
 from django.db.models import Max
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from ctirs.models import STIPUser
 
 
-@python_2_unicode_compatible
 class Message(models.Model):
-    user = models.ForeignKey(STIPUser, related_name='+')
+    user = models.ForeignKey(STIPUser, related_name='+', on_delete=models.CASCADE)
     message = models.TextField(max_length=1000, blank=True)
     date = models.DateTimeField(auto_now_add=True)
-    conversation = models.ForeignKey(STIPUser, related_name='+')
-    from_user = models.ForeignKey(STIPUser, related_name='+')
+    conversation = models.ForeignKey(STIPUser, related_name='+', on_delete=models.CASCADE)
+    from_user = models.ForeignKey(STIPUser, related_name='+', on_delete=models.CASCADE)
     is_read = models.BooleanField(default=False)
 
     class Meta:

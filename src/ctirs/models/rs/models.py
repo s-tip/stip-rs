@@ -111,7 +111,7 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     evaluation = models.IntegerField(default=0)
     description = models.CharField(max_length=1024, null=True, blank=True)
     tlp = models.CharField(max_length=10, choices=const.TLP_CHOICES, default="AMBER")
-    region = models.ForeignKey(Region, null=True)
+    region = models.ForeignKey(Region, null=True, on_delete=models.CASCADE)
     country_code = models.TextField(max_length=8, default='US', null=True)
     administrative_code = models.TextField(max_length=8, default=None, null=True)
     administrative_area = models.TextField(max_length=128, default=None, null=True)
@@ -156,13 +156,15 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
             return ''
         url = self.url.encode()
         if "http://" not in self.url and "https://" not in self.url and len(self.url) > 0:  # noqa: E501
-            # url = "http://" + str(self.url)
             url = "http://" + self.url
         return url
 
     def get_picture_location(self, prefix):
-        s = prefix + '/profile_pictures/' + self.username + '.jpg'
-        return s.encode()
+        if prefix.endswith('/'):
+            s = prefix[:-1] + '/profile_pictures/' + self.username + '.jpg'
+        else:
+            s = prefix + '/profile_pictures/' + self.username + '.jpg'
+        return s
 
     def get_picture(self):
         no_picture_url = '/static/img/user.png'

@@ -8,7 +8,6 @@ import json
 import traceback
 from . import rs
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from ctirs.models import Group
 from ctirs.models import STIPUser
@@ -22,7 +21,6 @@ from stix.common.structured_text import StructuredText
 import stip.common.const as const
 
 
-@python_2_unicode_compatible
 class AttachFile(models.Model):
     file_name = models.TextField(max_length=1024)
     file_path = models.FilePathField(max_length=1024, default=None, null=True)
@@ -38,7 +36,6 @@ class AttachFile(models.Model):
         return self.package_id
 
 
-@python_2_unicode_compatible
 class Feed(models.Model):
     STIP_SNS_USER_NAME_PREFIX = const.STIP_SNS_USER_NAME_KEY + ': '
     STIP_SNS_SCREEN_NAME_PREFIX = const.STIP_SNS_SCREEN_NAME_KEY + ': '
@@ -49,7 +46,7 @@ class Feed(models.Model):
     STIP_SNS_STIX2_PACKAGE_ID_PREFIX = const.STIP_SNS_STIX2_PACKAGE_ID_KEY + ': '
 
     package_id = models.CharField(max_length=128, default='', primary_key=True)
-    user = models.ForeignKey(STIPUser)
+    user = models.ForeignKey(STIPUser, on_delete=models.CASCADE)
     date = models.DateTimeField(null=True)
     post = models.TextField(max_length=1024)
     post_org = models.TextField(max_length=1024, default='')
@@ -61,7 +58,7 @@ class Feed(models.Model):
     tlp = models.CharField(max_length=10, choices=const.TLP_CHOICES, default='AMBER')
     sharing_range_type = models.CharField(max_length=10, choices=const.SHARING_RANGE_CHOICES, default=const.SHARING_RANGE_TYPE_KEY_ALL)
     sharing_people = models.ManyToManyField(STIPUser, related_name='feed_sharing_people')
-    sharing_group = models.ForeignKey(Group, default=None, null=True)
+    sharing_group = models.ForeignKey(Group, default=None, null=True, on_delete=models.CASCADE)
     filename_pk = models.CharField(max_length=128, default='undefined')
     screen_name = models.CharField(max_length=128, default='')
     screen_affiliation = models.CharField(max_length=50, default='')

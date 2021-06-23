@@ -10,7 +10,7 @@ import ctirs.adapter.urls
 import ctirs.configuration.urls
 import ctirs.profile.urls
 import ctirs.api.urls
-import django.views.i18n
+from django.views.i18n import JavaScriptCatalog
 
 urlpatterns = [
     url(r'^$', dashboard.top),
@@ -25,5 +25,5 @@ urlpatterns = [
     url(r'^login_totp/$', login_totp, name='login_totp'),
     url(r'^logout/$', logout),
     url(r'^api/', include(ctirs.api.urls)),
-    url(r'^jsi18n/(?P<packages>\S+?)/$', django.views.i18n.javascript_catalog),
+    url(r'^jsi18n/(?P<packages>\S+?)/$', JavaScriptCatalog.as_view()),
 ]
