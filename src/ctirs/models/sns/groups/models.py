@@ -1,18 +1,14 @@
-
-
 from stip.common.const import LANGUAGES
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from ctirs.models import STIPUser
 
 
-@python_2_unicode_compatible
 class Group(models.Model):
     en_name = models.CharField(max_length=128, default=None, null=True, unique=True)
     local_name = models.CharField(max_length=128, default=None, null=True, unique=True)
-    locale = models.CharField(max_length=4, choices=LANGUAGES, default='en')
+    locale = models.CharField(max_length=16, choices=LANGUAGES, default='en')
     description = models.TextField(max_length=1024, default=None, null=True)
-    creator = models.ForeignKey(STIPUser)
+    creator = models.ForeignKey(STIPUser,  on_delete=models.CASCADE)
     members = models.ManyToManyField(STIPUser, related_name='Members')
 
     class Meta:

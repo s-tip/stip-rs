@@ -2,10 +2,8 @@
 
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Profile(models.Model):
     DEFAULT_PAHNTOM_SOURCE_NAME = 'local'
     DEFAULT_SPLUNK_API_PORT = 8089
