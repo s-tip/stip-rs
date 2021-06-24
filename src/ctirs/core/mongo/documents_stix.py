@@ -6,7 +6,10 @@ import stix2slider
 import tempfile
 import stip.common.const as const
 from stix2slider.options import initialize_options as sl_init
-from stix2elevator import elevate_file
+try:
+    from stix2elevator import elevate_file as ELEVATE
+except ImportError:
+    from stix2elevator import elevate as ELEVATE
 from stix2elevator.options import initialize_options as el_init
 from stix2elevator.options import set_option_value
 from stix2elevator.stix_stepper import step_file
@@ -487,14 +490,14 @@ class StixFiles(Document):
     def get_elevate_20(self):
         if self.version.startswith('1.'):
             el_init()
-            return elevate_file(self.origin_path)
+            return ELEVATE(self.origin_path)
         return None
 
     def get_elevate_21(self):
         if self.version.startswith('1.'):
             el_init()
             set_option_value('spec_version', '2.1')
-            return elevate_file(self.origin_path)
+            return ELEVATE(self.origin_path)
         if self.version == '2.0':
             return step_file(self.origin_path)
         return None
