@@ -118,7 +118,7 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     sector = models.CharField(max_length=128, choices=const.SECTOR_GROUP_CHOICES, null=True)
     ci = models.CharField(max_length=128, choices=const.CRITICAL_INFRASTRUCTURE_CHOICES, null=True)
     language = models.CharField(max_length=16, choices=const.LANGUAGES, default='en')
-    role = models.CharField(max_length=10, choices=const.ROLE_CHOICES, default="user")
+    role = models.CharField(max_length=32, choices=const.ROLE_CHOICES, default="user")
     gv_auth_user = models.ForeignKey(GVAuthUser, on_delete=models.CASCADE, default=1)
     sns_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, default=1)
 
