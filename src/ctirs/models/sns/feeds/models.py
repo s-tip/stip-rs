@@ -872,6 +872,8 @@ class Feed(models.Model):
                 for feed_ in feeds_:
                     for file_ in feed_.files.all():
                         attach_package_ids.append(file_.package_id)
+                        from ctirs.core.mongo.documents_stix import StixFiles
+                        StixFiles.delete_by_package_id(file_.package_id)
                         file_.delete()
             for attach_package_id in attach_package_ids:
                 attach_dir = Feed.get_attach_stix_dir_path(attach_package_id)
