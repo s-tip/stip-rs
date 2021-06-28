@@ -313,6 +313,8 @@ class StixFiles(Document):
             self.taxii2_stix_objects = []
             for object_ in objects:
                 type_ = object_['type']
+                if type_ == 'marking-definition':
+                    continue
                 if type_ != 'x-stip-sns':
                     if 'labels' in object_:
                         LabelCaches.create(object_, self)
@@ -1291,6 +1293,9 @@ class StixOthers(Stix2Base):
     def create(cls, object_, stix_file):
         if object_ is None:
             return None
+        if object_['type'] == 'x-stip-sns':
+            if object_['x_stip_sns_type'] != 'post':
+                return None
         document = StixOthers()
         document = super(StixOthers, cls).create(document, object_, stix_file)
         if ('name' in object_):
