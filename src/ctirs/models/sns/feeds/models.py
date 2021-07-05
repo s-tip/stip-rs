@@ -45,7 +45,7 @@ class Feed(models.Model):
     STIP_SNS_REFERRED_URL_PREFIX = const.STIP_SNS_REFERRED_URL_KEY + ': '
     STIP_SNS_STIX2_PACKAGE_ID_PREFIX = const.STIP_SNS_STIX2_PACKAGE_ID_KEY + ': '
 
-    package_id = models.CharField(max_length=128, default='', primary_key=True)
+    package_id = models.CharField(max_length=128, primary_key=True)
     user = models.ForeignKey(STIPUser, on_delete=models.CASCADE)
     date = models.DateTimeField(null=True)
     post = models.TextField(max_length=1024)

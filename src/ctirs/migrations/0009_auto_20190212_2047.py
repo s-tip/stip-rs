@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='stipuser',
             name='language',
-            field=models.CharField(choices=[(b'en', 'English'), (b'pt-br', 'Portuguese'), (b'es', 'Spanish'), (b'ja', 'Japanese'), (b'fr', 'French'), (b'zh-cn', 'Chinese')], default=b'en', max_length=4),
+            field=models.CharField(choices=[(b'en', 'English'), (b'pt-br', 'Portuguese'), (b'es', 'Spanish'), (b'ja', 'Japanese'), (b'fr', 'French'), (b'zh-cn', 'Chinese')], default=b'en', max_length=16),
         ),
         migrations.AddField(
             model_name='stipuser',
