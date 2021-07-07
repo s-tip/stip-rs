@@ -215,7 +215,7 @@ class Feed(models.Model):
                 if (file_name is None) or (content is None):
                     return None
             elif version.startswith('v2'):
-                with open(attachement_cached_stix_file_path, 'r') as fp:
+                with open(attachement_cached_stix_file_path, 'r', encoding='utf-8') as fp:
                     attachment_bundle = json.load(fp)
                 file_name = None
                 content = None
