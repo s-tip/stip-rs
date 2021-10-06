@@ -13,20 +13,22 @@ def _get_auth_credentials_dict(taxii_client):
     auth_credentials_dict = {}
     auth_credentials_dict['username'] = taxii_client._username
     auth_credentials_dict['password'] = taxii_client._password
+    cert_fd = None
+    key_fd = None
     if taxii_client._auth_type == clients.HttpClient.AUTH_CERT_BASIC:
-        _, cert_file = tempfile.mkstemp()
+        cert_fd, cert_file = tempfile.mkstemp()
         with open(cert_file, 'w', encoding='utf-8') as fp:
             fp.write(taxii_client._cert_file)
-        _, key_file = tempfile.mkstemp()
+        key_fd, key_file = tempfile.mkstemp()
         with open(key_file, 'w', encoding='utf-8') as fp:
             fp.write(taxii_client._key_file)
         auth_credentials_dict['cert_file'] = cert_file
         auth_credentials_dict['key_file'] = key_file
-    return auth_credentials_dict
+    return auth_credentials_dict, cert_fd, key_fd
 
 
 def poll_11(taxii_client):
-    auth_credentials_dict = _get_auth_credentials_dict(taxii_client)
+    auth_credentials_dict, cert_fd, key_fd = _get_auth_credentials_dict(taxii_client)
     taxii_client._client.set_auth_credentials(auth_credentials_dict)
 
     try:
@@ -78,6 +80,16 @@ def poll_11(taxii_client):
         taxii_client._taxii.save()
         return count
     finally:
+        if cert_fd is not None:
+            try:
+                os.close(cert_fd)
+            except Exception:
+                pass
+        if key_fd is not None:
+            try:
+                os.close(key_fd)
+            except Exception:
+                pass
         if 'cert_file' in auth_credentials_dict:
             try:
                 os.remove(auth_credentials_dict['cert_file'])
@@ -101,7 +113,7 @@ def push_11(taxii_client, stix_file_doc):
         with open(stix_file_doc.origin_path, 'r', encoding='utf-8') as fp:
             content = fp.read()
 
-    auth_credentials_dict = _get_auth_credentials_dict(taxii_client)
+    auth_credentials_dict, cert_fd, key_fd = _get_auth_credentials_dict(taxii_client)
     taxii_client._client.set_auth_credentials(auth_credentials_dict)
     try:
         subscription_information = tm11.SubscriptionInformation(
@@ -130,6 +142,16 @@ def push_11(taxii_client, stix_file_doc):
         traceback.print_exc()
         raise e
     finally:
+        if cert_fd is not None:
+            try:
+                os.close(cert_fd)
+            except Exception:
+                pass
+        if key_fd is not None:
+            try:
+                os.close(key_fd)
+            except Exception:
+                pass
         if 'cert_file' in auth_credentials_dict:
             try:
                 os.remove(auth_credentials_dict['cert_file'])
