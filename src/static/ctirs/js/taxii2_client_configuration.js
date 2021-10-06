@@ -9,6 +9,10 @@ $(function(){
         $('#error-msg').html(msg);
     }
 
+    if($('#create-ca').prop('checked') ==  false){
+        $('#certificate-file-div').hide();
+    }
+
     $("#dropdown-menu-community-name li a").click(function(){
     	$(this).parents('.dropdown').find('.dropdown-toggle').html($(this).text() + ' <span class="caret"></span>');
     	$(this).parents('.dropdown').find('#create-community-id').val($(this).attr("data-value"));
@@ -39,6 +43,24 @@ $(function(){
         if(collection.length == 0){
             modify_taxii2_error('Enter Collection');
             return;
+        }
+        if($('#create-ca').prop('checked') == true){
+            if($('#create-certificate').val().length == 0){
+                modify_taxii2_error('Enter Certificate');
+                return;
+            }
+            if($('#create-private-key').val().length == 0){
+                modify_taxii2_error('Enter Private Key');
+                return;
+            }
+        } else{
+            var login_id = $('#create-login-id').val();
+            if(login_id.length == 0){
+                modify_taxii2_error('Enter Login ID');
+                return;
+            }
+            $('#create-certificate').val('');
+            $('#create-private-key').val('');
         }
         var community = $('#create-community-id').val();
         if(community.length == 0){
@@ -82,6 +104,15 @@ $(function(){
         $('#create-collection').val(tr.find('.collection').text());
         $('#create-login-id').val(tr.find('.login-id').text());
         $('#create-login-password').val('');
+        var ca = tr.find('.ca').prop("checked");
+        var d = $('#certificate-file-div');
+        $('#create-ca').prop("checked",ca);
+        if(ca == true){
+            d.show();
+        }
+        else{
+            d.hide();
+        }
         $('#create-community-id').val(tr.find('.community-id').val());
         $('#create-community-dropdown-button').text(tr.find('.community').text());
         $('#create-protocol-version-dropdown-button').text(tr.find('.protocol-version').text());
@@ -101,4 +132,11 @@ $(function(){
     	f.attr('action',action + id);
     	f.submit();
     });
+
+    $('#create-ca').click(function(){
+        $('#certificate-file-div').toggle();
+        if($(this).prop('checked') ==  true){
+            $('#create-ssl').prop('checked',true);
+        }
+    }); 
 });

@@ -588,7 +588,8 @@ class Taxii2Clients(Document):
     @classmethod
     def create(
             cls, name, api_root='', collection='', login_id='', login_password='',
-            community_id='', protocol_version='', push=False, uploader_id=None,
+            community_id='', ca=False, key_file=None, cert_file=None,
+            protocol_version='', push=False, uploader_id=None,
             can_read=False, can_write=False):
         community = Communities.objects.get(id=community_id)
         try:
@@ -603,6 +604,15 @@ class Taxii2Clients(Document):
         if login_password:
             t.login_password = login_password
         t.community = community
+        t.is_use_cert = ca
+        if ca:
+            if key_file:
+                t.key_file = key_file
+            if cert_file:
+                t.cert_file = cert_file
+        else:
+            t.key_file = None
+            t.cert_file = None
         t.protocol_version = protocol_version
         t.push = push
         t.uploader = uploader_id
@@ -637,6 +647,9 @@ class Taxii2Clients(Document):
     login_id = fields.StringField(max_length=100, default='login_id')
     login_password = fields.StringField(max_length=100, default='login_password')
     community = fields.ReferenceField(Communities)
+    is_use_cert = fields.BooleanField(default=False)
+    cert_file = fields.StringField(max_length=10240)
+    key_file = fields.StringField(max_length=10240)
     last_requested = fields.DateTimeField(default=None)
     protocol_version = fields.StringField(max_length=16, choices=TAXII_PROTOCOL_VERSION_CHOICES, default='2.1')
     push = fields.BooleanField(default=False)

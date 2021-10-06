@@ -24,7 +24,12 @@ class Client(object):
         self._interval_job = taxii.interval_schedule_job
         self._can_read = taxii.can_read
         self._can_write = taxii.can_write
-
+        if taxii.is_use_cert:
+            self._auth_type = clients.HttpClient.AUTH_CERT_BASIC
+            self._key_file = taxii.key_file
+            self._cert_file = taxii.cert_file
+        else:
+            self._auth_type = clients.HttpClient.AUTH_BASIC
         if taxii2_client:
             self._api_root = taxii.api_root
             self._collection = taxii.collection
@@ -37,12 +42,6 @@ class Client(object):
             self._via = Vias.get_via_taxii_poll(taxii_client=taxii, uploader=taxii.uploader)
             self._client = clients.HttpClient()
 
-            if taxii.is_use_cert:
-                self._auth_type = clients.HttpClient.AUTH_CERT_BASIC
-                self._key_file = taxii.key_file
-                self._cert_file = taxii.cert_file
-            else:
-                self._auth_type = clients.HttpClient.AUTH_BASIC
             self._ssl = taxii.ssl
             self._client.set_use_https(self._ssl)
             self._client.set_auth_type(self._auth_type)
