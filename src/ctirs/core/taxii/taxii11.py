@@ -58,7 +58,7 @@ def poll_11(taxii_client):
 
         count = 0
         for cb in taxii_message.content_blocks:
-            _, stix_file_path = tempfile.mkstemp(suffix='.xml')
+            fd, stix_file_path = tempfile.mkstemp(suffix='.xml')
             with open(stix_file_path, 'wb+') as fp:
                 fp.write(cb.content)
             try:
@@ -72,6 +72,8 @@ def poll_11(taxii_client):
             except BaseException as e:
                 traceback.print_exc()
                 raise e
+            finally:
+                os.close(fd)
 
         taxii_client._taxii.last_requested = last_requested
         taxii_client._taxii.save()
