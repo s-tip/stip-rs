@@ -93,6 +93,42 @@
             </div>
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Use Certificate Authentication
+            </div>
+            <div class="col-xs-4" >
+                <input id="create-ca" type="checkbox" name="ca"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+
+	<div id="certificate-file-div">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-2">
+                    Certificate
+                </div>
+                <div class="col-xs-4" >
+                    <textarea id="create-certificate" name="certificate" placeholder="-----BEGIN CERTIFICATE..."></textarea>
+                </div>
+            </div> <!-- <div class="row">-->
+        </div><!-- <div class="form-group"> -->
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-xs-2">
+                    Private Key
+                </div>
+                <div class="col-xs-4" >
+                    <textarea id="create-private-key" name="private_key" placeholder="-----BEGIN PRIVATE..."></textarea>
+                </div>
+            </div> <!-- <div class="row">-->
+        </div><!-- <div class="form-group"> -->
+    </div><!--  <div id="certificate-file-div"> -->
+
     <div class="form-group">
         <div class="row">
             <div class="col-xs-2">
@@ -220,6 +256,9 @@
         Login Password
     </td>
     <td>
+        Use Certificate
+    </td>
+    <td>
         Push on Adding Files
     </td>
     <td>
@@ -269,6 +308,9 @@
     </td>
     <td>
         <p class="login-password">xxx</p>
+    </td>
+    <td>
+        <input type="checkbox" disabled {% if taxii2_client.is_use_cert %}checked{% endif %} class="ca"/> 
     </td>
     <td>
         <input type="checkbox" disabled {% if taxii2_client.push %}checked{% endif %} class="push"/> 

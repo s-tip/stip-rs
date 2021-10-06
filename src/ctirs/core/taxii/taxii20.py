@@ -1,9 +1,11 @@
+import os
 import json
 import tempfile
 import datetime
 import pytz
 import requests
 import traceback
+import libtaxii.clients as clients
 import urllib.parse as urlparse
 from urllib.parse import urlencode
 from requests.auth import _basic_auth_str
@@ -74,14 +76,54 @@ def _get_json_response(taxii_client, protocol_version, next=None):
         if next is not None:
             query['next'] = next
 
-    url_parts[4] = urlencode(query)
-    url = urlparse.urlunparse(url_parts)
-    resp = requests.get(
-        url,
-        headers=headers,
-        verify=False,
-        proxies=taxii_client._proxies
-    )
+    cert_file = None
+    key_file = None
+    cert_fd = None
+    key_fd = None
+    if taxii_client._auth_type == clients.HttpClient.AUTH_CERT_BASIC:
+        del(headers['Authorization'])
+        cert_fd, cert_file = tempfile.mkstemp()
+        with open(cert_file, 'w', encoding='utf-8') as fp:
+            fp.write(taxii_client._cert_file)
+        key_fd, key_file = tempfile.mkstemp()
+        with open(key_file, 'w', encoding='utf-8') as fp:
+            fp.write(taxii_client._key_file)
+        cert = (cert_file, key_file)
+    else:
+        cert = None
+
+    try:
+        url_parts[4] = urlencode(query)
+        url = urlparse.urlunparse(url_parts)
+        resp = requests.get(
+            url,
+            headers=headers,
+            verify=False,
+            cert=cert,
+            proxies=taxii_client._proxies
+        )
+    finally:
+        if cert_fd is not None:
+            try:
+                os.close(cert_fd)
+            except Exception:
+                pass
+        if key_fd is not None:
+            try:
+                os.close(key_fd)
+            except Exception:
+                pass
+        if cert_file is not None:
+            try:
+                os.remove(cert_file)
+            except Exception:
+                pass
+        if key_file is not None:
+            try:
+                os.remove(key_file)
+            except Exception:
+                pass
+
     if resp.status_code >= 300:
         raise Exception('Invalid http response (%s).' % (resp.status_code))
     return resp.json()
@@ -124,11 +166,12 @@ def _get_objects_21(taxii_client, protocol_version, objects, resp_json):
 def poll_20(taxii_client, protocol_version='2.0'):
     try:
         count = 0
+        fd = None
         js = _get_json_response(taxii_client, protocol_version)
         if 'objects' not in js:
             return 0
 
-        _, stix_file_path = tempfile.mkstemp(suffix='.json')
+        fd, stix_file_path = tempfile.mkstemp(suffix='.json')
         if protocol_version == '2.0':
             with open(stix_file_path, 'wb+') as fp:
                 fp.write(json.dumps(js, indent=4).encode('utf-8'))
@@ -150,6 +193,12 @@ def poll_20(taxii_client, protocol_version='2.0'):
     except BaseException as e:
         traceback.print_exc()
         raise e
+    finally:
+        if fd is not None:
+            try:
+                os.close(fd)
+            except Exception:
+                pass
 
 
 def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
@@ -174,12 +223,27 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
         push_stix['objects'] = org_stix['objects']
         content = json.dumps(push_stix, indent=4)
 
+    cert_fd = None
+    key_fd = None
+    if taxii_client._auth_type == clients.HttpClient.AUTH_CERT_BASIC:
+        del(headers['Authorization'])
+        cert_fd, cert_file = tempfile.mkstemp()
+        with open(cert_file, 'w', encoding='utf-8') as fp:
+            fp.write(taxii_client._cert_file)
+        key_fd, key_file = tempfile.mkstemp()
+        with open(key_file, 'w', encoding='utf-8') as fp:
+            fp.write(taxii_client._key_file)
+        cert = (cert_file, key_file)
+    else:
+        cert = None
+
     try:
         resp = requests.post(
             url,
             headers=headers,
             data=content,
             verify=False,
+            cert=cert,
             proxies=taxii_client._proxies
         )
 
@@ -191,3 +255,24 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
     except Exception as e:
         traceback.print_exc()
         raise e
+    finally:
+        if cert_fd is not None:
+            try:
+                os.close(cert_fd)
+            except Exception:
+                pass
+        if key_fd is not None:
+            try:
+                os.close(key_fd)
+            except Exception:
+                pass
+        if cert_file is not None:
+            try:
+                os.remove(cert_file)
+            except Exception:
+                pass
+        if key_file is not None:
+            try:
+                os.remove(key_file)
+            except Exception:
+                pass

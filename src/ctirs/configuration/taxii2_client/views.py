@@ -26,6 +26,18 @@ def get_taxii2_client_create_login_password(request):
     return get_text_field_value(request, 'login_password', default_value='')
 
 
+def get_taxii2_client_create_ca(request):
+    return 'ca' in request.POST
+
+
+def get_taxii2_client_create_certificate(request):
+    return get_text_field_value(request, 'certificate', default_value='')
+
+
+def get_taxii2_client_create_private_key(request):
+    return get_text_field_value(request, 'private_key', default_value='')
+
+
 def get_taxii2_client_create_community_id(request):
     return get_text_field_value(request, 'community_id', default_value='')
 
@@ -86,6 +98,9 @@ def create(request):
         login_id = get_taxii2_client_create_login_id(request)
         login_password = get_taxii2_client_create_login_password(request)
         community_id = get_taxii2_client_create_community_id(request)
+        ca = get_taxii2_client_create_ca(request)
+        certificate = get_taxii2_client_create_certificate(request)
+        private_key = get_taxii2_client_create_private_key(request)
         protocol_version = get_taxii2_client_create_protocol_version(request)
         push = get_taxii2_client_create_push(request)
         uploader_id = int(get_taxii2_client_create_uploader_id(request))
@@ -99,6 +114,9 @@ def create(request):
             login_id=login_id,
             login_password=login_password,
             community_id=community_id,
+            ca=ca,
+            cert_file=certificate,
+            key_file=private_key,
             protocol_version=protocol_version,
             push=push,
             uploader_id=uploader_id,
