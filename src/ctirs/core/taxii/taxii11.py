@@ -70,8 +70,7 @@ def poll_11(taxii_client):
                         taxii_client._via)
                 count += 1
             except BaseException as e:
-                traceback.print_exc()
-                raise e
+                print('>>>>> Exception occured during registration: Skip: ' + str(e))
             finally:
                 os.close(fd)
 
