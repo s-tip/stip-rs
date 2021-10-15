@@ -70,11 +70,20 @@ def get_package_bean_v2(stix_file_path):
             if package_bean.sns_type != StixFiles.STIP_SNS_TYPE_V2_POST:
                 package_bean.is_post_sns = False
             package_bean.related_packages = []
-            if const.STIP_STIX2_PROP_OBJECT_REF in stip_sns:
+
+            if const.STIP_STIX2_PROP_BUNDLE_ID in stip_sns:
+                package_bean.related_packages.append(stip_sns[const.STIP_STIX2_PROP_BUNDLE_ID])
+            elif const.STIP_STIX2_PROP_OBJECT_REF in stip_sns:
                 package_bean.related_packages.append(stip_sns[const.STIP_STIX2_PROP_OBJECT_REF])
-            if const.STIP_STIX2_PROP_ATTACHMENT_REFS in stip_sns:
-                for ref in stip_sns[const.STIP_STIX2_PROP_ATTACHMENT_REFS]:
-                    package_bean.related_packages.append(ref['bundle'])
+
+            if const.STIP_STIX2_PROP_ATTACHMENTS in stip_sns:
+                attach_refs = stip_sns[const.STIP_STIX2_PROP_ATTACHMENTS]
+            elif const.STIP_STIX2_PROP_ATTACHMENT_REFS in stip_sns:
+                attach_refs = stip_sns[const.STIP_STIX2_PROP_ATTACHMENT_REFS]
+            else:
+                attach_refs = []
+            for ref in attach_refs:
+                package_bean.related_packages.append(ref['bundle'])
             if len(package_bean.related_packages) == 0:
                 package_bean.related_packages = None
             produced_str = stip_sns['created']

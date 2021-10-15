@@ -544,8 +544,14 @@ class Feed(models.Model):
             sharing_range_info = None
 
         if stip_sns:
-            if const.STIP_STIX2_PROP_ATTACHMENT_REFS in stip_sns:
-                for attach in stip_sns[const.STIP_STIX2_PROP_ATTACHMENT_REFS]:
+            if const.STIP_STIX2_PROP_ATTACHMENTS in stip_sns:
+                attach_refs = stip_sns[const.STIP_STIX2_PROP_ATTACHMENTS]
+            elif const.STIP_STIX2_PROP_ATTACHMENT_REFS in stip_sns:
+                attach_refs = stip_sns[const.STIP_STIX2_PROP_ATTACHMENT_REFS]
+            else:
+                attach_refs = []
+            if len(attach_refs) != 0:
+                for attach in attach_refs:
                     feed.save()
                     attach_bundle_id = attach['bundle']
                     attach_file = Feed.get_attach_file(
