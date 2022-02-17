@@ -71,6 +71,7 @@ class Feed(models.Model):
     referred_url = models.TextField(max_length=1024, default=None, null=True)
     stix2_package_id = models.CharField(max_length=128, default='', null=True)
     stix_version = models.CharField(max_length=8, default='1.2', null=True)
+    confidence = models.IntegerField(default=50)
     build_cache_flag = False
 
     class Meta:

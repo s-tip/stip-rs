@@ -121,6 +121,7 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=32, choices=const.ROLE_CHOICES, default="user")
     gv_auth_user = models.ForeignKey(GVAuthUser, on_delete=models.CASCADE, default=1)
     sns_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, default=1)
+    confidence = models.IntegerField(default=50)
 
     USERNAME_FIELD = 'username'
     ANONYMOUS_USER_ACCOUNT_NAME = 'anonymous'
