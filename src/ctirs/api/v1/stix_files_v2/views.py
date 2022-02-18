@@ -3,6 +3,7 @@ import tempfile
 import traceback
 from stix2.v21.common import LanguageContent
 from stix2.v21.bundle import Bundle
+from stix2.v21.sdo import Opinion, Identity, Note
 from django.http import HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.http.response import JsonResponse
@@ -32,6 +33,35 @@ def get_api_stix_files_v2_sighting_last_seen(request):
 
 def get_api_stix_files_v2_sighting_count(request):
     return get_text_field_value(request, 'count', default_value=0)
+
+
+def get_api_stix_files_v2_common_object_id(request):
+    return get_text_field_value(request, 'object_id', default_value=None)
+
+
+def get_api_stix_files_v2_opinion_object_id(request):
+    return get_api_stix_files_v2_common_object_id(request)
+
+
+def get_api_stix_files_v2_opinion_opinion(request):
+    return get_text_field_value(request, 'opinion', default_value=None)
+
+
+def get_api_stix_files_v2_opinion_explanation(request):
+    return get_text_field_value(request, 'explanation', default_value=None)
+
+
+def get_api_stix_files_v2_note_object_id(request):
+    return get_api_stix_files_v2_common_object_id(request)
+
+
+def get_api_stix_files_v2_note_abstract(request):
+    return get_text_field_value(request, 'abstract', default_value=None)
+
+
+def get_api_stix_files_v2_note_content(request):
+    return get_text_field_value(request, 'content', default_value=None)
+
 
 # /api/v1/stix_files_v2/<observed_data_id>/sighting
 @csrf_exempt
@@ -154,12 +184,7 @@ def post_language_contents(request, object_ref, ctirs_auth_user):
             )
             bundle.objects.append(language_content)
 
-        via = Vias.get_via_rest_api_upload(uploader=ctirs_auth_user.id)
-        community = Communities.get_default_community()
-        stix_file_path = tempfile.mktemp(suffix='.json')
-        with open(stix_file_path, 'wb+') as fp:
-            fp.write(bundle.serialize(indent=4, ensure_ascii=False)).encode()
-        regist(stix_file_path, community, via)
+        _regist_bundle(bundle, ctirs_auth_user)
         resp = get_normal_response_json()
         bundle_json = json.loads(str(bundle))
         resp['data'] = {'bundle': bundle_json}
@@ -167,6 +192,15 @@ def post_language_contents(request, object_ref, ctirs_auth_user):
     except Exception as e:
         traceback.print_exc()
         return error(e)
+
+
+def _regist_bundle(bundle, ctirs_auth_user):
+    via = Vias.get_via_rest_api_upload(uploader=ctirs_auth_user.id)
+    community = Communities.get_default_community()
+    stix_file_path = tempfile.mktemp(suffix='.json')
+    with open(stix_file_path, 'wb+') as fp:
+        fp.write(bundle.serialize(indent=4, ensure_ascii=False).encode('utf-8'))
+    regist(stix_file_path, community, via)
 
 
 def get_language_contents(request, object_ref):
@@ -272,6 +306,68 @@ def search_bundle(request):
         d['package_id_list'] = package_id_list
         resp['data'] = d
         return JsonResponse(resp, safe=False)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return error(e)
+
+
+# /api/v1/stix_files_v2/create_opinion
+@csrf_exempt
+@api_key_auth
+def create_opinion(request):
+    try:
+        if request.method != 'POST':
+            return HttpResponseNotAllowed(['POST'])
+        object_id = get_api_stix_files_v2_opinion_object_id(request)
+        opinion = get_api_stix_files_v2_opinion_opinion(request)
+        explanation = get_api_stix_files_v2_opinion_explanation(request)
+
+        stip_identity = _get_stip_identname(request.user)
+        ctirs_auth_user = authentication(request)
+
+        opinion_o = Opinion(
+            explanation=explanation,
+            created_by_ref=stip_identity,
+            opinion=opinion,
+            object_refs=[object_id]
+        )
+        bundle = Bundle(stip_identity, opinion_o)
+        _regist_bundle(bundle, ctirs_auth_user)
+        resp = get_normal_response_json()
+        return JsonResponse(resp, status=201, safe=False)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return error(e)
+
+
+# /api/v1/stix_files_v2/create_note
+@csrf_exempt
+@api_key_auth
+def create_note(request):
+    try:
+        if request.method != 'POST':
+            return HttpResponseNotAllowed(['POST'])
+        object_id = get_api_stix_files_v2_note_object_id(request)
+        abstract = get_api_stix_files_v2_note_abstract(request)
+        content = get_api_stix_files_v2_note_content(request)
+
+        stip_identity = _get_stip_identname(request.user)
+        ctirs_auth_user = authentication(request)
+
+        note_o = Note(
+            abstract=abstract,
+            created_by_ref=stip_identity,
+            content=content,
+            authors=[ctirs_auth_user.screen_name],
+            object_refs=[object_id]
+        )
+        bundle = Bundle(stip_identity, note_o)
+        _regist_bundle(bundle, ctirs_auth_user)
+ 
+        resp = get_normal_response_json()
+        return JsonResponse(resp, status=201, safe=False)
     except Exception as e:
         import traceback
         traceback.print_exc()
