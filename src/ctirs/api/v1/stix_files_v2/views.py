@@ -1,6 +1,7 @@
 import json
 import tempfile
 import traceback
+from stix2 import parse
 from stix2.v21.common import LanguageContent
 from stix2.v21.bundle import Bundle
 from stix2.v21.sdo import Opinion, Identity, Note
@@ -17,7 +18,8 @@ from ctirs.core.mongo.documents_stix import StixAttackPatterns, StixCampaignsV2,
     StixIntrusionSets, StixLocations, StixMalwares,\
     StixNotes, StixObservedData, StixOpinions, \
     StixReports, StixThreatActorsV2, StixTools, \
-    StixVulnerabilities, StixRelationships, StixSightings, StixLanguageContents, StixOthers, StixFiles
+    StixVulnerabilities, StixRelationships, StixSightings, StixLanguageContents, \
+    StixOthers, StixFiles, Stix2Base
 from ctirs.core.mongo.documents import Vias, Communities
 from ctirs.core.stix.regist import regist
 from ctirs.api.v1.package_id.views import delete_stix_file_package_id_document_info
@@ -61,6 +63,14 @@ def get_api_stix_files_v2_note_abstract(request):
 
 def get_api_stix_files_v2_note_content(request):
     return get_text_field_value(request, 'content', default_value=None)
+
+
+def get_api_stix_files_v2_mark_revoke_object_id(request):
+    return get_api_stix_files_v2_common_object_id(request)
+
+
+def get_api_stix_files_v2_update_json(request):
+    return get_api_stix_files_v2_common_object_id(request)
 
 
 # /api/v1/stix_files_v2/<observed_data_id>/sighting
@@ -366,6 +376,78 @@ def create_note(request):
         bundle = Bundle(stip_identity, note_o)
         _regist_bundle(bundle, ctirs_auth_user)
  
+        resp = get_normal_response_json()
+        return JsonResponse(resp, status=201, safe=False)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return error(e)
+
+# /api/v1/stix_files_v2/mark_revoke
+@csrf_exempt
+@api_key_auth
+def mark_revoke(request):
+    try:
+        if request.method != 'POST':
+            return HttpResponseNotAllowed(['POST'])
+        object_id = get_api_stix_files_v2_mark_revoke_object_id(request)
+
+        ctirs_auth_user = authentication(request)
+
+        try:
+            o_ = Stix2Base.newest_find(object_id)
+        except IndexError:
+            message = '%s does not exist (2)' % (object_id)
+            print(message)
+            return error(Exception(message))
+        if o_ is None:
+            message = '%s does not exist' % (object_id)
+            print(message)
+            return error(Exception(message))
+        if o_.revoked:
+            message = '%s already has been revoked' % (object_id)
+            print(message)
+            return error(Exception(message))
+        # <todo> check matching created_by_ref
+        d = Stix2Base.get_revoked_dict(o_)
+        revoked_obj = parse(d, allow_custom=True)
+
+        bundle = Bundle(revoked_obj, allow_custom=True)
+        _regist_bundle(bundle, ctirs_auth_user)
+        resp = get_normal_response_json()
+        return JsonResponse(resp, status=201, safe=False)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return error(e)
+
+# /api/v1/stix_files_v2/update
+@csrf_exempt
+@api_key_auth
+def update(request):
+    try:
+        if request.method != 'POST':
+            return HttpResponseNotAllowed(['POST'])
+        
+        stix2 = json.loads(request.body)
+
+        ctirs_auth_user = authentication(request)
+
+        object_id = stix2['id']
+        before = Stix2Base.newest_find(object_id)
+        if before is None:
+            message = '%s does not exist' % (object_id)
+            print(message)
+            return error(Exception(message))
+        if before.revoked:
+            message = '%s already has been revoked' % (object_id)
+            print(message)
+            return error(Exception(message))
+        # <todo> check matching created_by_ref
+        d = Stix2Base.get_modified_dict(before, stix2)
+        modified_obj = parse(d, allow_custom=True)
+        bundle = Bundle(modified_obj, allow_custom=True)
+        _regist_bundle(bundle, ctirs_auth_user)
         resp = get_normal_response_json()
         return JsonResponse(resp, status=201, safe=False)
     except Exception as e:

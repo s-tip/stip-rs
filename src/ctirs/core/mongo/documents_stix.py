@@ -4,6 +4,7 @@ import pytz
 import datetime
 import stix2slider
 import tempfile
+import copy
 import stip.common.const as const
 from stix2slider.options import initialize_options as sl_init
 try:
@@ -659,6 +660,72 @@ class Stix2Base(Document):
         document.package_name = stix_file.package_name
         document.package_id = stix_file.package_id
         return document
+
+    @staticmethod
+    def newest(objects):
+        return objects.order_by('-modified')[0]
+
+    @staticmethod
+    def newest_find(object_id):
+        if object_id.startswith('attack-pattern--'):
+            return Stix2Base.newest(StixAttackPatterns.objects(object_id_=object_id))
+        if object_id.startswith('campaign--'):
+            return Stix2Base.newest(StixCampaignsV2.objects(object_id_=object_id))
+        if object_id.startswith('course-of-action--'):
+            return Stix2Base.newest(StixCoursesOfActionV2.objects(object_id_=object_id))
+        if object_id.startswith('grouping--'):
+            raise Exception('Grouping Modification is not supported')
+        if object_id.startswith('identity--'):
+            return Stix2Base.newest(StixIdentities.objects(object_id_=object_id))
+        if object_id.startswith('indicator--'):
+            return Stix2Base.newest(StixIndicatorsV2.objects(object_id_=object_id))
+        if object_id.startswith('infrastructure--'):
+            raise Exception('Infrastructure Modification is not supported')
+        if object_id.startswith('intrusion-set--'):
+            return Stix2Base.newest(StixIntrusionSets.objects(object_id_=object_id))
+        if object_id.startswith('location--'):
+            return Stix2Base.newest(StixLocations.objects(object_id_=object_id))
+        if object_id.startswith('malware--'):
+            return Stix2Base.newest(StixMalwares.objects(object_id_=object_id))
+        if object_id.startswith('malware-analysis--'):
+            raise Exception('Malware Analysis Modification is not supported')
+        if object_id.startswith('note--'):
+            return Stix2Base.newest(StixNotes.objects(object_id_=object_id))
+        if object_id.startswith('observed-data--'):
+            return Stix2Base.newest(StixObservedData.objects(object_id_=object_id))
+        if object_id.startswith('opinion--'):
+            return Stix2Base.newest(StixOpinions.objects(object_id_=object_id))
+        if object_id.startswith('report--'):
+            return Stix2Base.newest(StixReports.objects(object_id_=object_id))
+        if object_id.startswith('threat-actor--'):
+            return Stix2Base.newest(StixThreatActorsV2.objects(object_id_=object_id))
+        if object_id.startswith('tool--'):
+            return Stix2Base.newest(StixTools.objects(object_id_=object_id))
+        if object_id.startswith('vulnerability--'):
+            return Stix2Base.newest(StixVulnerabilities.objects(object_id_=object_id))
+        return Stix2Base.newest(StixOthers.objects(object_id_=object_id))
+
+    @staticmethod
+    def change_modified_timestamp_dict(o_):
+        d = copy.deepcopy(o_.object_)
+        d['modified'] = datetime.datetime.now(pytz.utc)
+        return d
+
+    @staticmethod
+    def get_revoked_dict(o_):
+        d = Stix2Base.change_modified_timestamp_dict(o_)
+        d['revoked'] = True
+        return d
+
+    @staticmethod
+    def get_modified_dict(before, after):
+        SKIP_PROP = ['id', 'type', 'created', 'modified', 'spec_version', 'created_by_ref']
+        d = Stix2Base.change_modified_timestamp_dict(before)
+        for k in after:
+            if k in SKIP_PROP:
+                continue
+            d[k] = after[k]
+        return d
 
 
 class StixAttackPatterns(Stix2Base):
