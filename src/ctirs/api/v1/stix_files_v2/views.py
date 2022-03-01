@@ -19,7 +19,7 @@ from ctirs.core.mongo.documents_stix import StixAttackPatterns, StixCampaignsV2,
     StixNotes, StixObservedData, StixOpinions, \
     StixReports, StixThreatActorsV2, StixTools, \
     StixVulnerabilities, StixRelationships, StixSightings, StixLanguageContents, \
-    StixOthers, StixFiles, Stix2Base
+    StixOthers, StixFiles, Stix2Base, StixGroupings, StixInfrastructures, StixMalwareAnalyses
 from ctirs.core.mongo.documents import Vias, Communities
 from ctirs.core.stix.regist import regist
 from ctirs.api.v1.package_id.views import delete_stix_file_package_id_document_info
@@ -285,7 +285,9 @@ def _get_document(object_id):
                    StixIntrusionSets, StixLocations, StixMalwares,
                    StixNotes, StixObservedData, StixOpinions,
                    StixReports, StixThreatActorsV2, StixTools,
-                   StixVulnerabilities, StixRelationships, StixSightings, StixLanguageContents, StixOthers]
+                   StixVulnerabilities, StixRelationships, StixSightings,
+                   StixLanguageContents, StixOthers,
+                   StixGroupings, StixInfrastructures, StixMalwareAnalyses]
     doc = None
     for collection in collections:
         docs = collection.objects.filter(object_id_=object_id)
@@ -391,6 +393,8 @@ def mark_revoke(request):
         if request.method != 'POST':
             return HttpResponseNotAllowed(['POST'])
         object_id = get_api_stix_files_v2_mark_revoke_object_id(request)
+        if object_id is None:
+            return error(Exception('object_id is required'))
 
         ctirs_auth_user = authentication(request)
 

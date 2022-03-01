@@ -164,6 +164,9 @@ class StixFiles(Document):
         StixSightings.drop_collection()
         StixLanguageContents.drop_collection()
         StixOthers.drop_collection()
+        StixGroupings.drop_collection()
+        StixInfrastructures.drop_collection()
+        StixMalwareAnalyses.drop_collection()
 
         TXS21_SO.drop_collection()
         StixManifest.drop_collection()
@@ -359,6 +362,12 @@ class StixFiles(Document):
                     StixSightings.create(object_, self)
                 elif type_ == 'language-content':
                     StixLanguageContents.create(object_, self)
+                elif type_ == 'grouping':
+                    StixGroupings.create(object_, self)
+                elif type_ == 'infrastructure':
+                    StixInfrastructures.create(object_, self)
+                elif type_ == 'malware-analysis':
+                    StixMalwareAnalyses.create(object_, self)
                 else:
                     StixOthers.create(object_, self)
 
@@ -674,13 +683,13 @@ class Stix2Base(Document):
         if object_id.startswith('course-of-action--'):
             return Stix2Base.newest(StixCoursesOfActionV2.objects(object_id_=object_id))
         if object_id.startswith('grouping--'):
-            raise Exception('Grouping Modification is not supported')
+            return Stix2Base.newest(StixGroupings.objects(object_id_=object_id))
         if object_id.startswith('identity--'):
             return Stix2Base.newest(StixIdentities.objects(object_id_=object_id))
         if object_id.startswith('indicator--'):
             return Stix2Base.newest(StixIndicatorsV2.objects(object_id_=object_id))
         if object_id.startswith('infrastructure--'):
-            raise Exception('Infrastructure Modification is not supported')
+            return Stix2Base.newest(StixInfrastructures.objects(object_id_=object_id))
         if object_id.startswith('intrusion-set--'):
             return Stix2Base.newest(StixIntrusionSets.objects(object_id_=object_id))
         if object_id.startswith('location--'):
@@ -688,7 +697,7 @@ class Stix2Base(Document):
         if object_id.startswith('malware--'):
             return Stix2Base.newest(StixMalwares.objects(object_id_=object_id))
         if object_id.startswith('malware-analysis--'):
-            raise Exception('Malware Analysis Modification is not supported')
+            return Stix2Base.newest(StixMalwareAnalyses.objects(object_id_=object_id))
         if object_id.startswith('note--'):
             return Stix2Base.newest(StixNotes.objects(object_id_=object_id))
         if object_id.startswith('observed-data--'):
@@ -1013,6 +1022,136 @@ class StixNotes(Stix2Base):
             document.authors = Stix2Base.get_lists_or_string(object_['authors'])
         if ('object_refs' in object_):
             document.object_refs = Stix2Base.get_lists_or_string(object_['object_refs'])
+        document.save()
+        return document
+
+
+class StixGroupings(Stix2Base):
+    name = fields.StringField(max_length=1024)
+    description = fields.StringField(max_length=10240)
+    context = fields.StringField(max_length=10240)
+    object_refs = fields.ListField()
+
+    meta = {
+        'collection': 'stix_groupings',
+    }
+
+    @classmethod
+    def create(cls, object_, stix_file):
+        if object_ is None:
+            return None
+        document = StixGroupings()
+        document = super(StixGroupings, cls).create(document, object_, stix_file)
+        if ('name' in object_):
+            document.name = object_['name']
+        if ('description' in object_):
+            document.description = object_['description']
+        if ('context' in object_):
+            document.context = object_['context']
+        if ('object_refs' in object_):
+            document.object_refs = Stix2Base.get_lists_or_string(object_['object_refs'])
+        document.save()
+        return document
+
+
+class StixInfrastructures(Stix2Base):
+    name = fields.StringField(max_length=1024)
+    description = fields.StringField(max_length=10240)
+    infrastructure_types = fields.ListField()
+    aliases = fields.ListField()
+    kill_chain_phases = fields.ListField()
+    first_seen = fields.DateTimeField()
+    last_seen = fields.DateTimeField()
+
+    meta = {
+        'collection': 'stix_infrastructures',
+    }
+
+    @classmethod
+    def create(cls, object_, stix_file):
+        if object_ is None:
+            return None
+        document = StixInfrastructures()
+        document = super(StixInfrastructures, cls).create(document, object_, stix_file)
+        if ('name' in object_):
+            document.name = object_['name']
+        if ('description' in object_):
+            document.description = object_['description']
+        if ('infrastructure_types' in object_):
+            document.infrastructure_types = Stix2Base.get_lists_or_string(object_['infrastructure_types'])
+        if ('aliases' in object_):
+            document.aliases = Stix2Base.get_lists_or_string(object_['aliases'])
+        if ('kill_chain_phases' in object_):
+            document.kill_chain_phases = Stix2Base.get_lists_or_string(object_['kill_chain_phases'])
+        if ('first_seen' in object_):
+            document.first_seen = object_['first_seen']
+        if ('last_seen' in object_):
+            document.last_seen = object_['last_seen']
+        if ('context' in object_):
+            document.context = object_['context']
+        if ('object_refs' in object_):
+            document.object_refs = Stix2Base.get_lists_or_string(object_['object_refs'])
+        document.save()
+        return document
+
+
+class StixMalwareAnalyses(Stix2Base):
+    product = fields.StringField(max_length=1024)
+    version = fields.StringField(max_length=10240)
+    host_vm_ref = fields.StringField(max_length=10240)
+    installed_software_refs = fields.ListField()
+    configuration_version = fields.StringField(max_length=10240)
+    modules = fields.ListField()
+    analysis_engine_version = fields.StringField(max_length=10240)
+    analysis_definition_version = fields.StringField(max_length=10240)
+    submitted = fields.DateTimeField()
+    analysis_started = fields.DateTimeField()
+    analysis_ended = fields.DateTimeField()
+    result_name = fields.StringField(max_length=10240)
+    result = fields.StringField(max_length=10240)
+    analysis_sco_refs = fields.ListField()
+    sample_ref = fields.StringField(max_length=10240)
+
+    meta = {
+        'collection': 'stix_malware_analyses',
+    }
+
+    @classmethod
+    def create(cls, object_, stix_file):
+        if object_ is None:
+            return None
+        document = StixMalwareAnalyses()
+        document = super(StixMalwareAnalyses, cls).create(document, object_, stix_file)
+        if ('product' in object_):
+            document.product = object_['product']
+        if ('version' in object_):
+            document.version = object_['version']
+        if ('host_vm_ref' in object_):
+            document.host_vm_ref = object_['host_vm_ref']
+        if ('installed_software_refs' in object_):
+            document.installed_software_refs = Stix2Base.get_lists_or_string(object_['installed_software_refs'])
+        if ('configuration_version' in object_):
+            document.configuration_version = object_['configuration_version']
+        if ('modules' in object_):
+            document.modules = Stix2Base.get_lists_or_string(object_['modules'])
+        if ('analysis_engine_version' in object_):
+            document.analysis_engine_version = object_['analysis_engine_version']
+        if ('analysis_definition_version' in object_):
+            document.analysis_definition_version = object_['analysis_definition_version']
+        if ('submitted' in object_):
+            document.submitted = object_['submitted']
+        if ('analysis_started' in object_):
+            document.analysis_started = object_['analysis_started']
+        if ('analysis_ended' in object_):
+            document.analysis_ended = object_['analysis_ended']
+        if ('result_name' in object_):
+            document.result_name = object_['result_name']
+        if ('result' in object_):
+            document.result = object_['result']
+        if ('analysis_sco_refs' in object_):
+            document.analysis_sco_refs = Stix2Base.get_lists_or_string(object_['analysis_sco_refs'])
+        if ('sample_ref' in object_):
+            document.sample_ref = object_['sample_ref']
         document.save()
         return document
 
