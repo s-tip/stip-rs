@@ -388,7 +388,7 @@ def create_note(request):
 # /api/v1/stix_files_v2/mark_revoke
 @csrf_exempt
 @api_key_auth
-def mark_revoke(request):
+def revoke(request):
     try:
         if request.method != 'POST':
             return HttpResponseNotAllowed(['POST'])
@@ -401,7 +401,7 @@ def mark_revoke(request):
         try:
             o_ = Stix2Base.newest_find(object_id)
         except IndexError:
-            message = '%s does not exist (2)' % (object_id)
+            message = '%s does not exist' % (object_id)
             print(message)
             return error(Exception(message))
         if o_ is None:
@@ -425,10 +425,10 @@ def mark_revoke(request):
         traceback.print_exc()
         return error(e)
 
-# /api/v1/stix_files_v2/update
+# /api/v1/stix_files_v2/modify
 @csrf_exempt
 @api_key_auth
-def update(request):
+def modify(request):
     try:
         if request.method != 'POST':
             return HttpResponseNotAllowed(['POST'])
