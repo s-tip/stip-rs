@@ -712,6 +712,8 @@ class Stix2Base(Document):
             return Stix2Base.newest(StixTools.objects(object_id_=object_id))
         if object_id.startswith('vulnerability--'):
             return Stix2Base.newest(StixVulnerabilities.objects(object_id_=object_id))
+        if object_id.startswith('relationship--'):
+            return Stix2Base.newest(StixRelationships.objects(object_id_=object_id))
         return Stix2Base.newest(StixOthers.objects(object_id_=object_id))
 
     @staticmethod
