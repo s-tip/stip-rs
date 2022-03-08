@@ -412,7 +412,10 @@ def revoke(request):
             message = '%s already has been revoked' % (object_id)
             print(message)
             return error(Exception(message))
-        # <todo> check matching created_by_ref
+        if ctirs_auth_user.identity_id != o_['created_by_ref']:
+            message = 'You (%s) are not this object producer (%s).' % (ctirs_auth_user.identity_id, o_['created_by_ref'])
+            print(message)
+            return error(Exception(message))
         d = Stix2Base.get_revoked_dict(o_)
         revoked_obj = parse(d, allow_custom=True)
 
@@ -447,7 +450,10 @@ def modify(request):
             message = '%s already has been revoked' % (object_id)
             print(message)
             return error(Exception(message))
-        # <todo> check matching created_by_ref
+        if ctirs_auth_user.identity_id != before['created_by_ref']:
+            message = 'You (%s) are not this object producer (%s).' % (ctirs_auth_user.identity_id, before['created_by_ref'])
+            print(message)
+            return error(Exception(message))
         d = Stix2Base.get_modified_dict(before, stix2)
         modified_obj = parse(d, allow_custom=True)
         bundle = Bundle(modified_obj, allow_custom=True)
