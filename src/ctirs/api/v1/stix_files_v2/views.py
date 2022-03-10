@@ -9,7 +9,7 @@ from django.http import HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.http.response import JsonResponse
 from stip.common import get_text_field_value
-from stip.common.stip_stix2 import _get_stip_identname
+from stip.common.stip_stix2 import _get_stip_individual_identity
 from ctirs.api import error, get_normal_response_json, authentication
 from ctirs.api.v1.decolators import api_key_auth
 from mongoengine.queryset.visitor import Q
@@ -145,8 +145,8 @@ def is_exist_objects(selector, o_):
 def post_language_contents(request, object_ref, ctirs_auth_user):
     try:
         j = json.loads(request.body)
-        stip_identity = _get_stip_identname(request.user)
-        bundle = Bundle(stip_identity)
+        identity = _get_stip_individual_identity(ctirs_auth_user)
+        bundle = Bundle(identity)
         object_ = get_object(object_ref)
         if object_ is None:
             return error(Exception('No document. (object_ref=%s)' % (object_ref)))
@@ -187,7 +187,7 @@ def post_language_contents(request, object_ref, ctirs_auth_user):
             contents = {}
             contents[language] = {selector: content}
             language_content = LanguageContent(
-                created_by_ref=stip_identity,
+                created_by_ref=identity,
                 object_ref=object_ref,
                 object_modified=object_['modified'],
                 contents=contents
@@ -335,16 +335,16 @@ def create_opinion(request):
         opinion = get_api_stix_files_v2_opinion_opinion(request)
         explanation = get_api_stix_files_v2_opinion_explanation(request)
 
-        stip_identity = _get_stip_identname(request.user)
         ctirs_auth_user = authentication(request)
+        identity = _get_stip_individual_identity(ctirs_auth_user)
 
         opinion_o = Opinion(
             explanation=explanation,
-            created_by_ref=stip_identity,
+            created_by_ref=identity,
             opinion=opinion,
             object_refs=[object_id]
         )
-        bundle = Bundle(stip_identity, opinion_o)
+        bundle = Bundle(identity, opinion_o, allow_custom=True)
         _regist_bundle(bundle, ctirs_auth_user)
         resp = get_normal_response_json()
         return JsonResponse(resp, status=201, safe=False)
@@ -365,17 +365,17 @@ def create_note(request):
         abstract = get_api_stix_files_v2_note_abstract(request)
         content = get_api_stix_files_v2_note_content(request)
 
-        stip_identity = _get_stip_identname(request.user)
         ctirs_auth_user = authentication(request)
+        identity = _get_stip_individual_identity(ctirs_auth_user)
 
         note_o = Note(
             abstract=abstract,
-            created_by_ref=stip_identity,
+            created_by_ref=identity,
             content=content,
             authors=[ctirs_auth_user.screen_name],
             object_refs=[object_id]
         )
-        bundle = Bundle(stip_identity, note_o)
+        bundle = Bundle(identity, note_o, allow_custom=True)
         _regist_bundle(bundle, ctirs_auth_user)
  
         resp = get_normal_response_json()
@@ -397,6 +397,7 @@ def revoke(request):
             return error(Exception('object_id is required'))
 
         ctirs_auth_user = authentication(request)
+        identity = _get_stip_individual_identity(ctirs_auth_user)
 
         try:
             o_ = Stix2Base.newest_find(object_id)
@@ -419,7 +420,7 @@ def revoke(request):
         d = Stix2Base.get_revoked_dict(o_)
         revoked_obj = parse(d, allow_custom=True)
 
-        bundle = Bundle(revoked_obj, allow_custom=True)
+        bundle = Bundle(identity, revoked_obj, allow_custom=True)
         _regist_bundle(bundle, ctirs_auth_user)
         resp = get_normal_response_json()
         return JsonResponse(resp, status=201, safe=False)
@@ -439,6 +440,7 @@ def modify(request):
         stix2 = json.loads(request.body)
 
         ctirs_auth_user = authentication(request)
+        identity = _get_stip_individual_identity(ctirs_auth_user)
 
         object_id = stix2['id']
         before = Stix2Base.newest_find(object_id)
@@ -456,7 +458,7 @@ def modify(request):
             return error(Exception(message))
         d = Stix2Base.get_modified_dict(before, stix2)
         modified_obj = parse(d, allow_custom=True)
-        bundle = Bundle(modified_obj, allow_custom=True)
+        bundle = Bundle(identity, modified_obj, allow_custom=True)
         _regist_bundle(bundle, ctirs_auth_user)
         resp = get_normal_response_json()
         return JsonResponse(resp, status=201, safe=False)
