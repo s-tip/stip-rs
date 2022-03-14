@@ -23,7 +23,7 @@ def get_table_info(request):
     sort_dir = request.GET['sSortDir_0']
     order_query = None
     if sort_col == 1:
-        order_query = 'produced'
+        order_query = 'modified'
     elif sort_col == 2:
         order_query = 'package_name'
     elif sort_col == 3:
@@ -57,7 +57,7 @@ def get_table_info(request):
     for d in objects[iDisplayStart:(iDisplayStart + iDisplayLength)]:
         l = []
         l.append('<input type="checkbox" file_id="%s"/ class="delete-checkbox">' % (d.id))
-        l.append(d.produced.strftime('%Y/%m/%d %H:%M:%S'))
+        l.append(d.modified.strftime('%Y/%m/%d %H:%M:%S'))
         l.append(d.package_name)
         l.append(d.package_id)
         l.append(d.version)
