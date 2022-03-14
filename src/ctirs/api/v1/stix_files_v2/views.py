@@ -398,6 +398,8 @@ def revoke(request):
 
         ctirs_auth_user = authentication(request)
         identity = _get_stip_individual_identity(ctirs_auth_user)
+        if ctirs_auth_user.identity_id == object_id:
+            return error(Exception('You cannot revoke own identity object'))
 
         try:
             o_ = Stix2Base.newest_find(object_id)
