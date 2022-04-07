@@ -10,5 +10,7 @@ urlpatterns = [
     url(r'^modify$', stix_files_v2.modify),
     url(r'^(?P<observed_data_id>\S+)/sighting$', stix_files_v2.sighting),
     url(r'^(?P<object_ref>\S+)/language_contents$', stix_files_v2.language_contents),
+    url(r'^object/(?P<object_id>\S+)/latest$', stix_files_v2.get_latest_object),
+    url(r'^object/(?P<object_id>\S+)/(?P<version>\S+)$', stix_files_v2.get_stix2_content),
     url(r'^object/(?P<object_id>\S+)$', stix_files_v2.object_main),
 ]

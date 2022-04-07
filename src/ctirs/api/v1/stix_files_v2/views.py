@@ -21,6 +21,7 @@ from ctirs.core.mongo.documents_stix import StixAttackPatterns, StixCampaignsV2,
     StixVulnerabilities, StixRelationships, StixSightings, StixLanguageContents, \
     StixOthers, StixFiles, Stix2Base, StixGroupings, StixInfrastructures, StixMalwareAnalyses
 from ctirs.core.mongo.documents import Vias, Communities
+from ctirs.core.mongo.documents_taxii21_objects import StixManifest, StixObject
 from ctirs.core.stix.regist import regist
 from ctirs.api.v1.package_id.views import delete_stix_file_package_id_document_info
 
@@ -464,6 +465,64 @@ def modify(request):
         _regist_bundle(bundle, ctirs_auth_user)
         resp = get_normal_response_json()
         return JsonResponse(resp, status=201, safe=False)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return error(e)
+
+
+# /api/v1/stix_files_v2/object/<object_id>/latest
+@csrf_exempt
+@api_key_auth
+def get_latest_object(request, object_id):
+    try:
+        if request.method != 'POST':
+            return HttpResponseNotAllowed(['POST'])
+        modified = request.POST['modified']
+        try: 
+            manifest = StixManifest.objects.get(object_id=object_id)
+        except StixManifest.DoesNotExist:
+            raise Exception('object_id (%s) does not exist' % (object_id))
+        versions = sorted(manifest.versions, reverse=True)
+        is_latest = (versions[0] == modified)
+        try:
+            so = StixObject.objects.get(
+                object_id=object_id,
+                modified=versions[0])
+        except StixObject.DoesNotExist:
+            raise Exception('object_id (%s) and modified (%s) does not exist' %
+                (object_id, modified))
+        d = {}
+        d['is_latest'] = is_latest
+        d['object'] = so.object_value
+        d['versions'] = versions
+        resp = get_normal_response_json()
+        resp['data'] = d
+        return JsonResponse(resp, status=201, safe=False)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return error(e)
+
+# /api/v1/stix_files_v2/object/<object_id>/<version>
+@csrf_exempt
+@api_key_auth
+def get_stix2_content(request, object_id, version):
+    try:
+        if request.method != 'GET':
+            return HttpResponseNotAllowed(['GET'])
+        try:
+            so = StixObject.objects.get(
+                object_id=object_id,
+                modified=version)
+        except StixObject.DoesNotExist:
+            raise Exception('object_id (%s) and modified (%s) does not exist' %
+                (object_id, version))
+        d = {}
+        d['object'] = so.object_value
+        resp = get_normal_response_json()
+        resp['data'] = d
+        return JsonResponse(resp, safe=False)
     except Exception as e:
         import traceback
         traceback.print_exc()
