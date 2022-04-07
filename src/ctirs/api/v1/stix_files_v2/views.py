@@ -446,6 +446,8 @@ def modify(request):
         identity = _get_stip_individual_identity(ctirs_auth_user)
 
         object_id = stix2['id']
+        if ctirs_auth_user.identity_id == object_id:
+            return error(Exception('You cannot modify own identity object'))
         before = Stix2Base.newest_find(object_id)
         if before is None:
             message = '%s does not exist' % (object_id)
