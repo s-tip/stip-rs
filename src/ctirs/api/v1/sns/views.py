@@ -2,6 +2,7 @@ import pytz
 import datetime
 import re
 import string
+import json
 from mongoengine.errors import DoesNotExist
 from mongoengine.queryset.visitor import Q
 from django.http import HttpResponseNotAllowed
@@ -116,6 +117,13 @@ def get_feeds_size(request):
     return get_int_value(request, 'size')
 
 
+def get_feeds_filter(request):
+    try:
+        return json.loads(request.GET['filter'])
+    except Exception:
+        return None
+
+
 def get_int_value(request, key, default=0):
     try:
         return int(request.GET[key])
@@ -208,6 +216,21 @@ def feeds(request):
         query_string = request.GET.get(key='query_string', default=None)
         index = get_feeds_index(request)
         size = get_feeds_size(request)
+        filter = get_feeds_filter(request)
+        if filter is None:
+            ignore_accounts = None
+            ignore_na = False
+        else:
+            try:
+                ignore_accounts = filter['ignore_accounts']
+                if len(ignore_accounts) == 0:
+                    ignore_accounts = None
+            except KeyError:
+                ignore_accounts = None
+            try:
+                ignore_na = filter['ignore_na']
+            except KeyError:
+                ignore_na = False
 
         QQ = Q(is_post_sns__ne=False)
         if last_feed is not None:
@@ -255,9 +278,18 @@ def feeds(request):
             stip_users = STIPUser.objects.only('id')
             stip_user_list = []
             for stip_user in stip_users:
+                if ignore_accounts and len(ignore_accounts):
+                    if stip_user.username in ignore_accounts:
+                        continue
                 stip_user_list.append(stip_user.id)
             stip_users_vias = Vias.objects.filter(uploader__in=stip_user_list)
-            QQ & Q(via__in=stip_users_vias)
+            QQ &= Q(via__in=stip_users_vias)
+
+        if ignore_accounts:
+            QQ &= (Q(sns_user_name__nin=ignore_accounts) & Q(sns_type=StixFiles.STIP_SNS_TYPE_V2_POST))
+
+        if ignore_na:
+            QQ &= Q(sns_user_name__ne='')
 
         feeds_list = []
         stix_files = StixFiles.objects(QQ).order_by('-produced').skip(index).timeout(False)

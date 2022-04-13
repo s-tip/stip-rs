@@ -12,6 +12,9 @@ class Profile(models.Model):
         ('http', 'http'),
         ('https', 'https')
     )
+    DEFAULT_SNS_FILTER = {
+        "ignore_na": True,
+    }
 
     scan_csv = models.BooleanField(default=True)
     scan_pdf = models.BooleanField(default=False)
@@ -30,6 +33,7 @@ class Profile(models.Model):
     splunk_password = models.TextField(max_length=128, default='')
     splunk_scheme = models.TextField(max_length=16, default='https', choices=SPLUNK_SCHEME_CHOICE)
     splunk_query = models.TextField(max_length=10240, default='')
+    sns_filter = models.JSONField(blank=True, null=True)
 
     class Meta:
         db_table = 'stip_sns_user'
@@ -40,5 +44,6 @@ class Profile(models.Model):
     @classmethod
     def create_first_login(cls):
         profile = Profile()
+        profile.sns_filter = Profile.DEFAULT_SNS_FILTER
         profile.save()
         return profile
