@@ -48,6 +48,7 @@ class Notification(models.Model):
     notification_type = models.CharField(max_length=1,
                                          choices=NOTIFICATION_TYPES)
     is_read = models.BooleanField(default=False)
+    opinion = models.JSONField(blank=True, null=True)
 
     class Meta:
         verbose_name = 'Notification'

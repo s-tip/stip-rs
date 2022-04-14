@@ -193,12 +193,13 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     def get_description(self):
         return self.description
 
-    def notify_liked(self, package_id, feed_user):
+    def notify_liked(self, package_id, feed_user, opinion=None):
         from ctirs.models.sns.activities.models import Notification
         if self != feed_user:
             Notification(notification_type=Notification.LIKED,
                          from_user=self, to_user=feed_user,
-                         package_id=package_id).save()
+                         package_id=package_id,
+                         opinion=opinion).save()
 
     def unotify_liked(self, package_id, feed_user):
         from ctirs.models.sns.activities.models import Notification
