@@ -61,7 +61,7 @@ def _get_taxii_2x_objects_url(taxii_client):
     return url
 
 
-def _get_json_response(taxii_client, protocol_version, next=None):
+def _get_json_response(taxii_client, protocol_version, next=None, filtering_params=None):
     url = _get_taxii_2x_objects_url(taxii_client)
     url_parts = list(urlparse.urlparse(url))
     query = {}
@@ -75,6 +75,23 @@ def _get_json_response(taxii_client, protocol_version, next=None):
         headers = _get_taxii_21_get_request_header(taxii_client)
         if next is not None:
             query['next'] = next
+
+    if filtering_params is not None:
+        if 'next' not in query:
+            if 'next' in filtering_params:
+                query['next'] = filtering_params['next']
+        if 'limit' in filtering_params:
+            query['limit'] = filtering_params['limit']
+        if 'match' in filtering_params:
+            match = filtering_params['match']
+            if 'id' in match:
+                query['match[id]'] = match['id']
+            if 'type' in match:
+                query['match[type]'] = match['type']
+            if 'spec_version' in match:
+                query['match[spec_version]'] = match['spec_version']
+            if 'version' in match:
+                query['match[version]'] = match['version']
 
     cert_file = None
     key_file = None
@@ -129,7 +146,7 @@ def _get_json_response(taxii_client, protocol_version, next=None):
     return resp.json()
 
 
-def _get_objects_21(taxii_client, protocol_version, objects, resp_json):
+def _get_objects_21(taxii_client, protocol_version, objects, resp_json, filtering_params=None):
     if resp_json is None:
         return objects
     if 'objects' not in resp_json:
@@ -154,20 +171,24 @@ def _get_objects_21(taxii_client, protocol_version, objects, resp_json):
         next_resp_json = _get_json_response(
             taxii_client,
             protocol_version,
-            next=resp_json['next'])
+            next=resp_json['next'],
+            filtering_params=filtering_params)
         return _get_objects_21(
             taxii_client,
             protocol_version,
             objects,
-            next_resp_json)
+            next_resp_json,
+            filtering_params)
     return objects
 
 
-def poll_20(taxii_client, protocol_version='2.0'):
+def poll_20(taxii_client, protocol_version='2.0', filtering_params=None):
     try:
         count = 0
         fd = None
-        js = _get_json_response(taxii_client, protocol_version)
+        js = _get_json_response(
+            taxii_client, protocol_version,
+            next=None, filtering_params=filtering_params)
         if 'objects' not in js:
             return 0
 
@@ -176,7 +197,9 @@ def poll_20(taxii_client, protocol_version='2.0'):
             with open(stix_file_path, 'wb+') as fp:
                 fp.write(json.dumps(js, indent=4).encode('utf-8'))
         elif protocol_version == '2.1':
-            objects = _get_objects_21(taxii_client, protocol_version, [], js)
+            objects = _get_objects_21(
+                taxii_client, protocol_version, [],
+                js, filtering_params=filtering_params)
             if len(objects) == 0:
                 return 0
             bundle = Bundle(objects)

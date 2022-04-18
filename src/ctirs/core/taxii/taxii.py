@@ -126,14 +126,20 @@ class Client(object):
         except BaseException:
             traceback.print_exc()
 
-    def poll(self):
+    def poll(self, filtering_params=None):
         if not self._can_read:
             print('This collection is not for polling/consuming.: %s ' % (self._name))
             return 0
         if self._protocol_version == '2.0':
-            return poll_20(self, protocol_version='2.0')
+            return poll_20(
+                self,
+                protocol_version='2.0',
+                filtering_params=filtering_params)
         elif self._protocol_version == '2.1':
-            return poll_20(self, protocol_version='2.1')
+            return poll_20(
+                self,
+                protocol_version='2.1',
+                filtering_params=filtering_params)
         else:
             return poll_11(self)
 

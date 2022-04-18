@@ -8,6 +8,8 @@ from ctirs.error.views import error_page, error_page_no_view_permission, error_p
 from ctirs.core.mongo.documents import TaxiiClients, Taxii2Clients
 from ctirs.core.taxii.taxii import Client
 
+DEFAULT_LIMIT_NUM = 10
+
 
 def get_start_start(request):
     return get_text_field_value(request, 'poll_start', default_value=None)
@@ -19,6 +21,33 @@ def get_start_end(request):
 
 def get_protocol_version(request):
     return get_text_field_value(request, 'protocol_version', default_value=None)
+
+
+def get_limit(request):
+    try:
+        return int(get_text_field_value(request, 'poll_limit', default_value=DEFAULT_LIMIT_NUM))
+    except ValueError:
+        return DEFAULT_LIMIT_NUM
+
+
+def get_next(request):
+    return get_text_field_value(request, 'poll_next', default_value=None)
+
+
+def get_match_id(request):
+    return get_text_field_value(request, 'poll_match_id', default_value=None)
+
+
+def get_match_spec_version(request):
+    return get_text_field_value(request, 'poll_match_spec_version', default_value=None)
+
+
+def get_match_type(request):
+    return get_text_field_value(request, 'poll_match_type', default_value=None)
+
+
+def get_match_version(request):
+    return get_text_field_value(request, 'poll_match_version', default_value=None)
 
 
 @login_required
@@ -71,8 +100,15 @@ def start(request, id_):
     protocol_version = get_protocol_version(request)
     start = get_datetime_from_string(get_start_start(request))
     end = get_datetime_from_string(get_start_end(request))
+    limit = get_limit(request)
+    next = get_next(request)
+    match_id = get_match_id(request)
+    match_spec_version = get_match_spec_version(request)
+    match_type = get_match_type(request)
+    match_version = get_match_version(request)
     try:
         replace_dict = get_common_replace_dict(request)
+        filtering_params = {}
         if protocol_version.startswith('1.'):
             taxii_client = TaxiiClients.objects.get(id=id_)
             replace_dict['taxii'] = taxii_client
@@ -81,13 +117,26 @@ def start(request, id_):
             taxii2_client = Taxii2Clients.objects.get(id=id_)
             replace_dict['taxii'] = taxii2_client
             cl = Client(taxii2_client=taxii2_client)
+            filtering_params['limit'] = limit
+            if next is not None:
+                filtering_params['next'] = next
+            match = {}
+            if match_id is not None:
+                match['id'] = match_id
+            if match_spec_version is not None:
+                match['spec_version'] = match_spec_version
+            if match_type is not None:
+                match['type'] = match_type
+            if match_version is not None:
+                match['version'] = match_version
+            filtering_params['match'] = match
         else:
             raise Exception('Invalid taxii protocol version.')
 
         if cl._can_read:
             cl.set_start_time(start)
             cl.set_end_time(end)
-            count = cl.poll()
+            count = cl.poll(filtering_params=filtering_params)
             replace_dict['info_msg'] = 'Poll end successfully!! (Get %d stix files.)' % (count)
         else:
             replace_dict['error_msg'] = 'This collection is not for polling'
