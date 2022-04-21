@@ -55,24 +55,27 @@ def _get_taxii_21_post_request_header(taxii_client):
     
 
 def _get_taxii_2x_objects_url(taxii_client):
-    url = '%scollections/%s/objects/' % (
-        taxii_client._api_root,
-        taxii_client._collection)
+    if taxii_client._port == 443:
+        url = 'https://%s%s%scollections/objects/' % (
+            taxii_client._domain,
+            taxii_client._api_root,
+            taxii_client._collection)
+    else:
+        url = 'https://%s:%d%scollections/%s/objects/' % (
+            taxii_client._domain,
+            taxii_client._port,
+            taxii_client._api_root,
+            taxii_client._collection)
     return url
 
 
-def _get_json_response(taxii_client, protocol_version, next=None, filtering_params=None):
+def _get_json_response(taxii_client, next=None, filtering_params=None):
     url = _get_taxii_2x_objects_url(taxii_client)
-    url_parts = list(urlparse.urlparse(url))
     query = {}
 
     if taxii_client._start is not None:
         query['added_after'] = taxii_client._start.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-    if protocol_version == '2.0':
-        headers = _get_taxii_20_get_request_header(taxii_client)
-    elif protocol_version == '2.1':
-        headers = None
-        headers = _get_taxii_21_get_request_header(taxii_client)
+    if taxii_client._protocol_version == '2.1':
         if next is not None:
             query['next'] = next
 
@@ -92,6 +95,14 @@ def _get_json_response(taxii_client, protocol_version, next=None, filtering_para
                 query['match[spec_version]'] = match['spec_version']
             if 'version' in match:
                 query['match[version]'] = match['version']
+    return get_request(taxii_client, url, query)
+
+
+def get_request(taxii_client, url, query):
+    if taxii_client._protocol_version == '2.0':
+        headers = _get_taxii_20_get_request_header(taxii_client)
+    elif taxii_client._protocol_version == '2.1':
+        headers = _get_taxii_21_get_request_header(taxii_client)
 
     cert_file = None
     key_file = None
@@ -110,6 +121,7 @@ def _get_json_response(taxii_client, protocol_version, next=None, filtering_para
         cert = None
 
     try:
+        url_parts = list(urlparse.urlparse(url))
         url_parts[4] = urlencode(query)
         url = urlparse.urlunparse(url_parts)
         resp = requests.get(
@@ -140,9 +152,6 @@ def _get_json_response(taxii_client, protocol_version, next=None, filtering_para
                 os.remove(key_file)
             except Exception:
                 pass
-
-    if resp.status_code >= 300:
-        raise Exception('Invalid http response (%s).' % (resp.status_code))
     return resp.json()
 
 
@@ -170,25 +179,24 @@ def _get_objects_21(taxii_client, protocol_version, objects, resp_json, filterin
     if resp_json['more'] and 'next' in resp_json:
         next_resp_json = _get_json_response(
             taxii_client,
-            protocol_version,
             next=resp_json['next'],
             filtering_params=filtering_params)
         return _get_objects_21(
             taxii_client,
-            protocol_version,
             objects,
             next_resp_json,
             filtering_params)
     return objects
 
 
-def poll_20(taxii_client, protocol_version='2.0', filtering_params=None):
+def poll_20(taxii_client, filtering_params=None):
     try:
+        protocol_version = taxii_client._protocol_version
         count = 0
         fd = None
         js = _get_json_response(
-            taxii_client, protocol_version,
-            next=None, filtering_params=filtering_params)
+            taxii_client, next=None,
+            filtering_params=filtering_params)
         if 'objects' not in js:
             return 0
 
@@ -289,13 +297,14 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
                 os.close(key_fd)
             except Exception:
                 pass
-        if cert_file is not None:
-            try:
-                os.remove(cert_file)
-            except Exception:
-                pass
-        if key_file is not None:
-            try:
-                os.remove(key_file)
-            except Exception:
-                pass
+        if cert is not None:
+            if cert_file is not None:
+                try:
+                    os.remove(cert_file)
+                except Exception:
+                    pass
+            if key_file is not None:
+                try:
+                    os.remove(key_file)
+                except Exception:
+                    pass

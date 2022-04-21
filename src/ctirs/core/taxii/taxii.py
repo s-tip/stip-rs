@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from ctirs.core.mongo.documents import Vias, ScheduleJobs
 from ctirs.core.schedule.schedule import CtirsScheduler
 from ctirs.models.rs.models import System
-from ctirs.core.taxii.taxii20 import poll_20, push_20
+from ctirs.core.taxii.taxii20 import poll_20, push_20, get_request
 from ctirs.core.taxii.taxii11 import poll_11, push_11
 
 
@@ -31,6 +31,8 @@ class Client(object):
         else:
             self._auth_type = clients.HttpClient.AUTH_BASIC
         if taxii2_client:
+            self._domain = taxii.domain
+            self._port = taxii.port
             self._api_root = taxii.api_root
             self._collection = taxii.collection
             self._via = Vias.get_via_taxii_poll(taxii2_client=taxii, uploader=taxii.uploader)
@@ -62,6 +64,9 @@ class Client(object):
         self._start = None
         self._end = None
         self._schedule = CtirsScheduler()
+
+    def request_get_taxii_server(self, url):
+        return get_request(self, url, {})
 
     def set_start_time(self, start):
         self._start = start
@@ -131,15 +136,9 @@ class Client(object):
             print('This collection is not for polling/consuming.: %s ' % (self._name))
             return 0
         if self._protocol_version == '2.0':
-            return poll_20(
-                self,
-                protocol_version='2.0',
-                filtering_params=filtering_params)
+            return poll_20(self, filtering_params=filtering_params)
         elif self._protocol_version == '2.1':
-            return poll_20(
-                self,
-                protocol_version='2.1',
-                filtering_params=filtering_params)
+            return poll_20(self, filtering_params=filtering_params)
         else:
             return poll_11(self)
 

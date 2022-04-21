@@ -30,6 +30,7 @@
             </div>
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
+    <hr/>
     <div class="form-group">
         <div class="row">
             <div class="col-xs-2">
@@ -56,20 +57,23 @@
     <div class="form-group">
         <div class="row">
             <div class="col-xs-2">
-                API Root
+                TAXII Server Domain
             </div>
             <div class="col-xs-4">
-                <input id="create-api-root" type="text" name="api_root" class="form-control"/>
+                <input id="create-domain" type="text" name="domain" class="form-control"/>
             </div>
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
     <div class="form-group">
         <div class="row">
             <div class="col-xs-2">
-                Collection
+                TAXII Server Port
             </div>
-            <div class="col-xs-4">
-                <input id="create-collection" type="text" name="collection" class="form-control"/>
+            <div class="col-xs-3">
+                <input id="create-port" type="text" name="port" class="form-control" value="8443"/>
+            </div>
+            <div class="col-xs-1">
+                <button id="button-get-discovery" type="button" class="btn btn-danger">Get API Roots</button>
             </div>
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
@@ -128,7 +132,43 @@
             </div> <!-- <div class="row">-->
         </div><!-- <div class="form-group"> -->
     </div><!--  <div id="certificate-file-div"> -->
-
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                API Root
+            </div>
+            <div class="col-xs-4">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" id="create-api-root-dropdown-button" type="button" data-toggle="dropdown" disabled>
+                        Choose API Root
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="dropdown-menu-api-root">
+                    </ul>
+                    <input type="hidden" id="create-api-root" name="api_root" value="">
+                </div>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-2">
+                Collection
+            </div>
+            <div class="col-xs-4">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" id="create-collection-dropdown-button" type="button" data-toggle="dropdown" disabled>
+                        Choose Collection
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="dropdown-menu-collection">
+                    </ul>
+                    <input type="hidden" id="create-collection" name="collection" value="">
+                </div>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
+    <hr/>
     <div class="form-group">
         <div class="row">
             <div class="col-xs-2">
@@ -235,6 +275,12 @@
         Display Name
     </td>
     <td>
+        Domain
+    </td>
+    <td>
+        Port
+    </td>
+    <td>
         Protocol Version
     </td>
     <td>
@@ -285,8 +331,15 @@
     <td>
         <div class="form-group">
             <button class="btn btn-default detail-taxii2-client-button btn-sm" type="button" display_name="{{ taxii2_client.name }}" taxii2_client_id="{{ taxii2_client.id }}">Detail</button>
+    </td>
     <td>
         <p class="display-name" style="word-wrap: break-word;">{{ taxii2_client.name }}</p>
+    </td>
+    <td>
+        <p class="domain" style="word-wrap: break-word;">{{ taxii2_client.domain }}</p>
+    </td>
+    <td>
+        <p class="port" style="word-wrap: break-word;">{{ taxii2_client.port }}</p>
     </td>
     <td>
         <p class="protocol-version">{{ taxii2_client.protocol_version }}</p>
