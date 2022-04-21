@@ -281,6 +281,96 @@ $(function(){
       });        
     })
 
+    var col_info_dialog = $('#collection-information-dialog')
+    col_info_dialog.dialog({
+        width: 800,
+        height: 800,
+        resizable: true,
+        autoOpen: false,
+        modal: true,
+        buttons: {
+            Close: function() {
+                $( this ).dialog('close');
+            },
+        },
+    });
+    function _open_col_confirm_dialog(resp) {
+      TAB = 2
+      $('#col-info-id').val(resp['id'])
+      $('#col-info-title').val(resp['title'])
+      $('#col-info-alias').val(JSON.stringify(resp['alias'],null, TAB))
+      if(resp['can_read']){
+        $('#col-info-can-read').prop('checked', true)
+      } else {
+        $('#col-info-can-read').prop('checked', false)
+      }
+      if(resp['can_write']){
+        $('#col-info-can-write').prop('checked', true)
+      } else {
+        $('#col-info-can-write').prop('checked', false)
+      }
+      $('#col-info-description').val(JSON.stringify(resp['description'],null, TAB))
+      $('#col-info-media-type').val(JSON.stringify(resp['media_types'],null, TAB))
+      var title = 'Collection Information (id: ' + resp['id'] + ')'
+      col_info_dialog.dialog('option', 'title', title)
+      col_info_dialog.dialog('open')
+    }
+
+    $('#button-get-collection').click(function(){
+      if (_is_valid_name() == false) {
+        return
+      }
+      if (_is_valid_protocol_version() == false) {
+        return
+      }
+      if (_is_valid_domain() == false) {
+        return
+      }
+      if (_is_valid_port() == false) {
+        return
+      }
+      if (_is_valid_ca() == false) {
+         return
+      }
+      if (_is_valid_api_root() == false) {
+        return
+      }
+      if (_is_valid_collection() == false) {
+        return
+      }
+      d = {
+        'display_name' : $('#create-display-name').val(),
+        'protocol_version' : $('#create-protocol-version').val(),
+        'domain' : $('#create-domain').val(),
+        'port' : $('#create-port').val(),
+        'ca' : $('#create-ca').val(),
+        'certficate' : $('#create-certificate').val(),
+        'private_key' : $('#create-private-key').val(),
+        'login_id' : $('#create-login-id').val(),
+        'login_password' : $('#create-login-password').val(),
+        'api_root' : $('#create-api-root').val(),
+        'collection' : $('#create-collection').val(),
+      }
+      $.ajax({
+        type: 'GET',
+        url: '/configuration/taxii2_client/ajax/get_collection',
+        timeout: 100 * 1000,
+        cache: true,
+        data: d,
+        dataType: 'json',
+      }).done(function(r,textStatus,jqXHR){
+        if(r['status'] != 'OK'){
+          alert('get_collection failed:' + r['message'], 'Error!');
+        }else{
+          resp = r['data']
+          _open_col_confirm_dialog(resp)
+        }
+      }).fail(function(jqXHR,textStatus,errorThrown){
+        alert('Error occured: get_collection:' + textStatus + ':' + errorThrown);
+      }).always(function(data_or_jqXHR,textStatus,jqHXR_or_errorThrown){
+      });        
+    })
+
     function _get_collections(api_root) {
       if (_is_valid_name() == false) {
         return

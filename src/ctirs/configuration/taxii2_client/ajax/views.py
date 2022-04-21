@@ -6,6 +6,9 @@ import ctirs.configuration.taxii2_client.views as tc2
 import uuid
 
 
+COLLECTION_SUFFIX = 'collections/'
+
+
 def _get_taxii_discovery_url(protocol_version, domain, port):
     if protocol_version == '2.1':
         end_point = '/taxii2/'
@@ -18,7 +21,6 @@ def _get_taxii_discovery_url(protocol_version, domain, port):
 
 
 def _get_collections_url(domain, port, api_root):
-    COLLECTION_SUFFIX = 'collections/'
     if api_root.startswith('/'):
         end_point = api_root
     else:
@@ -29,6 +31,11 @@ def _get_collections_url(domain, port, api_root):
         return 'https://%s%s%s' % (domain, end_point, COLLECTION_SUFFIX)
     else:
         return 'https://%s:%d%s%s' % (domain, port, end_point, COLLECTION_SUFFIX)
+
+
+def _get_collection_url(domain, port, api_root, collection):
+    base = _get_collections_url(domain, port, api_root)
+    return '%s%s/' % (base, collection)
 
 
 def _taxii_request(request, end_point):
@@ -80,6 +87,10 @@ def _taxii_request(request, end_point):
         elif end_point == 'collections':
             api_root = tc2.get_taxii2_client_create_api_root(request)
             url = _get_collections_url(domain, port, api_root)
+        elif end_point == 'collection':
+            api_root = tc2.get_taxii2_client_create_api_root(request)
+            collection = tc2.get_taxii2_client_create_collection(request)
+            url = _get_collection_url(domain, port, api_root, collection)
         else:
             raise Exception('Invalid end_point')
         txs_resp = cl.request_get_taxii_server(url)
@@ -103,3 +114,8 @@ def get_discovery(request):
 @login_required
 def get_collections(request):
     return _taxii_request(request, end_point='collections')
+
+
+@login_required
+def get_collection(request):
+    return _taxii_request(request, end_point='collection')

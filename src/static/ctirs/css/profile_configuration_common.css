@@ -39,3 +39,7 @@ h1{
     margin: 10px 0px 10px;
 }
 
+.col-info-textarea
+{
+    width: 100%;
+}
