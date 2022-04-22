@@ -11,11 +11,19 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
-import logging
+import json
+from logging import config as logging_config
+from logging import disable, WARNING
 from unipath import Path
 from decouple import Csv, config, UndefinedValueError
 
-logging.disable(logging.WARNING)
+try:
+    txs2_audit_long_conf_path = config('TXS2_AUDIT_LOG_CONF')
+    with open(txs2_audit_long_conf_path) as fp:
+        log_conf = json.load(fp)
+        logging_config.dictConfig(log_conf)
+except FileNotFoundError:
+    disable(WARNING)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

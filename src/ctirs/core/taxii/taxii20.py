@@ -12,6 +12,9 @@ from requests.auth import _basic_auth_str
 from stix2 import parse
 from stix2.v21.bundle import Bundle
 from ctirs.core.mongo.documents_taxii21_objects import StixObject
+from logging import getLogger
+
+logger = getLogger('txs2_audit')
 
 
 TAXII_20_ACCEPT = 'application/vnd.oasis.stix+json; version=2.0'
@@ -104,54 +107,7 @@ def get_request(taxii_client, url, query):
     elif taxii_client._protocol_version == '2.1':
         headers = _get_taxii_21_get_request_header(taxii_client)
 
-    cert_file = None
-    key_file = None
-    cert_fd = None
-    key_fd = None
-    if taxii_client._auth_type == clients.HttpClient.AUTH_CERT_BASIC:
-        del(headers['Authorization'])
-        cert_fd, cert_file = tempfile.mkstemp()
-        with open(cert_file, 'w', encoding='utf-8') as fp:
-            fp.write(taxii_client._cert_file)
-        key_fd, key_file = tempfile.mkstemp()
-        with open(key_file, 'w', encoding='utf-8') as fp:
-            fp.write(taxii_client._key_file)
-        cert = (cert_file, key_file)
-    else:
-        cert = None
-
-    try:
-        url_parts = list(urlparse.urlparse(url))
-        url_parts[4] = urlencode(query)
-        url = urlparse.urlunparse(url_parts)
-        resp = requests.get(
-            url,
-            headers=headers,
-            verify=False,
-            cert=cert,
-            proxies=taxii_client._proxies
-        )
-    finally:
-        if cert_fd is not None:
-            try:
-                os.close(cert_fd)
-            except Exception:
-                pass
-        if key_fd is not None:
-            try:
-                os.close(key_fd)
-            except Exception:
-                pass
-        if cert_file is not None:
-            try:
-                os.remove(cert_file)
-            except Exception:
-                pass
-        if key_file is not None:
-            try:
-                os.remove(key_file)
-            except Exception:
-                pass
+    resp = _request_to_txs20(taxii_client, headers, url, http_method='GET', query=query, content=None)
     return resp.json()
 
 
@@ -254,6 +210,18 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
         push_stix['objects'] = org_stix['objects']
         content = json.dumps(push_stix, indent=4)
 
+    resp = _request_to_txs20(taxii_client, headers, url, http_method='POST', query={}, content=content)
+    if resp.status_code != 202:
+        raise Exception('Invalid http response: %s' % (resp.status_code))
+    msg = 'An add object status response shows below.'
+    msg += json.dumps(resp.json(), indent=4)
+    return msg
+ 
+
+def _request_to_txs20(taxii_client, headers, url, http_method='GET', query={}, content=None):
+    resp = None
+    cert_file = None
+    key_file = None
     cert_fd = None
     key_fd = None
     if taxii_client._auth_type == clients.HttpClient.AUTH_CERT_BASIC:
@@ -268,25 +236,41 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
     else:
         cert = None
 
+    logger.info('-----start-----')
+    logger.info('url: %s' % (url))
+    logger.info('method: %s' % (http_method))
+    logger.info('headers: \n%s' % (json.dumps(headers, indent=4)))
+    logger.info('query: \n%s' % (json.dumps(query, indent=4)))
+    logger.info('content: \n%s' % (content))
     try:
-        resp = requests.post(
-            url,
-            headers=headers,
-            data=content,
-            verify=False,
-            cert=cert,
-            proxies=taxii_client._proxies
-        )
-
-        if resp.status_code != 202:
-            raise Exception('Invalid http response: %s' % (resp.status_code))
-        msg = 'An add object status response shows below.'
-        msg += json.dumps(resp.json(), indent=4)
-        return msg
-    except Exception as e:
-        traceback.print_exc()
-        raise e
+        url_parts = list(urlparse.urlparse(url))
+        url_parts[4] = urlencode(query)
+        url = urlparse.urlunparse(url_parts)
+        if http_method == 'GET':
+            resp = requests.get(
+                url,
+                headers=headers,
+                verify=False,
+                cert=cert,
+                proxies=taxii_client._proxies
+            )
+        elif http_method == 'POST':
+            resp = requests.post(
+                url,
+                headers=headers,
+                data=content,
+                verify=False,
+                cert=cert,
+                proxies=taxii_client._proxies
+            )
+ 
     finally:
+        logger.info('response status: %s' % (resp.status_code))
+        try:
+            logger.info('response json: \n%s' % (json.dumps(resp.json(), indent=4)))
+        except Exception:
+            logger.info('response body (not json format): \n%s' % (resp.text))
+        logger.info('-----end-----')
         if cert_fd is not None:
             try:
                 os.close(cert_fd)
@@ -297,14 +281,14 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
                 os.close(key_fd)
             except Exception:
                 pass
-        if cert is not None:
-            if cert_file is not None:
-                try:
-                    os.remove(cert_file)
-                except Exception:
-                    pass
-            if key_file is not None:
-                try:
-                    os.remove(key_file)
-                except Exception:
-                    pass
+        if cert_file is not None:
+            try:
+                os.remove(cert_file)
+            except Exception:
+                pass
+        if key_file is not None:
+            try:
+                os.remove(key_file)
+            except Exception:
+                pass
+    return resp
