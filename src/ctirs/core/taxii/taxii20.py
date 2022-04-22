@@ -153,6 +153,8 @@ def poll_20(taxii_client, filtering_params=None):
         js = _get_json_response(
             taxii_client, next=None,
             filtering_params=filtering_params)
+        if 'http_status' in js:
+            raise Exception(json.dumps(js, indent=4))
         if 'objects' not in js:
             return 0
 
