@@ -295,6 +295,10 @@ $(function(){
         },
     });
     function _open_col_confirm_dialog(resp) {
+      if ('http_status' in resp){
+        alert(JSON.stringify(resp,null,2))
+        return
+      }
       TAB = 2
       $('#col-info-id').val(resp['id'])
       $('#col-info-title').val(resp['title'])
