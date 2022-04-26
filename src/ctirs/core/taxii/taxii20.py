@@ -72,8 +72,29 @@ def _get_taxii_2x_objects_url(taxii_client):
     return url
 
 
-def _get_json_response(taxii_client, next=None, filtering_params=None):
-    url = _get_taxii_2x_objects_url(taxii_client)
+def _get_taxii_2x_manifest_url(taxii_client):
+    if taxii_client._port == 443:
+        url = 'https://%s%s%scollections/manifest/' % (
+            taxii_client._domain,
+            taxii_client._api_root,
+            taxii_client._collection)
+    else:
+        url = 'https://%s:%d%scollections/%s/manifest/' % (
+            taxii_client._domain,
+            taxii_client._port,
+            taxii_client._api_root,
+            taxii_client._collection)
+    return url
+
+
+def _get_json_response(taxii_client, method='objects', next=None, filtering_params=None):
+    if method == 'objects':
+        url = _get_taxii_2x_objects_url(taxii_client)
+    elif method == 'manifest':
+        url = _get_taxii_2x_manifest_url(taxii_client)
+    else:
+        raise Exception('Method invalid')
+
     query = {}
 
     if taxii_client._start is not None:
@@ -111,7 +132,7 @@ def get_request(taxii_client, url, query):
     return resp.json()
 
 
-def _get_objects_21(taxii_client, protocol_version, objects, resp_json, filtering_params=None):
+def _get_objects_21(taxii_client, objects, resp_json, filtering_params=None):
     if resp_json is None:
         return objects
     if 'objects' not in resp_json:
@@ -135,6 +156,7 @@ def _get_objects_21(taxii_client, protocol_version, objects, resp_json, filterin
     if resp_json['more'] and 'next' in resp_json:
         next_resp_json = _get_json_response(
             taxii_client,
+            method='objects',
             next=resp_json['next'],
             filtering_params=filtering_params)
         return _get_objects_21(
@@ -145,13 +167,28 @@ def _get_objects_21(taxii_client, protocol_version, objects, resp_json, filterin
     return objects
 
 
+def manifest(taxii_client, filtering_params=None):
+    try:
+        js = _get_json_response(
+            taxii_client, method='manifest', next=None,
+            filtering_params=filtering_params)
+        if 'http_status' in js:
+            raise Exception(json.dumps(js, indent=4))
+        if 'objects' not in js:
+            return []
+        return js['objects']
+    except BaseException as e:
+        traceback.print_exc()
+        raise e
+
+
 def poll_20(taxii_client, filtering_params=None):
     try:
         protocol_version = taxii_client._protocol_version
         count = 0
         fd = None
         js = _get_json_response(
-            taxii_client, next=None,
+            taxii_client, method='objects', next=None,
             filtering_params=filtering_params)
         if 'http_status' in js:
             raise Exception(json.dumps(js, indent=4))
@@ -164,7 +201,7 @@ def poll_20(taxii_client, filtering_params=None):
                 fp.write(json.dumps(js, indent=4).encode('utf-8'))
         elif protocol_version == '2.1':
             objects = _get_objects_21(
-                taxii_client, protocol_version, [],
+                taxii_client, [],
                 js, filtering_params=filtering_params)
             if len(objects) == 0:
                 return 0

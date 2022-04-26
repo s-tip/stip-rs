@@ -137,6 +137,18 @@
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
     {% endif %}
+    <hr/>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-3">
+                Only Fetch Manifest
+                <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" title="Note" data-html="true" data-content="If you checked, STIX 2.1 objects are not saved." data-placement="bottom"></span>
+            </div>
+            <div class="col-xs-4">
+                <input id="poll-manifest" type="checkbox" name="poll_manifest"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div><!-- <div class="form-group"> -->
     <div class="form-group">
         <div class="row">
             <input id="poll-start" type="hidden" name="protocol_version" value="{{taxii.protocol_version}}"/>

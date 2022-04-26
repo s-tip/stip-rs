@@ -50,6 +50,10 @@ def get_match_version(request):
     return get_text_field_value(request, 'poll_match_version', default_value=None)
 
 
+def get_manifest(request):
+    return (get_text_field_value(request, 'poll_manifest', default_value=None) == 'on')
+
+
 @login_required
 def top(request):
     if not request.user.is_active:
@@ -106,6 +110,7 @@ def start(request, id_):
     match_spec_version = get_match_spec_version(request)
     match_type = get_match_type(request)
     match_version = get_match_version(request)
+    manifest = get_manifest(request)
     try:
         replace_dict = get_common_replace_dict(request)
         filtering_params = {}
@@ -136,10 +141,25 @@ def start(request, id_):
         if cl._can_read:
             cl.set_start_time(start)
             cl.set_end_time(end)
-            count = cl.poll(filtering_params=filtering_params)
-            replace_dict['info_msg'] = 'Poll end successfully!! (Get %d stix files.)' % (count)
+            if manifest:
+                if protocol_version.startswith('1.'):
+                    replace_dict['error_msg'] = 'TAXII 1.x does not support manifest operation.'
+                else:
+                    return _manifest(request, replace_dict, cl, filtering_params)
+            else:
+                count = cl.poll(filtering_params=filtering_params)
+                replace_dict['info_msg'] = 'Poll end successfully!! (Get %d stix files.)' % (count)
         else:
             replace_dict['error_msg'] = 'This collection is not for polling'
         return render(request, 'poll_detail.html', replace_dict)
+    except Exception:
+        return error_page(request)
+
+
+def _manifest(request, replace_dict, cl, filtering_params):
+    try:
+        manifest = cl.manifest(filtering_params=filtering_params)
+        replace_dict['manifest'] = manifest
+        return render(request, 'manifest.html', replace_dict)
     except Exception:
         return error_page(request)
