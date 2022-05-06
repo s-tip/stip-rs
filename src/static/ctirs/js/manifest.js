@@ -19,13 +19,6 @@ $(function(){
     })
 
     $(document).on('click','#manifest-back',function(){
-        const f = $('#poll-detail')
-        const protocol_version = $(this).data('protocol-version');
-        const elem = document.createElement('input');
-        elem.type = 'hidden';
-        elem.name = 'protocol_version';
-        elem.value = protocol_version;
-        f.append(elem);
-        f.submit();
+      history.back()
     })
 })

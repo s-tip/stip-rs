@@ -74,7 +74,7 @@ def _get_taxii_2x_objects_url(taxii_client):
 
 def _get_taxii_2x_manifest_url(taxii_client):
     if taxii_client._port == 443:
-        url = 'https://%s%s%scollections/manifest/' % (
+        url = 'https://%s%scollections/%s/manifest/' % (
             taxii_client._domain,
             taxii_client._api_root,
             taxii_client._collection)
@@ -87,11 +87,30 @@ def _get_taxii_2x_manifest_url(taxii_client):
     return url
 
 
-def _get_json_response(taxii_client, method='objects', next=None, filtering_params=None):
+def _get_taxii_2x_versions_url(taxii_client, object_id):
+    if taxii_client._port == 443:
+        url = 'https://%s%scollections/%s/objects/%s/versions/' % (
+            taxii_client._domain,
+            taxii_client._api_root,
+            taxii_client._collection,
+            object_id)
+    else:
+        url = 'https://%s:%d%scollections/%s/objects/%s/versions/' % (
+            taxii_client._domain,
+            taxii_client._port,
+            taxii_client._api_root,
+            taxii_client._collection,
+            object_id)
+    return url
+
+
+def _get_json_response(taxii_client, method='objects', next=None, object_id=None, filtering_params=None):
     if method == 'objects':
         url = _get_taxii_2x_objects_url(taxii_client)
     elif method == 'manifest':
         url = _get_taxii_2x_manifest_url(taxii_client)
+    elif method == 'versions':
+        url = _get_taxii_2x_versions_url(taxii_client, object_id)
     else:
         raise Exception('Method invalid')
 
@@ -158,6 +177,7 @@ def _get_objects_21(taxii_client, objects, resp_json, filtering_params=None):
             taxii_client,
             method='objects',
             next=resp_json['next'],
+            object_id=None,
             filtering_params=filtering_params)
         return _get_objects_21(
             taxii_client,
@@ -170,7 +190,7 @@ def _get_objects_21(taxii_client, objects, resp_json, filtering_params=None):
 def manifest(taxii_client, filtering_params=None):
     try:
         js = _get_json_response(
-            taxii_client, method='manifest', next=None,
+            taxii_client, method='manifest', next=None, object_id=None,
             filtering_params=filtering_params)
         if 'http_status' in js:
             raise Exception(json.dumps(js, indent=4))
@@ -182,13 +202,28 @@ def manifest(taxii_client, filtering_params=None):
         raise e
 
 
+def versions(taxii_client, object_id, filtering_params=None):
+    try:
+        js = _get_json_response(
+            taxii_client, method='versions', next=None, object_id=object_id,
+            filtering_params=filtering_params)
+        if 'http_status' in js:
+            raise Exception(json.dumps(js, indent=4))
+        if 'versions' not in js:
+            return []
+        return js['versions']
+    except BaseException as e:
+        traceback.print_exc()
+        raise e
+
+
 def poll_20(taxii_client, filtering_params=None):
     try:
         protocol_version = taxii_client._protocol_version
         count = 0
         fd = None
         js = _get_json_response(
-            taxii_client, method='objects', next=None,
+            taxii_client, method='objects', next=None, object_id=None,
             filtering_params=filtering_params)
         if 'http_status' in js:
             raise Exception(json.dumps(js, indent=4))

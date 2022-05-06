@@ -113,28 +113,18 @@ def start(request, id_):
     manifest = get_manifest(request)
     try:
         replace_dict = get_common_replace_dict(request)
-        filtering_params = {}
+        taxii_client, cl = _get_client(protocol_version, id_)
+        replace_dict['taxii'] = taxii_client
         if protocol_version.startswith('1.'):
-            taxii_client = TaxiiClients.objects.get(id=id_)
-            replace_dict['taxii'] = taxii_client
-            cl = Client(taxii_client=taxii_client)
+            filtering_params = {}
         elif protocol_version.startswith('2.'):
-            taxii2_client = Taxii2Clients.objects.get(id=id_)
-            replace_dict['taxii'] = taxii2_client
-            cl = Client(taxii2_client=taxii2_client)
-            filtering_params['limit'] = limit
-            if next is not None:
-                filtering_params['next'] = next
-            match = {}
-            if match_id is not None:
-                match['id'] = match_id
-            if match_spec_version is not None:
-                match['spec_version'] = match_spec_version
-            if match_type is not None:
-                match['type'] = match_type
-            if match_version is not None:
-                match['version'] = match_version
-            filtering_params['match'] = match
+            filtering_params = _get_filtering_params(
+                limit=limit,
+                next=next,
+                match_id=match_id,
+                match_spec_version=match_spec_version,
+                match_type=match_type,
+                match_version=match_version)
         else:
             raise Exception('Invalid taxii protocol version.')
 
@@ -155,6 +145,59 @@ def start(request, id_):
     except Exception:
         return error_page(request)
 
+
+@login_required
+def versions(request, taxii_id, object_id):
+    if not request.user.is_active:
+        return error_page_inactive(request)
+    if not request.user.is_admin:
+        return error_page_no_view_permission(request)
+
+    protocol_version = get_protocol_version(request)
+
+    try:
+        replace_dict = get_common_replace_dict(request)
+        taxii_client, cl = _get_client(protocol_version, taxii_id)
+        replace_dict['taxii'] = taxii_client
+        if not protocol_version.startswith('2.'):
+            raise Exception('Invalid taxii protocol version.')
+        filtering_params = {}
+        if cl._can_read:
+            versions = cl.versions(object_id, filtering_params=filtering_params)
+            replace_dict['versions'] = versions
+            replace_dict['object_id'] = object_id
+        return render(request, 'versions.html', replace_dict)
+    except Exception:
+        return error_page(request)
+ 
+
+def _get_client(protocol_version, id_):
+    if protocol_version.startswith('1.'):
+        taxii_client = TaxiiClients.objects.get(id=id_)
+        cl = Client(taxii_client=taxii_client)
+    elif protocol_version.startswith('2.'):
+        taxii_client = Taxii2Clients.objects.get(id=id_)
+        cl = Client(taxii2_client=taxii_client)
+    return taxii_client, cl
+
+
+def _get_filtering_params(**kwargs):
+    filtering_params = {}
+    filtering_params['limit'] = kwargs['limit']
+    if kwargs['next'] is not None:
+        filtering_params['next'] = kwargs['next']
+    match = {}
+    if kwargs['match_id'] is not None:
+        match['id'] = kwargs['match_id']
+    if kwargs['match_spec_version'] is not None:
+        match['spec_version'] = kwargs['match_spec_version']
+    if kwargs['match_type'] is not None:
+        match['type'] = kwargs['match_type']
+    if kwargs['match_version'] is not None:
+        match['version'] = kwargs['match_version']
+    filtering_params['match'] = match
+    return filtering_params
+ 
 
 def _manifest(request, replace_dict, cl, filtering_params):
     try:
