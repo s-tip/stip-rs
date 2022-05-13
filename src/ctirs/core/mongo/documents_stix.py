@@ -543,7 +543,7 @@ class StixFiles(Document):
 
 class LabelCaches(Document):
     label = fields.StringField(max_length=1024)
-    node_id = fields.StringField(max_length=100)
+    node_id = fields.StringField(max_length=256)
     package_id = fields.StringField(max_length=1024)
     stix_file = fields.ReferenceField(StixFiles, reverse_delete_rule=CASCADE)
 
