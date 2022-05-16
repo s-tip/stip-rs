@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from ctirs.core.mongo.documents import Vias, ScheduleJobs
 from ctirs.core.schedule.schedule import CtirsScheduler
 from ctirs.models.rs.models import System
-from ctirs.core.taxii.taxii20 import poll_20, push_20, manifest, versions, get_request, get_object
+from ctirs.core.taxii.taxii20 import poll_20, push_20, manifest, versions, get_request, get_object, delete_object
 from ctirs.core.taxii.taxii11 import poll_11, push_11
 
 
@@ -133,7 +133,7 @@ class Client(object):
 
     def poll(self, filtering_params=None):
         if not self._can_read:
-            print('This collection is not for polling/consuming.: %s ' % (self._name))
+            print('This collection is not configured for consumption: %s ' % (self._name))
             return 0
         if self._protocol_version == '2.0':
             return poll_20(self, filtering_params=filtering_params)
@@ -144,7 +144,7 @@ class Client(object):
 
     def manifest(self, filtering_params=None):
         if not self._can_read:
-            print('This collection is not for retriving manifest.: %s ' % (self._name))
+            print('This collection is not configured for consumption: %s ' % (self._name))
             return []
         if self._protocol_version == '2.0':
             return manifest(self, filtering_params=filtering_params)
@@ -156,7 +156,7 @@ class Client(object):
 
     def versions(self, object_id, filtering_params=None):
         if not self._can_read:
-            print('This collection is not for retriving versions.: %s ' % (self._name))
+            print('This collection is not configured for consumption: %s ' % (self._name))
             return []
         if self._protocol_version == '2.0':
             return versions(self, object_id, filtering_params=filtering_params)
@@ -168,7 +168,7 @@ class Client(object):
 
     def get_object(self, object_id, filtering_params=None):
         if not self._can_read:
-            print('This collection is not for retriving versions.: %s ' % (self._name))
+            print('This collection is not configured for consumption: %s ' % (self._name))
             return []
         if self._protocol_version == '2.0':
             return get_object(self, object_id, filtering_params=filtering_params)
@@ -178,9 +178,22 @@ class Client(object):
             print('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
             return []
 
+    def delete_object(self, object_id, filtering_params=None):
+        if not self._can_read or not self._can_write:
+            print('This collection is not configured for delete: %s ' % (self._name))
+            raise Exception('This collection is not configured for delete: %s ' % (self._name))
+        if self._protocol_version == '2.0':
+            delete_object(self, object_id, filtering_params=filtering_params)
+        elif self._protocol_version == '2.1':
+            delete_object(self, object_id, filtering_params=filtering_params)
+        else:
+            print('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
+            raise Exception('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
+        return
+
     def push(self, stix_file_doc):
         if not self._can_write:
-            msg = 'This collection is not for inbox/publishing: %s ' % (self._name)
+            msg = 'This collection is not configured for publication: %s ' % (self._name)
             print(msg)
             return msg
         if self._protocol_version == '2.0':

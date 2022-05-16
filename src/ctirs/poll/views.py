@@ -55,6 +55,10 @@ def get_manifest(request):
     return (get_text_field_value(request, 'poll_manifest', default_value=None) == 'on')
 
 
+def get_version_method(request):
+    return get_text_field_value(request, 'method', default_value='get')
+
+
 @login_required
 def top(request):
     if not request.user.is_active:
@@ -178,14 +182,15 @@ def version(request, taxii_id, object_id, version):
         return error_page_inactive(request)
     if not request.user.is_admin:
         return error_page_no_view_permission(request)
-    if request.method == 'GET':
+    method = get_version_method(request)
+    if method == 'get':
         return _version_get(request, taxii_id, object_id, version)
-    elif request.method == 'DELETE':
-        pass
+    elif method == 'delete':
+        return _version_delete(request, taxii_id, object_id, version)
     else:
         d = {
             'status': 'NG',
-            'message': 'HTTP method not allowd'
+            'message': 'Invalid method'
         }
         return JsonResponse(d, safe=True)
 
@@ -227,6 +232,43 @@ def _version_get(request, taxii_id, object_id, version):
         }
         return JsonResponse(d, safe=True)
  
+
+def _version_delete(request, taxii_id, object_id, version):
+    try:
+        protocol_version = get_protocol_version(request)
+        _, cl = _get_client(protocol_version, taxii_id)
+        if not protocol_version.startswith('2.'):
+            d = {
+                'status': 'NG',
+                'message': 'Invalid taxii protocol version.',
+            }
+            return JsonResponse(d, safe=True)
+        if cl._can_read and cl._can_write:
+            filtering_params = _get_filtering_params(
+                limit=None,
+                next=None,
+                match_id=None,
+                match_spec_version=None,
+                match_type=None,
+                match_version=version)
+            cl.delete_object(object_id, filtering_params=filtering_params)
+        else:
+            d = {
+                'status': 'NG',
+                'message': 'This collection does not allow to delete objects',
+            }
+            return JsonResponse(d, safe=True)
+        d = {
+            'status': 'OK',
+        }
+        return JsonResponse(d, safe=True)
+    except Exception as e:
+        d = {
+            'status': 'NG',
+            'message': str(e),
+        }
+        return JsonResponse(d, safe=True)
+
 
 def _get_client(protocol_version, id_):
     if protocol_version.startswith('1.'):

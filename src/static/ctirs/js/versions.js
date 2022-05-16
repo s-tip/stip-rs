@@ -32,15 +32,20 @@ $(function(){
       history.back()
     })
 
+    function _get_version_url (taxii_id, object_id, version) {
+      return'/poll/' + taxii_id + '/objects/' + object_id + '/versions/' + version + '/'
+    }
+
     $(document).on('click','.button-get',function(){
       const object_id = $('#input-object-id').val()
       const taxii_id = $('#input-taxii-id').val()
       const protocol_version = $('#input-protocol-version').val()
       const version = $(this).data('version')
-      d = {
+      const d = {
         'protocol_version' : protocol_version,
+        'method' : 'get'
       }
-      const url = '/poll/' + taxii_id + '/objects/' + object_id + '/versions/' + version + '/'
+      const url = _get_version_url(taxii_id ,object_id, version)
 
       $.ajax({
         type: 'GET',
@@ -53,7 +58,6 @@ $(function(){
         if(r['status'] != 'OK'){
           alert(url + ' failed:' + r['message'], 'Error!');
         }else{
-          view_object_dialog
           const title = object_id + ' (' + version + ')'
           $('#object-content').val(JSON.stringify(r['data'], null, 4))
           view_object_dialog.dialog('option', 'title', title)
@@ -75,6 +79,28 @@ $(function(){
       if (ret == false) {
           return
       }
-      alert('delete')
+      const d = {
+        'protocol_version' : protocol_version,
+        'method' : 'delete'
+      }
+      const url = _get_version_url(taxii_id ,object_id, version)
+
+      $.ajax({
+        type: 'GET',
+        url: url,
+        timeout: 100 * 1000,
+        cache: true,
+        data: d,
+        dataType: 'json',
+      }).done(function(r,textStatus,jqXHR){
+        if(r['status'] != 'OK'){
+          alert(url + ' failed:' + r['message'], 'Error!');
+        }else{
+          alert('Delete Success!!')
+        }
+      }).fail(function(jqXHR,textStatus,errorThrown){
+        alert('Error occured: ' + url + ':' + textStatus + ':' + errorThrown);
+      }).always(function(data_or_jqXHR,textStatus,jqHXR_or_errorThrown){
+      });        
     })
 })

@@ -121,18 +121,7 @@ def _get_taxii_2x_object_url(taxii_client, object_id):
     return url
 
 
-def _get_json_response(taxii_client, method='objects', next=None, object_id=None, filtering_params=None):
-    if method == 'objects':
-        url = _get_taxii_2x_objects_url(taxii_client)
-    elif method == 'manifest':
-        url = _get_taxii_2x_manifest_url(taxii_client)
-    elif method == 'versions':
-        url = _get_taxii_2x_versions_url(taxii_client, object_id)
-    elif method == 'get_object':
-        url = _get_taxii_2x_object_url(taxii_client, object_id)
-    else:
-        raise Exception('Method invalid')
-
+def _get_query(taxii_client, next=None, filtering_params=None):
     query = {}
 
     if taxii_client._start is not None:
@@ -157,7 +146,28 @@ def _get_json_response(taxii_client, method='objects', next=None, object_id=None
                 query['match[spec_version]'] = match['spec_version']
             if 'version' in match:
                 query['match[version]'] = match['version']
+    return query
+
+
+def _get_json_response(taxii_client, method='objects', next=None, object_id=None, filtering_params=None):
+    if method == 'objects':
+        url = _get_taxii_2x_objects_url(taxii_client)
+    elif method == 'manifest':
+        url = _get_taxii_2x_manifest_url(taxii_client)
+    elif method == 'versions':
+        url = _get_taxii_2x_versions_url(taxii_client, object_id)
+    elif method == 'get_object':
+        url = _get_taxii_2x_object_url(taxii_client, object_id)
+    else:
+        raise Exception('Method invalid')
+    query = _get_query(taxii_client, next=next, filtering_params=filtering_params)
     return get_request(taxii_client, url, query)
+
+
+def _delete_json_response(taxii_client, object_id=None, filtering_params=None):
+    url = _get_taxii_2x_object_url(taxii_client, object_id)
+    query = _get_query(taxii_client, filtering_params)
+    return delete_request(taxii_client, url, query)
 
 
 def get_request(taxii_client, url, query):
@@ -167,6 +177,16 @@ def get_request(taxii_client, url, query):
         headers = _get_taxii_21_get_request_header(taxii_client)
 
     resp = _request_to_txs20(taxii_client, headers, url, http_method='GET', query=query, content=None)
+    return resp.json()
+
+
+def delete_request(taxii_client, url, query):
+    if taxii_client._protocol_version == '2.0':
+        headers = _get_taxii_20_get_request_header(taxii_client)
+    elif taxii_client._protocol_version == '2.1':
+        headers = _get_taxii_21_get_request_header(taxii_client)
+
+    resp = _request_to_txs20(taxii_client, headers, url, http_method='DELETE', query=query, content=None)
     return resp.json()
 
 
@@ -246,6 +266,17 @@ def get_object(taxii_client, object_id, filtering_params=None):
         if 'objects' not in js:
             return []
         return js['objects']
+    except BaseException as e:
+        traceback.print_exc()
+        raise e
+
+
+def delete_object(taxii_client, object_id, filtering_params=None):
+    try:
+        js = _delete_json_response(taxii_client, object_id=object_id, filtering_params=filtering_params)
+        if 'http_status' in js:
+            raise Exception(json.dumps(js, indent=4))
+        return
     except BaseException as e:
         traceback.print_exc()
         raise e
@@ -371,7 +402,15 @@ def _request_to_txs20(taxii_client, headers, url, http_method='GET', query={}, c
                 cert=cert,
                 proxies=taxii_client._proxies
             )
- 
+        elif http_method == 'DELETE':
+            resp = requests.delete(
+                url,
+                headers=headers,
+                data=content,
+                verify=False,
+                cert=cert,
+                proxies=taxii_client._proxies
+            )
     finally:
         logger.info('response status: %s' % (resp.status_code))
         try:
