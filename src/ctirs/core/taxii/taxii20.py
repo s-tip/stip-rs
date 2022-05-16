@@ -55,7 +55,7 @@ def _get_taxii_21_post_request_header(taxii_client):
         'Authorization': _get_taxii_2x_authorization(taxii_client),
         'Content-Type': TAXII_21_PUBLICATION_CONTENT_TYPE,
     }
-    
+
 
 def _get_taxii_2x_objects_url(taxii_client):
     if taxii_client._port == 443:
@@ -104,6 +104,23 @@ def _get_taxii_2x_versions_url(taxii_client, object_id):
     return url
 
 
+def _get_taxii_2x_object_url(taxii_client, object_id):
+    if taxii_client._port == 443:
+        url = 'https://%s%scollections/%s/objects/%s/' % (
+            taxii_client._domain,
+            taxii_client._api_root,
+            taxii_client._collection,
+            object_id)
+    else:
+        url = 'https://%s:%d%scollections/%s/objects/%s/' % (
+            taxii_client._domain,
+            taxii_client._port,
+            taxii_client._api_root,
+            taxii_client._collection,
+            object_id)
+    return url
+
+
 def _get_json_response(taxii_client, method='objects', next=None, object_id=None, filtering_params=None):
     if method == 'objects':
         url = _get_taxii_2x_objects_url(taxii_client)
@@ -111,6 +128,8 @@ def _get_json_response(taxii_client, method='objects', next=None, object_id=None
         url = _get_taxii_2x_manifest_url(taxii_client)
     elif method == 'versions':
         url = _get_taxii_2x_versions_url(taxii_client, object_id)
+    elif method == 'get_object':
+        url = _get_taxii_2x_object_url(taxii_client, object_id)
     else:
         raise Exception('Method invalid')
 
@@ -212,6 +231,21 @@ def versions(taxii_client, object_id, filtering_params=None):
         if 'versions' not in js:
             return []
         return js['versions']
+    except BaseException as e:
+        traceback.print_exc()
+        raise e
+
+
+def get_object(taxii_client, object_id, filtering_params=None):
+    try:
+        js = _get_json_response(
+            taxii_client, method='get_object', next=None, object_id=object_id,
+            filtering_params=filtering_params)
+        if 'http_status' in js:
+            raise Exception(json.dumps(js, indent=4))
+        if 'objects' not in js:
+            return []
+        return js['objects']
     except BaseException as e:
         traceback.print_exc()
         raise e

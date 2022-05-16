@@ -2,6 +2,7 @@ import pytz
 import datetime
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.http.response import JsonResponse
 from stip.common import get_text_field_value
 from ctirs.core.common import get_common_replace_dict
 from ctirs.error.views import error_page, error_page_no_view_permission, error_page_inactive
@@ -169,6 +170,62 @@ def versions(request, taxii_id, object_id):
         return render(request, 'versions.html', replace_dict)
     except Exception:
         return error_page(request)
+
+
+@login_required
+def version(request, taxii_id, object_id, version):
+    if not request.user.is_active:
+        return error_page_inactive(request)
+    if not request.user.is_admin:
+        return error_page_no_view_permission(request)
+    if request.method == 'GET':
+        return _version_get(request, taxii_id, object_id, version)
+    elif request.method == 'DELETE':
+        pass
+    else:
+        d = {
+            'status': 'NG',
+            'message': 'HTTP method not allowd'
+        }
+        return JsonResponse(d, safe=True)
+
+
+def _version_get(request, taxii_id, object_id, version):
+    try:
+        protocol_version = get_protocol_version(request)
+        _, cl = _get_client(protocol_version, taxii_id)
+        if not protocol_version.startswith('2.'):
+            d = {
+                'status': 'NG',
+                'message': 'Invalid taxii protocol version.',
+            }
+            return JsonResponse(d, safe=True)
+        if cl._can_read:
+            filtering_params = _get_filtering_params(
+                limit=None,
+                next=None,
+                match_id=None,
+                match_spec_version=None,
+                match_type=None,
+                match_version=version)
+            object_ = cl.get_object(object_id, filtering_params=filtering_params)
+        else:
+            d = {
+                'status': 'NG',
+                'message': 'This collection does not allow to read objects',
+            }
+            return JsonResponse(d, safe=True)
+        d = {
+            'status': 'OK',
+            'data': object_
+        }
+        return JsonResponse(d, safe=True)
+    except Exception as e:
+        d = {
+            'status': 'NG',
+            'message': str(e),
+        }
+        return JsonResponse(d, safe=True)
  
 
 def _get_client(protocol_version, id_):

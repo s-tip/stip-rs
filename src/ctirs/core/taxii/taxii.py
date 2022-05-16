@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from ctirs.core.mongo.documents import Vias, ScheduleJobs
 from ctirs.core.schedule.schedule import CtirsScheduler
 from ctirs.models.rs.models import System
-from ctirs.core.taxii.taxii20 import poll_20, push_20, manifest, versions, get_request
+from ctirs.core.taxii.taxii20 import poll_20, push_20, manifest, versions, get_request, get_object
 from ctirs.core.taxii.taxii11 import poll_11, push_11
 
 
@@ -162,6 +162,18 @@ class Client(object):
             return versions(self, object_id, filtering_params=filtering_params)
         elif self._protocol_version == '2.1':
             return versions(self, object_id, filtering_params=filtering_params)
+        else:
+            print('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
+            return []
+
+    def get_object(self, object_id, filtering_params=None):
+        if not self._can_read:
+            print('This collection is not for retriving versions.: %s ' % (self._name))
+            return []
+        if self._protocol_version == '2.0':
+            return get_object(self, object_id, filtering_params=filtering_params)
+        elif self._protocol_version == '2.1':
+            return get_object(self, object_id, filtering_params=filtering_params)
         else:
             print('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
             return []

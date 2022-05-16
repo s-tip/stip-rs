@@ -58,7 +58,13 @@
         <thead>
             <tr>
                 <th>
-                    version
+                    Version
+                </th>
+                <th>
+                    Get
+                </th>
+                <th>
+                    Delete
                 </th>
             </tr>
         </thead>
@@ -66,18 +72,38 @@
             {% for version in versions %}
             <tr>
                 <td>
-                    <a href="/poll/{{ taxii.id }}/objects/{{ object_id }}/" data-protcol-version="{{ taxii.protocol_version }}" data-taxii-id="{{ taxii.id }}">{{ version }}</a>
+                    {{version}}
+                </td>
+                <td>
+                    <button type="button" class="btn btn-info button-get" data-protocol-version="{{ taxii.protocol_version }}" data-taxii-id="{{ taxii.id }}" data-version="{{ version }}" >Get</button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger button-delete" data-protocol-version="{{ taxii.protocol_version }}" data-taxii-id="{{ taxii.id }}" data-version="{{ version }}" >Delete</button>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+            <input type="hidden" id="input-protocol-version" value="{{ taxii.protocol_version }}"/>
+            <input type="hidden" id="input-taxii-id"  value="{{ taxii.id }}"/>
+            <input type="hidden" id="input-object-id" value="{{ object_id }}"/>
     <div class="form-group">
         <div class="row">
-            <button type="button" id="versions-back" class="btn btn-info" data-taxii-id="{{taxii.id}}" data-protocol-version="{{taxii.protocol_version}}">Back</button>
+            <button type="button" id="button-back" class="btn btn-info" data-taxii-id="{{taxii.id}}" data-protocol-version="{{taxii.protocol_version}}">Back</button>
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
 </div> <!--  <div class="container"> -->
 </form>
+
+<div id="view-object-dialog">
+    <form>
+        <div class="form-group">
+            <label for="object-content" class="col-form-label">Content:</label>
+            <textarea class="form-control" id="object-content" rows="25" disabled></textarea>
+        </div>
+    </form>
+</div>
+
+
 </body>
 </html>
