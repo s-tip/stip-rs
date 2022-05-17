@@ -4,6 +4,7 @@ import pytz
 from mongoengine import fields
 from mongoengine.document import Document
 from mongoengine.errors import DoesNotExist
+from django.utils.timezone import make_aware
 from ctirs.models.rs.models import STIPUser, System
 from ctirs import COMMUNITY_ORIGIN_DIR_NAME
 
@@ -712,6 +713,22 @@ class CommonTaxiiClient(object):
     def uploader_name(taxii_client):
         return STIPUser.objects.get(id=taxii_client.uploader).username
 
+
+class Taxii2Statuses(Document):
+    taxii2client = fields.ReferenceField(Taxii2Clients, required=True)
+    published = fields.DateTimeField(default=datetime.datetime.now())
+    status_id = fields.StringField(max_length=128)
+    status = fields.DictField()
+
+    @classmethod
+    def create(cls, taxii2client, status):
+        doc = Taxii2Statuses()
+        doc.taxii2client = taxii2client
+        doc.published = make_aware(datetime.datetime.now())
+        doc.status_id = status['id']
+        doc.status = status
+        doc.save()
+ 
 
 class Vias(Document):
     VIA_CHOICES = (

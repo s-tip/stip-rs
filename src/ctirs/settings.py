@@ -108,6 +108,7 @@ DIRS = [
     os.path.join(CTIRS_DIR, 'login/templates'),
     os.path.join(CTIRS_DIR, 'upload/templates'),
     os.path.join(CTIRS_DIR, 'list/templates'),
+    os.path.join(CTIRS_DIR, 'status/templates'),
     os.path.join(CTIRS_DIR, 'poll/templates'),
     os.path.join(CTIRS_DIR, 'profile/templates'),
     os.path.join(CTIRS_DIR, 'configuration/user/templates'),

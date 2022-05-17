@@ -5,6 +5,7 @@ import ctirs.dashboard.views as dashboard
 import ctirs.dashboard.urls
 import ctirs.upload.urls
 import ctirs.list.urls
+import ctirs.status.urls
 import ctirs.poll.urls
 import ctirs.adapter.urls
 import ctirs.configuration.urls
@@ -17,6 +18,7 @@ urlpatterns = [
     url(r'^dashboard/', include(ctirs.dashboard.urls)),
     url(r'^upload/', include(ctirs.upload.urls)),
     url(r'^list/', include(ctirs.list.urls)),
+    url(r'^status/', include(ctirs.status.urls)),
     url(r'^poll/', include(ctirs.poll.urls)),
     url(r'^adapter/', include(ctirs.adapter.urls)),
     url(r'^configuration/', include(ctirs.configuration.urls)),

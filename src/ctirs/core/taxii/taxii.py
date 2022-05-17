@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from ctirs.core.mongo.documents import Vias, ScheduleJobs
 from ctirs.core.schedule.schedule import CtirsScheduler
 from ctirs.models.rs.models import System
-from ctirs.core.taxii.taxii20 import poll_20, push_20, manifest, versions, get_request, get_object, delete_object
+from ctirs.core.taxii.taxii20 import poll_20, push_20, manifest, versions, get_request, get_object, delete_object, status
 from ctirs.core.taxii.taxii11 import poll_11, push_11
 
 
@@ -165,6 +165,15 @@ class Client(object):
         else:
             print('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
             return []
+
+    def status(self, status_id):
+        if self._protocol_version == '2.0':
+            return status(self, status_id)
+        elif self._protocol_version == '2.1':
+            return status(self, status_id)
+        else:
+            print('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
+            return {}
 
     def get_object(self, object_id, filtering_params=None):
         if not self._can_read:

@@ -89,6 +89,19 @@ $(function(){
     	$('.delete-checkbox').prop('checked',false);
     });
 
+    var resultPublishTaxiiDialog = $('#publish-taxii-result-dialog');
+    resultPublishTaxiiDialog.dialog({
+        width: 800,
+        height: 600,
+        resizable: true,
+        autoOpen: false,
+        modal: true,
+        buttons: {
+            Close: function() {
+                $( this ).dialog('close');
+            },
+        }
+    })
 
     var publishTaxiiDialog = $('#publish-taxii-confirm-dialog');
     publishTaxiiDialog.dialog({
@@ -123,14 +136,15 @@ $(function(){
                         dataType: 'json',
                     }).done(function(r,textStatus,jqXHR){
                     	if(r['status'] == 'OK'){
-                    		msg = 'Publish finished successfully!!\nMessage:\n' + r['message'];
+                            msg = r['message']
                     	}else{
                     		msg = 'Publish failed. Message: ' + r['message'];
                     	}
                     }).fail(function(jqXHR,textStatus,errorThrown){
                         msg = 'publish error has occured: ' + textStatus + ': ' + errorThrown;
                     }).always(function(data_or_jqXHR,textStatus,jqHXR_or_errorThrown){
-                    	alert(msg);
+                        $('#push-result').val(msg)
+                        resultPublishTaxiiDialog.dialog('open');
                     });            		
                 	$( this ).dialog('close');
             	}

@@ -118,7 +118,7 @@ def start(request, id_):
     manifest = get_manifest(request)
     try:
         replace_dict = get_common_replace_dict(request)
-        taxii_client, cl = _get_client(protocol_version, id_)
+        taxii_client, cl = get_client(protocol_version, id_)
         replace_dict['taxii'] = taxii_client
         if protocol_version.startswith('1.'):
             filtering_params = {}
@@ -162,7 +162,7 @@ def versions(request, taxii_id, object_id):
 
     try:
         replace_dict = get_common_replace_dict(request)
-        taxii_client, cl = _get_client(protocol_version, taxii_id)
+        taxii_client, cl = get_client(protocol_version, taxii_id)
         replace_dict['taxii'] = taxii_client
         if not protocol_version.startswith('2.'):
             raise Exception('Invalid taxii protocol version.')
@@ -198,7 +198,7 @@ def version(request, taxii_id, object_id, version):
 def _version_get(request, taxii_id, object_id, version):
     try:
         protocol_version = get_protocol_version(request)
-        _, cl = _get_client(protocol_version, taxii_id)
+        _, cl = get_client(protocol_version, taxii_id)
         if not protocol_version.startswith('2.'):
             d = {
                 'status': 'NG',
@@ -236,7 +236,7 @@ def _version_get(request, taxii_id, object_id, version):
 def _version_delete(request, taxii_id, object_id, version):
     try:
         protocol_version = get_protocol_version(request)
-        _, cl = _get_client(protocol_version, taxii_id)
+        _, cl = get_client(protocol_version, taxii_id)
         if not protocol_version.startswith('2.'):
             d = {
                 'status': 'NG',
@@ -270,7 +270,7 @@ def _version_delete(request, taxii_id, object_id, version):
         return JsonResponse(d, safe=True)
 
 
-def _get_client(protocol_version, id_):
+def get_client(protocol_version, id_):
     if protocol_version.startswith('1.'):
         taxii_client = TaxiiClients.objects.get(id=id_)
         cl = Client(taxii_client=taxii_client)

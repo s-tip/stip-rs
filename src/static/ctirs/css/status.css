@@ -1,0 +1,15 @@
+.center{
+    text-align: center;
+}
+h1,h2{
+    font-family: 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+h1{
+    text-align: center;
+}
+#page-title{
+    display: flex;
+    justify-content: center;
+    position: relative;
+}

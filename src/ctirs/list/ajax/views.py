@@ -1,3 +1,4 @@
+import json
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q as QQ
 from django.http import HttpResponseNotAllowed
@@ -5,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from mongoengine.queryset.visitor import Q
 from mongoengine import DoesNotExist
 from ctirs.api import JsonResponse
-from ctirs.core.mongo.documents import Communities, Vias, TaxiiClients, Taxii2Clients
+from ctirs.core.mongo.documents import Communities, Vias, TaxiiClients, Taxii2Clients, Taxii2Statuses
 from ctirs.core.mongo.documents_stix import StixFiles
 from ctirs.core.taxii.taxii import Client
 from ctirs.models.rs.models import STIPUser
@@ -115,6 +116,9 @@ def publish(request):
         return JsonResponse(resp)
     try:
         msg = client.push(stix)
+        if protocol_version.startswith('2.'):
+            status = json.loads(msg)
+            Taxii2Statuses.create(taxii_client, status)
         resp = {'status': 'OK',
                 'message': msg}
     except Exception as e:

@@ -121,6 +121,21 @@ def _get_taxii_2x_object_url(taxii_client, object_id):
     return url
 
 
+def _get_taxii_2x_status_url(taxii_client, status_id):
+    if taxii_client._port == 443:
+        url = 'https://%s%sstatus/%s/' % (
+            taxii_client._domain,
+            taxii_client._api_root,
+            status_id)
+    else:
+        url = 'https://%s:%d%sstatus/%s/' % (
+            taxii_client._domain,
+            taxii_client._port,
+            taxii_client._api_root,
+            status_id)
+    return url
+
+
 def _get_query(taxii_client, next=None, filtering_params=None):
     query = {}
 
@@ -256,6 +271,18 @@ def versions(taxii_client, object_id, filtering_params=None):
         raise e
 
 
+def status(taxii_client, status_id):
+    try:
+        url = _get_taxii_2x_status_url(taxii_client, status_id)
+        js = get_request(taxii_client, url, {})
+        if 'http_status' in js:
+            raise Exception(json.dumps(js, indent=4))
+        return js
+    except BaseException as e:
+        traceback.print_exc()
+        raise e
+
+
 def get_object(taxii_client, object_id, filtering_params=None):
     try:
         js = _get_json_response(
@@ -352,8 +379,7 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
     resp = _request_to_txs20(taxii_client, headers, url, http_method='POST', query={}, content=content)
     if resp.status_code != 202:
         raise Exception('Invalid http response: %s' % (resp.status_code))
-    msg = 'An add object status response shows below.'
-    msg += json.dumps(resp.json(), indent=4)
+    msg = json.dumps(resp.json(), indent=4)
     return msg
  
 
