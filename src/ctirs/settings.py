@@ -22,7 +22,7 @@ try:
     with open(txs2_audit_long_conf_path) as fp:
         log_conf = json.load(fp)
         logging_config.dictConfig(log_conf)
-except FileNotFoundError:
+except (FileNotFoundError, UndefinedValueError):
     disable(WARNING)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
