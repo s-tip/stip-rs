@@ -59,7 +59,7 @@ def _get_taxii_21_post_request_header(taxii_client):
 
 def _get_taxii_2x_objects_url(taxii_client):
     if taxii_client._port == 443:
-        url = 'https://%s%s%scollections/objects/' % (
+        url = 'https://%s%scollections/%s/objects/' % (
             taxii_client._domain,
             taxii_client._api_root,
             taxii_client._collection)
