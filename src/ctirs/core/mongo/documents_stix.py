@@ -373,7 +373,11 @@ class StixFiles(Document):
 
                 media_types = ["application/stix+json;version=2.1"]
                 object_id = object_['id']
-                modified = get_modified_from_object(object_)
+                try:
+                    modified = get_modified_from_object(object_)
+                except Exception:
+                    print('>>> skip (no modified, created): ' + str(object_['id']))
+                    continue
                 try:
                     txs21_so = TXS21_SO.objects.get(object_id=object_id, modified=modified)
                     txs21_so.append_stix_file(self)
