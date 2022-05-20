@@ -18,8 +18,8 @@ from unipath import Path
 from decouple import Csv, config, UndefinedValueError
 
 try:
-    txs2_audit_long_conf_path = config('TXS2_AUDIT_LOG_CONF')
-    with open(txs2_audit_long_conf_path) as fp:
+    txc2_audit_long_conf_path = config('TXC2_AUDIT_LOG_CONF')
+    with open(txc2_audit_long_conf_path) as fp:
         log_conf = json.load(fp)
         logging_config.dictConfig(log_conf)
 except (FileNotFoundError, UndefinedValueError):
