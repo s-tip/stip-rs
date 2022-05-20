@@ -3,7 +3,7 @@ $(function(){
         searching: true,
         paging: true,
         info: false,
-        order: [[1,'desc']],
+        order: [[2,'desc']],
          columns:[
         	{width:'10%'},	//#
         	{width:'25%'},	//status_id
