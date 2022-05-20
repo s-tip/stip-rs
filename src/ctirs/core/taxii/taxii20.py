@@ -14,7 +14,7 @@ from stix2.v21.bundle import Bundle
 from ctirs.core.mongo.documents_taxii21_objects import StixObject
 from logging import getLogger
 
-logger = getLogger('txs2_audit')
+logger = getLogger('txc2_audit')
 
 
 TAXII_20_ACCEPT = 'application/vnd.oasis.stix+json; version=2.0'
