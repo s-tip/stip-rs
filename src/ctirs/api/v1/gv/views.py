@@ -504,26 +504,26 @@ def _fuzzy_match(target, package_id, matching_patterns, custom_objects, fuzzy_ma
                     continue
                 if another_target_value not in matching_list:
                     continue
-                fmi = _create_fuzzy_match_info(target_cache, another_cache)
+                fmi = _create_fuzzy_match_info(target_cache, another_cache, fm_rule, target_value, another_target_value)
             if fmi:
                 fuzzy_matched_list.append(fmi)
                 continue
 
-            target_value = _get_normalized_value(target_value, fm_rule)
-            another_target_value = _get_normalized_value(another_target_value, fm_rule)
-            if target_value == another_target_value:
-                fuzzy_matched_list.append(_create_fuzzy_match_info(target_cache, another_cache))
+            normalize_target_value = _get_normalized_value(target_value, fm_rule)
+            normalize_another_target_value = _get_normalized_value(another_target_value, fm_rule)
+            if normalize_target_value == normalize_another_target_value:
+                fuzzy_matched_list.append(_create_fuzzy_match_info(target_cache, another_cache, fm_rule, target_value, another_target_value))
     return fuzzy_matched_list
 
 
 class FuzzyMatchInfo(object):
     def __init__(self):
-        self.reason = ''
+        self.reason = {}
         self.start_node = {}
         self.end_node = {}
 
 
-def _create_fuzzy_match_info(target_cache, another_cache):
+def _create_fuzzy_match_info(target_cache, another_cache, fm_rule, target_value, another_target_value):
     fmi = FuzzyMatchInfo()
     fmi.start_node = {
         'package_id': target_cache.package_id,
@@ -533,7 +533,12 @@ def _create_fuzzy_match_info(target_cache, another_cache):
         'package_id': another_cache.package_id,
         'node_id': another_cache.node_id,
     }
-    fmi.reason = 'Fuzzy Matching'
+    fmi.reason = {
+        'title': 'Fuzzy Matching',
+        'rule': fm_rule,
+        'val_1': target_value,
+        'val_2': another_target_value
+    }
     return fmi
 
 
@@ -693,9 +698,10 @@ def contents_and_edges(request):
             start_node = fuzzy_info.start_node
             end_node = fuzzy_info.end_node
             edge = {
-                'edge_type': fuzzy_info.reason,
+                'edge_type': fuzzy_info.reason['title'],
                 'start_node': start_node,
-                'end_node': end_node
+                'end_node': end_node,
+                'reason': fuzzy_info.reason,
             }
             edges.append(edge)
 
