@@ -1,13 +1,17 @@
 import pytz
+import json
+import tempfile
 import datetime
+from stix2.v21.bundle import Bundle
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http.response import JsonResponse
 from stip.common import get_text_field_value
 from ctirs.core.common import get_common_replace_dict
 from ctirs.error.views import error_page, error_page_no_view_permission, error_page_inactive
-from ctirs.core.mongo.documents import TaxiiClients, Taxii2Clients
+from ctirs.core.mongo.documents import TaxiiClients, Taxii2Clients, Vias, Communities
 from ctirs.core.taxii.taxii import Client
+from ctirs.core.stix.regist import regist
 
 DEFAULT_LIMIT_NUM = 10
 
@@ -57,6 +61,14 @@ def get_manifest(request):
 
 def get_version_method(request):
     return get_text_field_value(request, 'method', default_value='get')
+
+
+def get_content(request):
+    return get_text_field_value(request, 'content', default_value=None)
+
+
+def get_taxii_id(request):
+    return get_text_field_value(request, 'taxii_id', default_value=None)
 
 
 @login_required
@@ -305,3 +317,33 @@ def _manifest(request, replace_dict, cl, filtering_params):
         return render(request, 'manifest.html', replace_dict)
     except Exception:
         return error_page(request)
+
+
+@login_required
+def register_object(request):
+    try:
+        taxii_id = get_taxii_id(request)
+        objects = json.loads(get_content(request))
+        bundle = Bundle(objects, allow_custom=True)
+        _regist_bundle(bundle, request.user, taxii_id)
+        d = {
+            'status': 'OK',
+            'message': 'Success'
+        }
+        return JsonResponse(d, safe=True)
+    except Exception as e:
+        d = {
+            'status': 'NG',
+            'message': str(e),
+        }
+        return JsonResponse(d, safe=True)
+
+
+def _regist_bundle(bundle, uploader, taxii_id):
+    taxii2_client = Taxii2Clients.objects.get(id=taxii_id)
+    via = Vias.get_via_taxii_poll(taxii2_client=taxii2_client, uploader=uploader.id)
+    community = Communities.get_default_community()
+    stix_file_path = tempfile.mktemp(suffix='.json')
+    with open(stix_file_path, 'wb+') as fp:
+        fp.write(bundle.serialize(indent=4, ensure_ascii=False).encode('utf-8'))
+    regist(stix_file_path, community, via)

@@ -481,7 +481,7 @@ def get_latest_object(request, object_id):
         if request.method != 'POST':
             return HttpResponseNotAllowed(['POST'])
         modified = request.POST['modified']
-        try: 
+        try:
             manifest = StixManifest.objects.get(object_id=object_id)
         except StixManifest.DoesNotExist:
             raise Exception('object_id (%s) does not exist' % (object_id))

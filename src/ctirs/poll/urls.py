@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^(?P<id_>\S+)/start$', poll.start),
     url(r'^(?P<taxii_id>\S+)/objects/(?P<object_id>\S+)/versions/$', poll.versions),
     url(r'^(?P<taxii_id>\S+)/objects/(?P<object_id>\S+)/versions/(?P<version>\S+)/', poll.version),
+    url(r'^register_object/$', poll.register_object),
     # poll detail
     url(r'^(?P<id_>\S+)$', poll.detail),
 ]

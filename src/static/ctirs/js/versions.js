@@ -22,6 +22,9 @@ $(function(){
         resizable: true,
         autoOpen: false,
         buttons: {
+          Save: function() {
+            _save()
+          },
           Close: function() {
             $(this).dialog('close');
           },
@@ -34,6 +37,51 @@ $(function(){
 
     function _get_version_url (taxii_id, object_id, version) {
       return'/poll/' + taxii_id + '/objects/' + object_id + '/versions/' + version + '/'
+    }
+
+    function getCookie(name){
+        var cookieValue = null
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';')
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i])
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
+                    break
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function _save() {
+      const csrf_token = $('input[name="csrfmiddlewaretoken"]').val()
+      d = {
+        'content': $('#object-content').val(),
+        'taxii_id': $('#input-taxii-id').val(),
+        'csrf': csrf_token
+      }
+      url = '/poll/register_object/'
+      $.ajax({
+        type: 'POST',
+        url: url,
+        timeout: 100 * 1000,
+        cache: true,
+        data: d,
+        dataType: 'json',
+        beforeSend: function (xhr, settings) {
+          xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+        }
+      }).done(function(r,textStatus,jqXHR){
+        if(r['status'] != 'OK'){
+          alert('register_object failed:' + r['message'], 'Error!');
+        }else{
+          alert('Success!!')
+        }
+      }).fail(function(jqXHR,textStatus,errorThrown){
+        alert('Error occured: register_object: ' + textStatus + ': ' + errorThrown);
+      }).always(function(data_or_jqXHR,textStatus,jqHXR_or_errorThrown){
+      });        
     }
 
     $(document).on('click','.button-get',function(){
