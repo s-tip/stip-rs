@@ -35,6 +35,7 @@ class Client(object):
             self._port = taxii.port
             self._api_root = taxii.api_root
             self._collection = taxii.collection
+            self._filtering_params = taxii.filtering_params
             self._via = Vias.get_via_taxii_poll(taxii2_client=taxii, uploader=taxii.uploader)
         else:
             self._address = taxii.address
@@ -127,7 +128,7 @@ class Client(object):
         if self._taxii.last_requested is not None:
             self.set_start_time(self._taxii.last_requested.replace(tzinfo=pytz.utc))
         try:
-            self.poll()
+            self.poll(filtering_params=self._filtering_params)
         except BaseException:
             traceback.print_exc()
 

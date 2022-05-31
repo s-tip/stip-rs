@@ -135,7 +135,7 @@ def start(request, id_):
         if protocol_version.startswith('1.'):
             filtering_params = {}
         elif protocol_version.startswith('2.'):
-            filtering_params = _get_filtering_params(
+            filtering_params = get_filtering_params(
                 limit=limit,
                 next=next,
                 match_id=match_id,
@@ -218,7 +218,7 @@ def _version_get(request, taxii_id, object_id, version):
             }
             return JsonResponse(d, safe=True)
         if cl._can_read:
-            filtering_params = _get_filtering_params(
+            filtering_params = get_filtering_params(
                 limit=None,
                 next=None,
                 match_id=None,
@@ -256,7 +256,7 @@ def _version_delete(request, taxii_id, object_id, version):
             }
             return JsonResponse(d, safe=True)
         if cl._can_read and cl._can_write:
-            filtering_params = _get_filtering_params(
+            filtering_params = get_filtering_params(
                 limit=None,
                 next=None,
                 match_id=None,
@@ -292,7 +292,7 @@ def get_client(protocol_version, id_):
     return taxii_client, cl
 
 
-def _get_filtering_params(**kwargs):
+def get_filtering_params(**kwargs):
     filtering_params = {}
     filtering_params['limit'] = kwargs['limit']
     if kwargs['next'] is not None:

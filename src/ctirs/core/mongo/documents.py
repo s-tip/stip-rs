@@ -664,6 +664,7 @@ class Taxii2Clients(Document):
     interval_schedule_job = fields.ReferenceField(ScheduleJobs)
     can_read = fields.BooleanField(default=False)
     can_write = fields.BooleanField(default=False)
+    filtering_params = fields.DictField(default={})
 
 
 class CommonTaxiiClient(object):

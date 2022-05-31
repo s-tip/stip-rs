@@ -17,6 +17,57 @@
     <h1>TAXII Client (2.x)</h1>
     <br/>
     <hr/>
+    <h2>TAXII 2.x Parameter Configuration</h2>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-xs-3">
+                Limit
+                <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" title="Note" data-content="Integer Only" data-placement="bottom"></span>
+            </div>
+            <div class="col-xs-4">
+                <input id="poll-limit" type="text" name="poll_limit" class="form-control" value="{{client.filtering_params.limit}}" />
+            </div>
+        </div> <!-- <div class="row">-->
+        <hr/>
+        <div class="row">
+            <div class="col-xs-3">
+                Match (id)
+                <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" title="Example" data-html="true" data-content="indicator--3600ad1b-fff1-4c98-bcc9-4de3bc2e2ffb<br/>indicator--3600ad1b-fff1-4c98-bcc9-4de3bc2e2ffb,sighting--4600ad1b-fff1-4c58-bcc9-4de3bc5e2ffd" data-placement="bottom"></span>
+            </div>
+            <div class="col-xs-4">
+                <input id="poll-match-id" type="text" name="poll_match_id" class="form-control" value="{{client.filtering_params.match.id}}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+        <div class="row">
+            <div class="col-xs-3">
+                Match (spec_version)
+                <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" title="Example" data-html="true" data-content="2.1<br/>2.0,2.1<br/>" data-placement="bottom"></span>
+            </div>
+            <div class="col-xs-4">
+                <input id="poll-match-spec-version" type="text" name="poll_match_spec_version" class="form-control" value="{{client.filtering_params.match.spec_version}}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+        <div class="row">
+            <div class="col-xs-3">
+                Match (type)
+                <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" title="Example" data-html="true" data-content="indicator<br/>indicator,sighting" data-placement="bottom"></span>
+            </div>
+            <div class="col-xs-4">
+                <input id="poll-match-type" type="text" name="poll_match_type" class="form-control" value="{{client.filtering_params.match.type}}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+        <div class="row">
+            <div class="col-xs-3">
+                Match (version)
+                <span class="glyphicon glyphicon-info-sign" aria-hidden="true" data-toggle="popover" title="Example" data-html="true" data-content="all<br/>last,first<br/>first,2018-03-02T01:01:01.123Z,last<br/>2016-03-23T01:01:01.000Z,2018-03-02T01:01:01.123Z" data-placement="bottom"></span>
+            </div>
+            <div class="col-xs-4">
+                <input id="poll-match-version" type="text" name="poll_match_version" class="form-control"                 <input id="poll-match-type" type="text" name="poll_match_type" class="form-control" value="{{client.filtering_params.match.version}}"/>
+            </div>
+        </div> <!-- <div class="row">-->
+    </div>
+    <br/>
+    <hr/>
     <h2>Poll Interval Configuration</h2>
     <div class="form-group">
     <p id="interval-error-msg">{{ interval_error_msg |default:'' }}</p>
