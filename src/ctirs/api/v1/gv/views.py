@@ -463,6 +463,22 @@ def _get_fuzzy_matched_info(package_id):
     return fuzzy_matched_list
 
 
+def _list_matching(target_cache, another_cache, fm_rule, target_value, another_target_value):
+    if not fm_rule.get('list_matching', False):
+        return None
+    matching_lists = fm_rule.get('lists', [])
+    if len(matching_lists) == 0:
+        return None
+
+    for matching_list in matching_lists:
+        if target_value not in matching_list:
+            continue
+        if another_target_value not in matching_list:
+            continue
+        return _create_fuzzy_match_info(target_cache, another_cache, fm_rule, target_value, another_target_value)
+    return None
+
+
 def _fuzzy_match(target, package_id, matching_patterns, custom_objects, fuzzy_matched_list):
     for matching_pattern in matching_patterns:
         try:
@@ -492,26 +508,14 @@ def _fuzzy_match(target, package_id, matching_patterns, custom_objects, fuzzy_ma
             another_target_value = another_cache.value
             if type(another_target_value) != str:
                 continue
-            if not fm_rule.get('list_matching', False):
-                continue
-            matching_lists = fm_rule.get('lists', [])
-            if len(matching_lists) == 0:
-                continue
-
-            fmi = None
-            for matching_list in matching_lists:
-                if target_value not in matching_list:
-                    continue
-                if another_target_value not in matching_list:
-                    continue
-                fmi = _create_fuzzy_match_info(target_cache, another_cache, fm_rule, target_value, another_target_value)
+            fmi = _list_matching(target_cache, another_cache, fm_rule, target_value, another_target_value)
             if fmi:
                 fuzzy_matched_list.append(fmi)
                 continue
 
-            normalize_target_value = _get_normalized_value(target_value, fm_rule)
-            normalize_another_target_value = _get_normalized_value(another_target_value, fm_rule)
-            if normalize_target_value == normalize_another_target_value:
+            target_values = _absorb_roma_fluctuations(_get_normalized_value(target_value, fm_rule))
+            another_target_values = _absorb_roma_fluctuations(_get_normalized_value(another_target_value, fm_rule))
+            if len(target_values & another_target_values) != 0:
                 fuzzy_matched_list.append(_create_fuzzy_match_info(target_cache, another_cache, fm_rule, target_value, another_target_value))
     return fuzzy_matched_list
 
@@ -552,6 +556,24 @@ def _normalize2kun(v):
     for item in list_:
         v += item['kunrei']
     return v
+
+
+def _absorb_roma_fluctuations(v):
+    ret = []
+    ret.append(v)
+    if 'ou' in v:
+        ret.append(v.replace('ou', 'o'))
+    if 'aa' in v:
+        ret.append(v.replace('aa', 'a'))
+    if 'ii' in v:
+        ret.append(v.replace('ii', 'i'))
+    if 'uu' in v:
+        ret.append(v.replace('uu', 'u'))
+    if 'ee' in v:
+        ret.append(v.replace('ee', 'e'))
+    if 'oo' in v:
+        ret.append(v.replace('oo', 'o'))
+    return set(ret)
 
 
 def _get_normalized_value(target_value, rule):
