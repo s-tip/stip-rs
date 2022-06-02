@@ -120,6 +120,7 @@ DIRS = [
     os.path.join(CTIRS_DIR, 'configuration/community/templates'),
     os.path.join(CTIRS_DIR, 'configuration/system/templates'),
     os.path.join(CTIRS_DIR, 'configuration/mongo/templates'),
+    os.path.join(CTIRS_DIR, 'configuration/customizer/templates'),
     os.path.join(CTIRS_DIR, 'configuration/taxii_client/templates'),
     os.path.join(CTIRS_DIR, 'configuration/taxii_client/detail/templates'),
     os.path.join(CTIRS_DIR, 'configuration/taxii2_client/templates'),

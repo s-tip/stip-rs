@@ -1,0 +1,208 @@
+{% include 'header.html' %}
+<head>
+<script type="text/javascript" src="/static/vis/js/vis.min.js"></script>
+<script type="text/javascript" src="/static/ctirs/js/customizer.js"></script>
+<link type="text/css" rel="stylesheet" href="/static/vis/css/vis.min.css"/>
+<link type="text/css" rel="stylesheet" href="/static/ctirs/css/customizer.css"/>
+</head>
+
+<body>
+{% include 'nav_header.html' %}
+<div id="add-node-popUp">
+  <span id="add-node-operation">Add Custom Object or Property</span>
+  <br/><br/>
+  <div class="form-group row">
+    <div class="col-xs-2">
+      <label for="add-node-name" class="col-form-label">Name</label>
+    </div>
+    <div class="col-xs-1">
+      <span id="add-prefix-span"></span>
+    </div>
+    <div class="col-xs-9" style="display:inline-block;">
+      <input class="form-control" id="add-node-name" placeholder="Do not enter prefix ('x-' or 'x_')"/>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="node-type" class="col-form-label col-sm-2">Type</label>
+    <div class="col-sm-5 form-check">
+      <input class="form-check-input add-type-radio" type="radio" name="add-type-radio" id="add-type-object" value="object" checked>
+      <label class="form-check-label" for="add-type-object">Object</label>
+    </div>
+    <div class="col-sm-5 form-check">
+      <input class="form-check-input add-type-radio" type="radio" name="add-type-radio" id="add-type-property" value="property">
+      <label class="form-check-label" for="add-type-property">Property</label>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-3">
+      <input class="btn btn-sm btn-primary" type="button" value="Save" id="add-node-saveButton" />
+    </div>
+    <div class="col-sm-3">
+      <input class="btn btn-sm " type="button" value="Cancel" id="add-node-cancelButton" />
+    </div>
+  </div>
+</div>
+
+<div id="edit-node-popUp">
+  <h4 id="edit-node-operation"></h4>
+  <div class="form-group row">
+    <div class="col-xs-2">
+      <label for="edit-node-name" class="col-form-label">Name</label>
+    </div>
+    <div class="col-xs-10" style="display:inline-block;">
+      <input class="form-control" id="edit-node-name" placeholder="Do not enter prefix ('x-' or 'x_')"/>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="node-type" class="col-form-label col-sm-2">Type</label>
+    <div class="col-sm-5 form-check">
+      <input class="form-check-input edit-type-radio" type="radio" name="edit-type-radio" id="edit-type-object" value="object" disabled>
+      <label class="form-check-label" for="edit-type-object">Object</label>
+    </div>
+    <div class="col-sm-5 form-check">
+      <input class="form-check-input edit-type-radio" type="radio" name="edit-type-radio" id="edit-type-property" value="property" disabled>
+      <label class="form-check-label" for="edit-type-property">Property</label>
+    </div>
+  </div>
+
+  <div id="edit-node-object-div">
+    <hr/>
+    <h4>Object Settings</h4>
+    <div class="form-group row">
+      <label class="col-sm-3 form-label" for="edit-common-color">Color</label>
+      <div class="col-sm-9">
+        <input class="form-control form-control-color" type="color" id="edit-common-color"/>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-node-property-div">
+    <hr/>
+    <h4>Property Settings</h4>
+    <div class="form-group row">
+      <label class="col-sm-3 form-label" for="edit-common-regexp">Regexp for Extractor</label>
+      <div class="col-sm-9">
+        <input class="form-control" type="text" id="edit-common-regexp" value=""/>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label class="col-sm-3 form-label" for="edit-common-val-type">Value Type</label>
+      <div class="col-sm-9">
+        <input class="form-control" type="text" id="edit-common-val-type" disabled/>
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label class="col-sm-3 form-label" for="edit-common-required">Required</label>
+      <div class="col-sm-9 form-check">
+        <input class="form-check-input" type="checkbox" value="" id="edit-common-required"/>
+      </div>
+    </div>
+
+    <hr/>
+    <h4>Matching Settings</h4>
+    <div class="form-group row">
+      <div class="form-check col-sm-12">
+        <input class="custom-control-input" type="checkbox" value="" id="edit-fuzzy-case-insensitive"/>
+        <label class="custom-control-label" for="edit-fuzzy-case-insensitive">Case-insensitive</label>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="form-check col-sm-12">
+        <input class="form-check-input" type="checkbox" value="" id="edit-fuzzy-kata-hira"/>
+        <label class="form-check-label" for="edit-fuzzy-kata-hira">Katakana/Hiragana Matching (トウキョウ =とうきょう)</label>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="form-check col-sm-12">
+        <input class="form-check-input" type="checkbox" value="" id="edit-fuzzy-zen-han"/>
+        <label class="form-check-label" for="edit-fuzzy-zen-han">Zenakaku/Hankaku Matching (トウキョウ = ﾄｳｷｮｳ)</label>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="form-check col-sm-12">
+        <input class="form-check-input" type="checkbox" value="" id="edit-fuzzy-eng-jpn"/>
+        <label class="form-label" for="edit-fuzzy-eng-jpn">Japanese/English Fuzzy Matching (トウキョウ = Tokyo)</label>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="form-check col-sm-12">
+        <input class="form-check-input" type="checkbox" value="" id="edit-fuzzy-list"/>
+        <label class="form-check-label" for="edit-fuzzy-list">List Matching</label>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="form-check col-sm-12" id="edit-fuzzy-list-div">
+        <textarea class="form-control edit-fuzzy-list-textarea" rows="3" id="edit-fuzzy-list-init"></textarea>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="col-sm-12">
+         <span class="glyphicon glyphicon-plus-sign btn-sm btn-info compose-title-plus-button" id='edit-fully-list-plus'></span>
+      </div>
+    </div>
+    <hr/>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-3">
+      <input class="btn btn-sm btn-primary" type="button" value="Save" id="edit-node-saveButton" />
+    </div>
+    <div class="col-sm-3">
+      <input class="btn btn-sm " type="button" value="Cancel" id="edit-node-cancelButton" />
+    </div>
+  </div>
+</div>
+
+<div id="edge-popUp">
+  <div class="form-group row">
+    <div class="col-xs-12">
+      <span id="edge-operation">edge</span> 
+    </div>
+  </div>
+  <br/><br/>
+  <div class="form-group row">
+    <div class="col-xs-12">
+      <span>Add the link?</span> 
+    </div>
+  </div>
+  <br/>
+
+  <div class="form-group row" id='edge-div-rule-name'>
+    <div class="col-sm-2">
+      <label for="edit-edge-rule-name" class="col-form-label">Rule Name</label>
+    </div>
+    <div class="col-sm-10" style="display:inline-block;">
+      <input class="form-control" id="edit-edge-rule-name" >
+    </div>
+  </div>
+ 
+  <div class="form-group row">
+    <div class="col-sm-3">
+      <input class="btn btn-sm btn-primary" type="button" value="save" id="edge-saveButton" />
+    </div>
+    <div class="col-sm-3">
+      <input class="btn btn-sm" type="button" value="cancel" id="edge-cancelButton" />
+    </div>
+  </div>
+</div>
+
+<div class="page-header">
+  <div class="form-group row">
+    <div class="col-sm-10">
+      <h1>(STIX) Customizer</h1>
+    </div>
+    <div class="col-sm-1">
+      <input class="btn btn-lg btn-danger" type="button" value="Discard" id="discard-button" />
+    </div>
+    <div class="col-sm-1">
+      <input class="btn btn-lg btn-primary" type="button" value="Save" id="save-button" />
+    </div>
+  </div>
+</div>
+<div class="from-group row">
+  <div class="col-sm-12">
+    <div id="visjs-network"></div>
+  </div>
+</div>
+</body>
