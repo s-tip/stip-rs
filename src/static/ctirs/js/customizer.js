@@ -350,18 +350,26 @@ $(function() {
   }
 
   function deleteEdge(data, callback) {
-    $.each(data.edges, function(key, edge){
-      delete(matching_names[edge])
-      $.each(network.getConnectedNodes(edge), function(key2, node_id){
-        if(network.body.nodes[node_id].options.val_type == VAL_TYPE_DICT) {
-          network.body.nodes[node_id].options.val_type = VAL_TYPE_STRING
-        } else {
-          delete(network.body.nodes[node_id].options.parent)
-        }
-      })
+    $.each(data.edges, function(key, edge_id){
+      const edge = network.body.edges[edge_id].options
+      if (edge.label == EDGE_TYPE_MATCHES) {
+        _delete_match_edge(edge_id)
+      }
     })
     callback(data)
     return
+  }
+
+  function _delete_match_edge(edge_id) {
+    const edge = network.body.edges[edge_id].options
+    if (edge_id in matching_names) {
+      delete(matching_names[edge_id])
+    }
+    $.each(network.getConnectedNodes(edge_id), function(key2, node_id){
+      if(network.body.nodes[node_id].options.val_type == VAL_TYPE_DICT) {
+        network.body.nodes[node_id].options.val_type = VAL_TYPE_STRING
+      }
+    })
   }
 
   function editNode(data, callback) {
@@ -966,6 +974,9 @@ $(function() {
   $('#save-button').on('click', function() {
     var ret = {}
     ret.custom_objects =  _get_custom_objects_json()
+    if (ret.custom_objects == null){
+      return
+    }
     ret.matching_patterns = _get_matching_patterns_json()
 
     $.ajax({

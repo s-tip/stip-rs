@@ -36,7 +36,6 @@ SIMILARTY_6_EDGE_TYPE = 'Similarity: 6'
 SIMILARTY_7_EDGE_TYPE = 'Similarity: 7'
 SIMILARTY_8_EDGE_TYPE = 'Similarity: 8'
 
-matching_patterns = MatchingCustomizer.get_instance().get_matching_patterns()
 kakasi = pykakasi.kakasi()
 
 
