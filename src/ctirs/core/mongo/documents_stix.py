@@ -1688,7 +1688,6 @@ class CustomObjectCaches(Document):
             if (type(v) != str):
                 continue
             node_id = '%s-%s' % (custom_object.object_id_, match_prop)
-            print(v)
             document = CustomObjectCaches()
             document.type = '%s:%s' % (custom_object.object_type, match_prop)
             if hasattr(custom_object, 'name'):

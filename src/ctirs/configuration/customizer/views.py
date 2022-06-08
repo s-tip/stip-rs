@@ -58,5 +58,4 @@ def set_customizer_configuration(request):
     matching_customizer.update_customizer_conf({
         'matching_patterns': j['matching_patterns']
     })
-    #print(json.dumps(j['custom_objects'], indent=4))
     return HttpResponse(status=201)
