@@ -479,22 +479,34 @@ def _list_matching(target_cache, another_cache, fm_rule, target_value, another_t
     return None
 
 
+def _get_object_value_from_cache_type(type_, object_):
+    if '.' in type_:
+        parent, child = type_.split('.')
+        return _get_object_value_from_cache_type(child, object_[parent])
+    else:
+        if type_ in object_:
+            return object_[type_]
+        raise KeyError('%s not in object' % (type_))
+
+
 def _fuzzy_match(target, package_id, matching_patterns, custom_objects, fuzzy_matched_list):
     for matching_pattern in matching_patterns:
         try:
             target_cache_type = matching_pattern['targets'][0]
             target_cache = CustomObjectCaches.objects.get(type=target_cache_type, package_id=package_id)
             another_cache_type = matching_pattern['targets'][1]
-            target_value = target.object_[target_cache_type.split(':')[1]]
+            target_value = _get_object_value_from_cache_type(target_cache_type.split(':')[1], target.object_)
             fm_rule = _get_fuzzy_matching_rule(custom_objects, target_cache_type)
         except DoesNotExist:
             try:
                 target_cache_type = matching_pattern['targets'][1]
                 target_cache = CustomObjectCaches.objects.get(type=target_cache_type, package_id=package_id)
                 another_cache_type = matching_pattern['targets'][0]
-                target_value = target.object_[target_cache_type.split(':')[1]]
+                target_value = _get_object_value_from_cache_type(target_cache_type.split(':')[1], target.object_)
                 fm_rule = _get_fuzzy_matching_rule(custom_objects, target_cache_type)
             except DoesNotExist:
+                continue
+            except KeyError:
                 continue
 
         if type(target_value) != str:
