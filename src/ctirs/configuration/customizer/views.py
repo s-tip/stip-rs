@@ -35,7 +35,6 @@ def get_customizer_configuration(request):
                     del(prop['pattern'])
         custom_objects.append(o_)
     matching_customizer = MatchingCustomizer.get_instance()
-    print(matching_customizer.conf_json['matching_patterns'])
 
     return JsonResponse({
         'custom_objects': custom_objects,
@@ -59,4 +58,5 @@ def set_customizer_configuration(request):
     matching_customizer.update_customizer_conf({
         'matching_patterns': j['matching_patterns']
     })
+    #print(json.dumps(j['custom_objects'], indent=4))
     return HttpResponse(status=201)

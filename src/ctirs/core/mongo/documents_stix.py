@@ -1915,13 +1915,12 @@ class CustomObjectCaches(Document):
         custom_properties = []
         for prop in custom_object.object_:
             for item in custom_properties_list:
-                if '/' in item:
-                    c_prop, c_key = item.split('/')
+                if '.' in item:
+                    c_prop, c_key = item.split('.')
                     if prop == c_prop:
                         if c_key in custom_object.object_[prop]:
                             v = custom_object.object_[prop][c_key]
-                            match_prop = '%s--%s' % (c_prop, c_key)
-                            custom_properties.append((match_prop, v))
+                            custom_properties.append((item, v))
                 else:
                     if prop == item:
                         v = custom_object.object_[prop]
@@ -1930,7 +1929,10 @@ class CustomObjectCaches(Document):
                 
         for custom_prop in custom_properties:
             match_prop, v = custom_prop
+            if (type(v) != str):
+                continue
             node_id = '%s-%s' % (custom_object.object_id_, match_prop)
+            print(v)
             document = CustomObjectCaches()
             document.type = '%s:%s' % (custom_object.object_type, match_prop)
             if hasattr(custom_object, 'name'):

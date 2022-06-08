@@ -1,7 +1,7 @@
 $(function() {
 
   const NODE_TYPE_OBJECT = 'eclipse'
-  const NODE_TYPE_PROPERTY = 'box'
+  const NODE_TYPE_PROPERTY_STRING = 'box'
   const NODE_DEFAULT_COLOR = '#D2E5FF'
   const EDGE_DEFAULT_COLOR = {
       opacity: 1.0,
@@ -10,9 +10,13 @@ $(function() {
 
   const EDGE_TYPE_CONTAINS = 'contains'
   const EDGE_TYPE_MATCHES = 'matches'
+  const EDGE_TYPE_CONSISTS_OF = 'consists-of'
 
   const DATA_TYPE_OBJECT = 'object'
   const DATA_TYPE_PROPERTY = 'property'
+
+  const VAL_TYPE_STRING = 'string'
+  const VAL_TYPE_DICT = 'dict'
 
   const OPERATION_TYPE_ADD_NODE = 'add_node'
   const OPERATION_TYPE_EDIT_NODE = 'edit_node'
@@ -56,13 +60,53 @@ $(function() {
     $.each(custom_objects, function(key_obj, co) {
       var co_node = _get_node_from_custom_object(co)
       nodes.add(co_node)
+      const dict_list = {}
       $.each(co.properties, function(key_prop, cp) {
-        var cp_node = _get_node_from_custom_property(cp, co_node)
-        nodes.add(cp_node)
-        const dict_key = co.name + ':' + cp.name
-        custom_property_dict[dict_key] = cp_node
-        var edge = _get_contains_edge(co_node.id, cp_node.id)
-        edges.add(edge)
+        const split_name = cp.name.split('.')
+        var dict_key = null
+        var prop_node = null
+        if (split_name.length == 1) {
+          const cp_node = _get_node_from_custom_property(cp, co_node, cp.name, false)
+          nodes.add(cp_node)
+          const edge = _get_contains_edge(co_node.id, cp_node.id)
+          edges.add(edge)
+          prop_node = cp_node
+        } else {
+          const dict_name = split_name[0]
+          const object_name = co_node.label
+
+          if (object_name in dict_list == false){
+            dict_list[object_name] = {}
+          }
+          var dict_node = null
+          if (dict_name in dict_list[object_name] == false) {
+            dict_node = _get_node_from_custom_property(cp, co_node, split_name[0], true)
+            nodes.add(dict_node)
+            const contains_edge = _get_contains_edge(co_node.id, dict_node.id)
+            edges.add(contains_edge)
+            dict_node_id = dict_node.id
+            dict_list[object_name] = {}
+            dict_list[object_name] [dict_name] = dict_node
+          }else {
+            dict_node = dict_list[object_name][dict_name]
+          }
+
+          const child_node = _get_node_from_custom_property(cp, co_node, split_name[1], false)
+          child_node.dict_name = split_name[0]
+          child_node.dict_id = dict_node_id
+
+          if ('child_nodes' in nodes._data[dict_node_id] == false) {
+            nodes._data[dict_node_id].child_nodes = []
+          }
+          nodes._data[dict_node_id].child_nodes.push(child_node)
+          nodes.add(child_node)
+
+          const consists_of_edge = _get_consists_of_edge(dict_node.id, child_node.id)
+          edges.add(consists_of_edge)
+          prop_node = child_node
+        }
+        dict_key = co.name + ':' + cp.name
+        custom_property_dict[dict_key] = prop_node
       })
     })
   }
@@ -94,7 +138,7 @@ $(function() {
 
   function _init_property_node() {
     var required = false
-    var val_type = 'string'
+    var val_type = VAL_TYPE_STRING
     var regexp = null
 
     var fuzzy_matching = {
@@ -115,20 +159,17 @@ $(function() {
       val_type: val_type,
       regexp: regexp,
       fuzzy_matching: fuzzy_matching,
-      shape: NODE_TYPE_PROPERTY,
+      shape: NODE_TYPE_PROPERTY_STRING,
       borderWidth: 1,
       shapeProperties: { borderDashes: [10, 10] },
     }
     return prop
   }
 
-  function _get_node_from_custom_property(cp, co_node) {
+  function _get_node_from_custom_property(cp, co_node, label, is_dict) {
     var node = _init_property_node()
     if ('required' in cp) {
       node.required = cp['required']
-    }
-    if ('type' in cp) {
-      node.val_type = cp['type']
     }
     if ('regexp' in cp) {
       node.regexp = cp['regexp']
@@ -136,10 +177,31 @@ $(function() {
     if ('fuzzy_matching' in cp) {
       node.fuzzy_matching = cp['fuzzy_matching']
     }
+ 
+    if(is_dict){
+      node.val_type = VAL_TYPE_DICT
+    }else {
+      if ('type' in cp) {
+        node.val_type = cp['type']
+      }
+   }
     node.parent = co_node.label
-    node.label = cp.name
+    node.label = label
     node.color = co_node.color
     return node
+  }
+
+  function _get_consists_of_edge(dict_id, child_id) {
+    var d = {
+      from: dict_id,
+      to: child_id,
+      type: EDGE_TYPE_CONSISTS_OF
+    }
+    d.label = EDGE_TYPE_CONSISTS_OF
+    d.color = EDGE_DEFAULT_COLOR
+    d.smooth = false
+    d.chosen = false
+    return d
   }
 
   function _get_contains_edge(obj_id, prop_id) {
@@ -239,24 +301,49 @@ $(function() {
   }
 
   function deleteNode(data, callback) {
-    $.each(data.nodes, function(index, node_id) {
+    $.each(data.nodes, function(_, node_id) {
       const node = getNode(node_id)
       const node_type = node.options.type
       if (node_type == 'property'){
+        if(node.options.val_type != VAL_TYPE_DICT) {
+          if ('dict_id' in node.options) {
+            if (node.options.dict_id in network.body.nodes) {
+              const dict_node = network.body.nodes[node.options.dict_id]
+              delete(dict_node.options.child_nodes[node.id])
+              if(Object.keys(dict_node.options.child_nodes).length == 0) {
+                network.body.nodes[node.options.dict_id].options.val_type = VAL_TYPE_STRING
+              }
+            }
+          }
+          if (node.options.dict_id in network.body.nodes) {
+            const temp_child_nodes = []
+            $.each(network.body.nodes[node.options.dict_id].options.child_nodes, function (_, child_node) {
+              if (child_node.dict_id != node.options.dict_id) {
+                temp_child_nodes.push(child_node)
+              }
+            })
+            network.body.nodes[node.options.dict_id].options.child_nodes = temp_child_nodes
+          }
+          $.each(node.edges, function(_, delete_edge) {
+            if (delete_edge.options.label == EDGE_TYPE_MATCHES) {
+              delete(matching_names[delete_edge.id])
+            }
+          })
+        } else {
+          $.each(node.options.child_nodes, function(_, child_node) {
+            delete(network.body.nodes[child_node.id].options.parent)
+            delete(network.body.nodes[child_node.id].options.dict_name)
+          })
+        }
+
         callback(data)
       } else{
         if(data.edges.length > 0){
-          const ret = confirm('Would you like to remove the object node and connected property nodes? \nCancel: Remove the object node only\nOK: Remove the connected nodes.')
-          if (ret == true){
-            const connected_nodes = network.getConnectedNodes(node_id)
-            data.nodes = data.nodes.concat(connected_nodes)
-            callback(data)
-          } else {
-            callback(data)
-          }
-        } else{
-          callback(data)
+          alert('Can not delete the object node which has edge (s)')
+          data.nodes = []
+          data.edges = []
         }
+        callback(data)
       }
     })
     return
@@ -265,6 +352,13 @@ $(function() {
   function deleteEdge(data, callback) {
     $.each(data.edges, function(key, edge){
       delete(matching_names[edge])
+      $.each(network.getConnectedNodes(edge), function(key2, node_id){
+        if(network.body.nodes[node_id].options.val_type == VAL_TYPE_DICT) {
+          network.body.nodes[node_id].options.val_type = VAL_TYPE_STRING
+        } else {
+          delete(network.body.nodes[node_id].options.parent)
+        }
+      })
     })
     callback(data)
     return
@@ -325,6 +419,17 @@ $(function() {
     )
     document.getElementById('edit-node-cancelButton').onclick =
       cancelNodeEdit.bind(this, callback)
+    if (network.body.nodes[data.id].options.val_type == VAL_TYPE_DICT){
+      $('#edit-common-regexp').prop('disabled', true)
+      $('#edit-common-required').prop('disabled', true)
+      $('#edit-fuzzy-case-insensitive').prop('disabled', true)
+      $('#edit-fuzzy-kata-hira').prop('disabled', true)
+      $('#edit-fuzzy-zen-han').prop('disabled', true)
+      $('#edit-fuzzy-eng-jpn').prop('disabled', true)
+      $('#edit-fuzzy-list').prop('disabled', true)
+      $('.edit-fuzzy-list-textarea').prop('disabled', true)
+      $('#edit-fully-list-plus').css({'display': 'none'})
+    }
     $('#edit-node-popUp').css({'display': 'block'})
   }
 
@@ -386,7 +491,7 @@ $(function() {
       data.label = 'x-' + node_base
       data.type = DATA_TYPE_OBJECT
     } else if (node_type == DATA_TYPE_PROPERTY) {
-      data.shape = NODE_TYPE_PROPERTY
+      data.shape = NODE_TYPE_PROPERTY_STRING
       data.label = 'x_' + node_base
       data.type = DATA_TYPE_PROPERTY
     } else {
@@ -510,10 +615,28 @@ $(function() {
       }
     }
 
+    var dict_node = null
+    var child_node = null
+    if (data.type == EDGE_TYPE_MATCHES) {
+      if ((from.options.parent == undefined) && (to.options.parent != undefined)){
+        dict_node = to
+        child_node = from
+      }
+      else if ((from.options.parent != undefined) && (to.options.parent == undefined)) {
+        dict_node = from
+        child_node = to
+      }
+      if (dict_node){
+        data.type = EDGE_TYPE_CONSISTS_OF
+      }
+    }
+
     if (data.type == EDGE_TYPE_CONTAINS) {
       _set_contains_edge_dialog(operation_type, prop_color, data, from, to, callback)
-    } else {
+    } else if (data.type == EDGE_TYPE_MATCHES) {
       _set_matching_edge_dialog(operation_type, data, from, to, callback)
+    } else {
+     _set_consists_of_edge(operation_type, data, dict_node, child_node, callback)
     }
   }
 
@@ -542,6 +665,13 @@ $(function() {
       alert('Cannot connect nodes which has already an edge')
       return
     }
+
+    $.each(network.getConnectedNodes(prop_id), function (k, connected_node_id){
+      const connected_node = network.body.nodes[connected_node_id]
+      alert('Cannot connect nodes which has already an edge')
+      return
+    })
+
     if (_is_duplicate_property(object_node, prop_name) == true) {
       alert('This object has already the same property')
       return
@@ -552,7 +682,7 @@ $(function() {
   }
 
   function _set_matching_edge_dialog(operation_type, data, from, to, callback) {
-    if ((from.options.parent == undefined) || (to.options.parent == undefined)) {
+    if ((from.options.parent == undefined) && (to.options.parent == undefined)) {
       alert('Cannot connect property nodes which do not define a parent object')
       callback(null)
       return
@@ -569,6 +699,12 @@ $(function() {
         return
       }
     }
+    if ((from.options.val_type != VAL_TYPE_STRING) || (to.options.val_type != VAL_TYPE_STRING)) {
+        alert('Cannnot connect nodes whose type are dictionary.')
+        callback(null)
+        return
+    }
+
     data.from = from.id
     data.to = to.id
 
@@ -588,6 +724,15 @@ $(function() {
     document.getElementById('edge-operation').innerText = 'Connect a matching link.'
     document.getElementById('edge-div-rule-name').style.display = 'block'
     document.getElementById('edge-popUp').style.display = 'block'
+  }
+
+  function _set_consists_of_edge(operation_type, data, dict_node, child_node, callback) {
+    if (operation_type == OPERATION_TYPE_EDIT_EDGE) {
+      alert('Cannot edit consists-of edge')
+      callback(null)
+      return
+    }
+    _save_consists_of_edge(data, dict_node, child_node, callback)
   }
 
   function _is_duplicate_property(object_node, prop_name) {
@@ -618,6 +763,42 @@ $(function() {
     callback(null)
   }
 
+  function _save_consists_of_edge(data, dict_node, child_node, callback) {
+    const child_label = child_node.options.label
+    if ('child_nodes' in  network.body.nodes[dict_node.id].options) {
+      const child_nodes = Object.values(network.body.nodes[dict_node.id].options.child_nodes)
+      if (child_nodes.includes(child_label)) { 
+        alert('This property has been added')
+        clearEdgePopUp()
+        return
+      }
+    } else {
+      network.body.nodes[dict_node.id].options.child_nodes = {}
+    }
+    network.body.nodes[dict_node.id].options.child_nodes[child_node.id] = child_label
+
+    network.body.nodes[child_node.id].options.parent = network.body.nodes[dict_node.id].options.parent
+    network.body.nodes[dict_node.id].options.val_type = VAL_TYPE_DICT
+    network.body.nodes[child_node.id].options.val_type = VAL_TYPE_STRING
+    network.body.nodes[child_node.id].options.dict_name = dict_node.options.label
+    network.body.nodes[child_node.id].options.dict_id = dict_node.id
+    network.body.nodes[child_node.id].options.color = network.body.nodes[dict_node.id].options.color
+    data.label = data.type
+    data.smooth = false
+    data.chosen = false
+    clearEdgePopUp()
+    callback(data)
+  }
+
+  function _save_contains_edge(data, callback) {
+    data.label = data.type
+    data.smooth = false
+    data.chosen = false
+    network.body.nodes[data.to].options.parent = network.body.nodes[data.from].options.label
+    clearEdgePopUp()
+    callback(data)
+  }
+
   function _save_matching_edge(data, callback) {
     const rule_name = $('#edit-edge-rule-name').val()
     if (Object.values(matching_names).includes(rule_name)){
@@ -630,15 +811,6 @@ $(function() {
     clearEdgePopUp()
     callback(data)
     matching_names[data.id] = rule_name
-  }
-
-  function _save_contains_edge(data, callback) {
-    data.label = data.type
-    data.smooth = false
-    data.chosen = false
-    network.body.nodes[data.to].options.parent = network.body.nodes[data.from].options.label
-    clearEdgePopUp()
-    callback(data)
   }
 
   $('#edit-fuzzy-list').on('change', function() {
@@ -683,22 +855,43 @@ $(function() {
         work_custom_objects[co.name] = co
       }
     })
+
+    var msg = null
     $.each(network.body.nodes, function(key, network_node) {
       var node = network_node.options
       if (node.type == DATA_TYPE_PROPERTY) {
-        var prop = {}
+        if (node.parent in work_custom_objects == false) {
+          msg = 'Property: ' + node.label + ' does not belong to any object.'
+          return false
+        }
+        const co = work_custom_objects[node.parent]
         if ('parent' in node == false) {
           return true
         }
-        var co = work_custom_objects[node.parent]
-        prop.name = node.label
-        prop.required = node.required
-        prop.type = node.val_type
-        prop.regexp = node.regexp
-        prop.fuzzy_matching = node.fuzzy_matching
-        co.properties.push(prop)
+        if (node.val_type == VAL_TYPE_STRING) {
+          co.properties.push(_get_property_from_node(node))
+        }
       }
     })
+    if (msg) {
+      alert(msg)
+      return null
+    }
+
+    function _get_property_from_node (node) {
+      const prop = {}
+      if ('dict_name' in node) {
+        prop.name = node.dict_name + '.' + node.label
+      } else{
+        prop.name = node.label
+      }
+      prop.required = node.required
+      prop.type = node.val_type
+      prop.regexp = node.regexp
+      prop.fuzzy_matching = node.fuzzy_matching
+      return prop
+    }
+
     var custom_objects = []
     $.each(work_custom_objects, function(key, co) {
       if (co.properties.length == 0) {
@@ -716,7 +909,11 @@ $(function() {
       function _get_target_from_node(node) {
         var target = {}
         target.object = node.options.parent
-        target.property = node.options.label
+        if ('dict_name' in node.options) {
+          target.property = node.options.dict_name + '.' + node.options.label
+        } else {
+          target.property = node.options.label
+        }
         return target
       }
 
