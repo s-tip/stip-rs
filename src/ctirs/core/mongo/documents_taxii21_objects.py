@@ -1,13 +1,16 @@
 import datetime
 import mongoengine as me
 from ctirs.core.mongo.documents import Communities
+from core.response import get_taxii_date_str
 
 
 def get_modified_from_object(object_):
     if 'modified' in object_:
         modified = object_['modified']
-    else:
+    elif 'created' in object_:
         modified = object_['created']
+    else:
+        modified = get_taxii_date_str(datetime.datetime.utcnow())
     return modified
 
 
