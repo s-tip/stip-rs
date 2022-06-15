@@ -163,11 +163,14 @@ $(function(){
           } else {
             data = api_root
           }
+          if (data.slice(-1) != '/') {
+            data += '/'
+          }
           const li = $('<li>')
           const a = $('<a>', {
             'data-value': data,
           })
-          a.text(api_root)
+          a.text(data)
           li.append(a)
           ul.append(li)
       })
