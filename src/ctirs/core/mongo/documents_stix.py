@@ -315,6 +315,7 @@ class StixFiles(Document):
                 return
             objects = j['objects']
             self.taxii2_stix_objects = []
+            #sco_list = ['ipv4-addr']
             for object_ in objects:
                 type_ = object_['type']
                 if type_ == 'marking-definition':
@@ -368,6 +369,8 @@ class StixFiles(Document):
                     StixInfrastructures.create(object_, self)
                 elif type_ == 'malware-analysis':
                     StixMalwareAnalyses.create(object_, self)
+                #elif type_ in sco_list:
+                #    StixScos.create(object_, self)
                 else:
                     StixOthers.create(object_, self)
 
@@ -718,6 +721,8 @@ class Stix2Base(Document):
             return Stix2Base.newest(StixVulnerabilities.objects(object_id_=object_id))
         if object_id.startswith('relationship--'):
             return Stix2Base.newest(StixRelationships.objects(object_id_=object_id))
+        if object_id.startswith('sighting--'):
+            return Stix2Base.newest(StixSightings.objects(object_id_=object_id))
         return Stix2Base.newest(StixOthers.objects(object_id_=object_id))
 
     @staticmethod
@@ -1518,6 +1523,33 @@ class StixOthers(Stix2Base):
         return document
 
 
+'''
+class StixScos(Stix2Base):
+    meta = {
+        'collection': 'stix_scos'
+    }
+
+    @classmethod
+    def create(cls, object_, stix_file):
+        if object_ is None:
+            return None
+        document = StixScos()
+        document = super(StixScos, cls).create(document, object_, stix_file)
+        if ('name' in object_):
+            document.name = object_['name']
+        if ('description' in object_):
+            document.description = object_['description']
+        document.save()
+        if object_['type'] == 'ipv4-addr':
+            ObservableCaches.create_2_x_from_sco(
+                object_, stix_file, object_['id'], 'ipv4', object_['value'])
+        elif object_['type'] == 'domain-name':
+            ObservableCaches.create_2_x_from_sco(
+                object_, stix_file, object_['id'], 'domain-name', object_['value'])
+        return document
+'''
+
+
 class StixIndicators(Document):
     indicator_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
@@ -1996,6 +2028,34 @@ class ObservableCaches(Document):
         document.save()
         return
 
+
+    @classmethod
+    def create_2_x_from_sco(cls, object_, stix_file, node_id, object_key, type_, value):
+        document = ObservableCaches()
+        object_node_id = '%s_%s' % (node_id, object_key)
+        document.observable_id = node_id
+        document.title = object_node_id
+        document.description = object_node_id
+        document.stix_file = stix_file
+        document.package_name = stix_file.package_name
+        document.package_id = stix_file.package_id
+        document.node_id = object_node_id
+        document.object_ = object_
+        if type_ == 'ipv4':
+            document.ipv4_1_3, document.ipv4_4 = cls.split_ipv4_value(value)
+        if type_ == 'domain_name':
+            rs_system = System.objects.get()
+            tld = TLD(rs_system.public_suffix_list_file_path)
+            document.domain_without_tld, document.domain_tld = tld.split_domain(value)
+            if document.domain_without_tld:
+                document.domain_last = document.domain_without_tld.split('.')[-1]
+        document.type = type_
+        document.value = value
+        #document.number_observed = observable['number_observed']
+        #document.first_observed = observable['first_observed']
+        #document.last_observed = observable['last_observed']
+        document.save()
+ 
     @classmethod
     def create(cls, observable, stix_file, node_id):
         if observable is None:
