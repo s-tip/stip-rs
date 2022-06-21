@@ -6,6 +6,7 @@ import ctirs.configuration.taxii_server.urls
 import ctirs.configuration.taxii2_client.urls
 import ctirs.configuration.system.urls
 import ctirs.configuration.mongo.urls
+import ctirs.configuration.customizer.urls
 
 urlpatterns = [
     url(r'^community/', include(ctirs.configuration.community.urls)),
@@ -15,4 +16,5 @@ urlpatterns = [
     url(r'^taxii_server/', include(ctirs.configuration.taxii_server.urls)),
     url(r'^system/', include(ctirs.configuration.system.urls)),
     url(r'^mongo/', include(ctirs.configuration.mongo.urls)),
+    url(r'^customizer/', include(ctirs.configuration.customizer.urls)),
 ]

@@ -4,6 +4,8 @@ import traceback
 import datetime
 import pytz
 import re
+import jaconv
+import pykakasi
 from stix2matcher import matcher
 from stix.core.stix_package import STIXPackage
 from mongoengine.queryset.visitor import Q
@@ -15,8 +17,10 @@ from ctirs.core.mongo.documents import Communities
 from ctirs.core.mongo.documents_stix import ObservableCaches, SimilarScoreCache, StixFiles, \
     StixCampaigns, StixIncidents, StixIndicators, StixObservables, StixThreatActors, \
     StixExploitTargets, StixCoursesOfAction, StixTTPs, ExploitTargetCaches, \
-    IndicatorV2Caches, StixLanguageContents, LabelCaches
+    IndicatorV2Caches, StixLanguageContents, LabelCaches, CustomObjectCaches, StixCustomObjects
 from stip.common.tld import TLD
+from stip.common.matching_customizer import MatchingCustomizer
+from stip.common.stix_customizer import StixCustomizer
 from mongoengine import DoesNotExist
 from .stix2_indicator import _get_observed_data
 from ctirs.models.rs.models import System
@@ -31,6 +35,8 @@ SIMILARTY_5_EDGE_TYPE = 'Similarity: 5'
 SIMILARTY_6_EDGE_TYPE = 'Similarity: 6'
 SIMILARTY_7_EDGE_TYPE = 'Similarity: 7'
 SIMILARTY_8_EDGE_TYPE = 'Similarity: 8'
+
+kakasi = pykakasi.kakasi()
 
 
 def get_boolean_value(d, key, default_value):
@@ -446,10 +452,170 @@ def _get_ip_4th_value(ipv4):
     return int(ipv4.split('.')[3])
 
 
+def _get_fuzzy_matched_info(package_id):
+    fuzzy_matched_list = []
+    matching_patterns = MatchingCustomizer.get_instance().get_matching_patterns()
+    custom_objects = StixCustomizer.get_instance().get_custom_objects()
+
+    for target in StixCustomObjects.objects.filter(package_id=package_id):
+        fuzzy_matched_list = _fuzzy_match(target, package_id, matching_patterns, custom_objects, fuzzy_matched_list)
+    return fuzzy_matched_list
+
+
+def _list_matching(target_cache, another_cache, fm_rule, target_value, another_target_value):
+    if not fm_rule.get('list_matching', False):
+        return None
+    matching_lists = fm_rule.get('lists', [])
+    if len(matching_lists) == 0:
+        return None
+
+    for matching_list in matching_lists:
+        if target_value not in matching_list:
+            continue
+        if another_target_value not in matching_list:
+            continue
+        return _create_fuzzy_match_info(target_cache, another_cache, fm_rule, target_value, another_target_value)
+    return None
+
+
+def _get_object_value_from_cache_type(type_, object_):
+    if '.' in type_:
+        parent, child = type_.split('.')
+        return _get_object_value_from_cache_type(child, object_[parent])
+    else:
+        if type_ in object_:
+            return object_[type_]
+        raise KeyError('%s not in object' % (type_))
+
+
+def _fuzzy_match(target, package_id, matching_patterns, custom_objects, fuzzy_matched_list):
+    for matching_pattern in matching_patterns:
+        try:
+            target_cache_type = matching_pattern['targets'][0]
+            target_cache = CustomObjectCaches.objects.get(type=target_cache_type, package_id=package_id)
+            another_cache_type = matching_pattern['targets'][1]
+            target_value = _get_object_value_from_cache_type(target_cache_type.split(':')[1], target.object_)
+            fm_rule = _get_fuzzy_matching_rule(custom_objects, target_cache_type)
+        except DoesNotExist:
+            try:
+                target_cache_type = matching_pattern['targets'][1]
+                target_cache = CustomObjectCaches.objects.get(type=target_cache_type, package_id=package_id)
+                another_cache_type = matching_pattern['targets'][0]
+                target_value = _get_object_value_from_cache_type(target_cache_type.split(':')[1], target.object_)
+                fm_rule = _get_fuzzy_matching_rule(custom_objects, target_cache_type)
+            except DoesNotExist:
+                continue
+            except KeyError:
+                continue
+
+        if type(target_value) != str:
+            continue
+
+        another_caches = CustomObjectCaches.objects.filter(
+            type__in=[target_cache_type, another_cache_type],
+            package_id__ne=package_id)
+
+        for another_cache in another_caches:
+            another_target_value = another_cache.value
+            if type(another_target_value) != str:
+                continue
+            fmi = _list_matching(target_cache, another_cache, fm_rule, target_value, another_target_value)
+            if fmi:
+                fuzzy_matched_list.append(fmi)
+                continue
+
+            target_values = _absorb_roma_fluctuations(_get_normalized_value(target_value, fm_rule))
+            another_target_values = _absorb_roma_fluctuations(_get_normalized_value(another_target_value, fm_rule))
+            if len(target_values & another_target_values) != 0:
+                fuzzy_matched_list.append(_create_fuzzy_match_info(target_cache, another_cache, fm_rule, target_value, another_target_value))
+    return fuzzy_matched_list
+
+
+class FuzzyMatchInfo(object):
+    def __init__(self):
+        self.reason = {}
+        self.start_node = {}
+        self.end_node = {}
+
+
+def _create_fuzzy_match_info(target_cache, another_cache, fm_rule, target_value, another_target_value):
+    fmi = FuzzyMatchInfo()
+    fmi.start_node = {
+        'package_id': target_cache.package_id,
+        'node_id': target_cache.node_id,
+    }
+    fmi.end_node = {
+        'package_id': another_cache.package_id,
+        'node_id': another_cache.node_id,
+    }
+    fmi.reason = {
+        'title': 'Fuzzy Matching',
+        'rule': fm_rule,
+        'val_1': target_value,
+        'val_2': another_target_value
+    }
+    return fmi
+
+
+def _normalize2zen(v):
+    return jaconv.h2z(v, kana=True, digit=True, ascii=True)
+
+
+def _normalize2kun(v):
+    list_ = kakasi.convert(v)
+    v = ''
+    for item in list_:
+        v += item['kunrei']
+    return v
+
+
+def _absorb_roma_fluctuations(v):
+    ret = []
+    ret.append(v)
+    if 'ou' in v:
+        ret.append(v.replace('ou', 'o'))
+    if 'aa' in v:
+        ret.append(v.replace('aa', 'a'))
+    if 'ii' in v:
+        ret.append(v.replace('ii', 'i'))
+    if 'uu' in v:
+        ret.append(v.replace('uu', 'u'))
+    if 'ee' in v:
+        ret.append(v.replace('ee', 'e'))
+    if 'oo' in v:
+        ret.append(v.replace('oo', 'o'))
+    return set(ret)
+
+
+def _get_normalized_value(target_value, rule):
+    v = target_value
+    if rule.get('match_zen_han', False):
+        v = _normalize2zen(v)
+    if rule.get('match_kata_hira', False):
+        v = jaconv.kata2hira(v)
+    if rule.get('match_eng_jpn', False):
+        v = _normalize2kun(v)
+    if rule.get('case_insensitive', False):
+        v = v.lower()
+    return v
+ 
+
+def _get_fuzzy_matching_rule(custom_objects, target_cache_type):
+    object_name, property_name = target_cache_type.split(':')
+    custom_objects = StixCustomizer.get_instance().get_custom_objects()
+    for custom_object in custom_objects:
+        if custom_object['name'] == object_name:
+            for prop in custom_object['properties']:
+                if prop['name'] == property_name:
+                    return prop['fuzzy_matching']
+    return None
+
+
 def get_matched_packages(package_id, exact=True, similar_ipv4=False, similar_domain=False):
     exact_dict = {}
     similar_ipv4_dict = {}
     similar_domain_dict = {}
+    fuzzy_dict = {}
     package_id_list = []
 
     if exact:
@@ -484,6 +650,15 @@ def get_matched_packages(package_id, exact=True, similar_ipv4=False, similar_dom
             else:
                 similar_domain_dict[key] += 1
 
+    infos = _get_fuzzy_matched_info(package_id)
+    for info in infos:
+        key = info.end_node['package_id']
+        package_id_list.append(key)
+        if key not in fuzzy_dict:
+            fuzzy_dict[key] = 1
+        else:
+            fuzzy_dict[key] += 1
+
     package_id_set = list(set(package_id_list))
 
     ret = []
@@ -498,6 +673,7 @@ def get_matched_packages(package_id, exact=True, similar_ipv4=False, similar_dom
                 'ipv4': 0 if (p_id in similar_ipv4_dict) is False else similar_ipv4_dict[p_id],
                 'domain': 0 if (p_id in similar_domain_dict) is False else similar_domain_dict[p_id]}
             d['similar'] = s_dict
+        d['fuzzy'] = 0 if (p_id in fuzzy_dict) is False else fuzzy_dict[p_id]
         ret.append(d)
     return ret
 
@@ -547,6 +723,21 @@ def contents_and_edges(request):
         similar_domain = get_boolean_value(request.GET, SIMILAR_DOMAIN_KEY, False)
 
         edges = []
+
+        fuzzy_infos = _get_fuzzy_matched_info(package_id)
+        for fuzzy_info in fuzzy_infos:
+            if fuzzy_info.end_node['package_id'] not in compared_package_ids:
+                continue
+            start_node = fuzzy_info.start_node
+            end_node = fuzzy_info.end_node
+            edge = {
+                'edge_type': fuzzy_info.reason['title'],
+                'start_node': start_node,
+                'end_node': end_node,
+                'reason': fuzzy_info.reason,
+            }
+            edges.append(edge)
+
         if exact:
             end_infos = _get_exact_matched_info(package_id)
             for end_info in end_infos:
@@ -569,6 +760,15 @@ def contents_and_edges(request):
                     start_caches = collection.objects.filter(
                         package_id=package_id,
                         label__iexact=end_info.label)
+                elif collection == CustomObjectCaches:
+                    if hasattr(end_info, 'start_type'):
+                        start_type = end_info.start_type
+                    else:
+                        start_type = end_info.type
+                    start_caches = collection.objects.filter(
+                        package_id=package_id,
+                        type=start_type,
+                        value=end_info.value)
                 else:
                     start_caches = collection.objects.filter(
                         package_id=package_id,

@@ -16,7 +16,8 @@ from ctirs.core.mongo.documents_stix import StixAttackPatterns, StixCampaignsV2,
     StixIntrusionSets, StixLocations, StixMalwares,\
     StixNotes, StixObservedData, StixOpinions, \
     StixReports, StixThreatActorsV2, StixTools, \
-    StixVulnerabilities, StixRelationships, StixSightings, StixLanguageContents, StixOthers, StixFiles
+    StixVulnerabilities, StixRelationships, StixSightings, StixLanguageContents, StixOthers, \
+    StixCustomObjects, StixFiles
 from ctirs.core.mongo.documents import Vias, Communities
 from ctirs.core.stix.regist import regist
 from ctirs.api.v1.package_id.views import delete_stix_file_package_id_document_info
@@ -241,7 +242,8 @@ def _get_document(object_id):
                    StixIntrusionSets, StixLocations, StixMalwares,
                    StixNotes, StixObservedData, StixOpinions,
                    StixReports, StixThreatActorsV2, StixTools,
-                   StixVulnerabilities, StixRelationships, StixSightings, StixLanguageContents, StixOthers]
+                   StixVulnerabilities, StixRelationships, StixSightings,
+                   StixLanguageContents, StixOthers, StixCustomObjects]
     doc = None
     for collection in collections:
         docs = collection.objects.filter(object_id_=object_id)

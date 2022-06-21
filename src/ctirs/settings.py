@@ -14,6 +14,8 @@ import os
 import logging
 from unipath import Path
 from decouple import Csv, config, UndefinedValueError
+from stip.common.stix_customizer import StixCustomizer
+from stip.common.matching_customizer import MatchingCustomizer
 
 logging.disable(logging.WARNING)
 
@@ -62,6 +64,18 @@ except UndefinedValueError:
     cookie_domain_name = None
 
 
+stix_customizer = StixCustomizer.get_instance()
+try:
+    stix_customizer.init_customizer_conf(config('STIX_CUSTOMIZER_CONF_PATH'))
+except UndefinedValueError:
+    pass
+
+matching_customizer = MatchingCustomizer.get_instance()
+try:
+    matching_customizer.init_customizer_conf(config('MATCHING_CUSTOMIZER_CONF_PATH'))
+except UndefinedValueError:
+    pass
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -106,6 +120,7 @@ DIRS = [
     os.path.join(CTIRS_DIR, 'configuration/community/templates'),
     os.path.join(CTIRS_DIR, 'configuration/system/templates'),
     os.path.join(CTIRS_DIR, 'configuration/mongo/templates'),
+    os.path.join(CTIRS_DIR, 'configuration/customizer/templates'),
     os.path.join(CTIRS_DIR, 'configuration/taxii_client/templates'),
     os.path.join(CTIRS_DIR, 'configuration/taxii_client/detail/templates'),
     os.path.join(CTIRS_DIR, 'configuration/taxii2_client/templates'),
