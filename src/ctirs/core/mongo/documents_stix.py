@@ -1915,8 +1915,8 @@ class CustomObjectCaches(Document):
         custom_properties = []
         for prop in custom_object.object_:
             for item in custom_properties_list:
-                if '.' in item:
-                    c_prop, c_key = item.split('.')
+                if StixCustomizer.DICT_PROP_DIVINDER in item:
+                    c_prop, c_key = item.split(StixCustomizer.DICT_PROP_DIVINDER)
                     if prop == c_prop:
                         if c_key in custom_object.object_[prop]:
                             v = custom_object.object_[prop][c_key]
