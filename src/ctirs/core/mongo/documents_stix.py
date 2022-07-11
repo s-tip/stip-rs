@@ -169,7 +169,7 @@ class StixFiles(Document):
         StixGroupings.drop_collection()
         StixInfrastructures.drop_collection()
         StixMalwareAnalyses.drop_collection()
-        StixStipCustomObjects.drop_collection()
+        StixCustomObjects.drop_collection()
 
         TXS21_SO.drop_collection()
         StixManifest.drop_collection()
