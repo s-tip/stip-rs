@@ -896,6 +896,11 @@ $(function() {
       prop.required = node.required
       prop.type = node.val_type
       prop.regexp = node.regexp
+      if (prop.regexp != null) {
+        if (prop.regexp.length == 0) {
+          prop.regexp = null
+        }
+      }
       prop.fuzzy_matching = node.fuzzy_matching
       return prop
     }
