@@ -20,7 +20,7 @@ from ctirs.core.mongo.documents_stix import StixAttackPatterns, StixCampaignsV2,
     StixReports, StixThreatActorsV2, StixTools, \
     StixVulnerabilities, StixRelationships, StixSightings, StixLanguageContents, \
     StixOthers, StixFiles, Stix2Base, StixGroupings, StixInfrastructures, StixMalwareAnalyses, \
-    StixStipCustomObjects
+    StixCustomObjects
 from ctirs.core.mongo.documents import Vias, Communities
 from ctirs.core.mongo.documents_taxii21_objects import StixManifest, StixObject
 from ctirs.core.stix.regist import regist
@@ -288,7 +288,7 @@ def _get_document(object_id):
                    StixNotes, StixObservedData, StixOpinions,
                    StixReports, StixThreatActorsV2, StixTools,
                    StixVulnerabilities, StixRelationships, StixSightings,
-                   StixLanguageContents, StixOthers, StixStipCustomObjects,
+                   StixLanguageContents, StixOthers, StixCustomObjects,
                    StixGroupings, StixInfrastructures, StixMalwareAnalyses]
     doc = None
     for collection in collections:
