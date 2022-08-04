@@ -123,7 +123,7 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     sns_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, default=1)
     confidence = models.IntegerField(default=50)
     identity_id = models.CharField(max_length=64, default='', null=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     USERNAME_FIELD = 'username'
     ANONYMOUS_USER_ACCOUNT_NAME = 'anonymous'
