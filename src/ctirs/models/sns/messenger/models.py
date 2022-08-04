@@ -1,6 +1,9 @@
 from django.db import models
 from django.db.models import Max
-from django.utils.translation import ugettext_lazy as _
+try:
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _
 from ctirs.models import STIPUser
 
 
