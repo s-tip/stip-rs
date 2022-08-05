@@ -2,7 +2,7 @@ from django.conf.urls import include
 try:
     from django.conf.urls import url as _url
 except ImportError:
-    from django.urls import path as _url
+    from django.urls import re_path as _url
 import ctirs.configuration.community.views as community
 import ctirs.configuration.community.ajax.urls
 
