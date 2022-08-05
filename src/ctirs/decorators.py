@@ -1,11 +1,8 @@
-from django.http import HttpResponseBadRequest
 from django.http.response import HttpResponse
 
 
 def ajax_required(f):
     def wrap(request, *args, **kwargs):
-        if not request.is_ajax():
-            return HttpResponseBadRequest()
         if not request.user.is_authenticated:
             return HttpResponse(status=401)
         return f(request, *args, **kwargs)
