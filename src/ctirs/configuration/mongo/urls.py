@@ -1,10 +1,12 @@
-# URLを正規表現で評価し、マッチングした場合の処理箇所を定義
-from django.conf.urls import url
+try:
+    from django.conf.urls import url as _url
+except ImportError:
+    from django.urls import re_path as _url
 import ctirs.configuration.mongo.views as mongo
 
 urlpatterns = [
     # configuration/mongo top
-    url(r'^$', mongo.top),
+    _url(r'^$', mongo.top),
     # configuration/mongo modify
-    url(r'^modify$', mongo.modify),
+    _url(r'^modify$', mongo.modify),
 ]

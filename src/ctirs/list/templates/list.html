@@ -38,7 +38,7 @@
 			<a><span class="glyphicon glyphicon-unchecked" id="deselect-all-icon" title="Deselect All"></span></a> 
         </th>
         <th>
-            Produced<br/>(GMT)
+            Modified<br/>(UTC)
         </th>
         <th>
             Package Name
@@ -137,6 +137,14 @@
     <input type="hidden"  id="hidden-protocol-version" name="protocol_version" value=""/>
 </div>
 
+<div id="publish-taxii-result-dialog" title="Result" style="align:center;display: none;">
+    <form>
+        <div class="form-group">
+            <label for="push-result" class="col-form-label">Result:</label>
+            <textarea class="form-control" id="push-result" rows="25" disabled></textarea>
+        </div>
+    </form>
+</div>
 
 </body>
 </html>

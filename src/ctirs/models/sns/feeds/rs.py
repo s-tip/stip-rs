@@ -1,4 +1,5 @@
 import os
+import json
 import stip.common.const as const
 import requests
 import urllib3
@@ -108,6 +109,7 @@ def get_feeds_from_rs(
         range_small_datetime=None,  # 期間範囲指定の小さい方(古い方)。この時間を含む
         range_big_datetime=None,  # 期間範囲指定の大きい方(新しい方)。この時間を含む
         query_string=None,
+        filter=None,
         index=0,
         size=-1):
     # start_time は aware な datetime
@@ -141,6 +143,10 @@ def get_feeds_from_rs(
     if user_id is not None:
         params['user_id'] = user_id
     params['instance'] = SNSConfig.get_sns_identity_name()
+    if filter is None:
+        params['filter'] = None
+    else:
+        params['filter'] = json.dumps(filter)
     rsp = requests.get(
         url,
         headers=headers,

@@ -4,6 +4,7 @@ import pytz
 import datetime
 import stix2slider
 import tempfile
+import copy
 import stip.common.const as const
 from stix2slider.options import initialize_options as sl_init
 try:
@@ -165,6 +166,9 @@ class StixFiles(Document):
         StixSightings.drop_collection()
         StixLanguageContents.drop_collection()
         StixOthers.drop_collection()
+        StixGroupings.drop_collection()
+        StixInfrastructures.drop_collection()
+        StixMalwareAnalyses.drop_collection()
         StixCustomObjects.drop_collection()
 
         TXS21_SO.drop_collection()
@@ -314,6 +318,7 @@ class StixFiles(Document):
                 return
             objects = j['objects']
             self.taxii2_stix_objects = []
+            #sco_list = ['ipv4-addr']
             for object_ in objects:
                 type_ = object_['type']
                 if type_ == 'marking-definition':
@@ -361,6 +366,14 @@ class StixFiles(Document):
                     StixSightings.create(object_, self)
                 elif type_ == 'language-content':
                     StixLanguageContents.create(object_, self)
+                elif type_ == 'grouping':
+                    StixGroupings.create(object_, self)
+                elif type_ == 'infrastructure':
+                    StixInfrastructures.create(object_, self)
+                elif type_ == 'malware-analysis':
+                    StixMalwareAnalyses.create(object_, self)
+                #elif type_ in sco_list:
+                #    StixScos.create(object_, self)
                 elif type_.startswith('x-'):
                     StixCustomObjects.create(object_, self)
                 else:
@@ -368,7 +381,11 @@ class StixFiles(Document):
 
                 media_types = ["application/stix+json;version=2.1"]
                 object_id = object_['id']
-                modified = get_modified_from_object(object_)
+                try:
+                    modified = get_modified_from_object(object_)
+                except Exception:
+                    print('>>> skip (no modified, created): ' + str(object_['id']))
+                    continue
                 try:
                     txs21_so = TXS21_SO.objects.get(object_id=object_id, modified=modified)
                     txs21_so.append_stix_file(self)
@@ -665,6 +682,76 @@ class Stix2Base(Document):
         document.package_id = stix_file.package_id
         return document
 
+    @staticmethod
+    def newest(objects):
+        return objects.order_by('-modified')[0]
+
+    @staticmethod
+    def newest_find(object_id):
+        if object_id.startswith('attack-pattern--'):
+            return Stix2Base.newest(StixAttackPatterns.objects(object_id_=object_id))
+        if object_id.startswith('campaign--'):
+            return Stix2Base.newest(StixCampaignsV2.objects(object_id_=object_id))
+        if object_id.startswith('course-of-action--'):
+            return Stix2Base.newest(StixCoursesOfActionV2.objects(object_id_=object_id))
+        if object_id.startswith('grouping--'):
+            return Stix2Base.newest(StixGroupings.objects(object_id_=object_id))
+        if object_id.startswith('identity--'):
+            return Stix2Base.newest(StixIdentities.objects(object_id_=object_id))
+        if object_id.startswith('indicator--'):
+            return Stix2Base.newest(StixIndicatorsV2.objects(object_id_=object_id))
+        if object_id.startswith('infrastructure--'):
+            return Stix2Base.newest(StixInfrastructures.objects(object_id_=object_id))
+        if object_id.startswith('intrusion-set--'):
+            return Stix2Base.newest(StixIntrusionSets.objects(object_id_=object_id))
+        if object_id.startswith('location--'):
+            return Stix2Base.newest(StixLocations.objects(object_id_=object_id))
+        if object_id.startswith('malware--'):
+            return Stix2Base.newest(StixMalwares.objects(object_id_=object_id))
+        if object_id.startswith('malware-analysis--'):
+            return Stix2Base.newest(StixMalwareAnalyses.objects(object_id_=object_id))
+        if object_id.startswith('note--'):
+            return Stix2Base.newest(StixNotes.objects(object_id_=object_id))
+        if object_id.startswith('observed-data--'):
+            return Stix2Base.newest(StixObservedData.objects(object_id_=object_id))
+        if object_id.startswith('opinion--'):
+            return Stix2Base.newest(StixOpinions.objects(object_id_=object_id))
+        if object_id.startswith('report--'):
+            return Stix2Base.newest(StixReports.objects(object_id_=object_id))
+        if object_id.startswith('threat-actor--'):
+            return Stix2Base.newest(StixThreatActorsV2.objects(object_id_=object_id))
+        if object_id.startswith('tool--'):
+            return Stix2Base.newest(StixTools.objects(object_id_=object_id))
+        if object_id.startswith('vulnerability--'):
+            return Stix2Base.newest(StixVulnerabilities.objects(object_id_=object_id))
+        if object_id.startswith('relationship--'):
+            return Stix2Base.newest(StixRelationships.objects(object_id_=object_id))
+        if object_id.startswith('sighting--'):
+            return Stix2Base.newest(StixSightings.objects(object_id_=object_id))
+        return Stix2Base.newest(StixOthers.objects(object_id_=object_id))
+
+    @staticmethod
+    def change_modified_timestamp_dict(o_):
+        d = copy.deepcopy(o_.object_)
+        d['modified'] = datetime.datetime.now(pytz.utc)
+        return d
+
+    @staticmethod
+    def get_revoked_dict(o_):
+        d = Stix2Base.change_modified_timestamp_dict(o_)
+        d['revoked'] = True
+        return d
+
+    @staticmethod
+    def get_modified_dict(before, after):
+        SKIP_PROP = ['id', 'type', 'created', 'modified', 'spec_version', 'created_by_ref']
+        d = Stix2Base.change_modified_timestamp_dict(before)
+        for k in after:
+            if k in SKIP_PROP:
+                continue
+            d[k] = after[k]
+        return d
+
 
 class StixAttackPatterns(Stix2Base):
     name = fields.StringField(max_length=1024)
@@ -951,6 +1038,136 @@ class StixNotes(Stix2Base):
             document.authors = Stix2Base.get_lists_or_string(object_['authors'])
         if ('object_refs' in object_):
             document.object_refs = Stix2Base.get_lists_or_string(object_['object_refs'])
+        document.save()
+        return document
+
+
+class StixGroupings(Stix2Base):
+    name = fields.StringField(max_length=1024)
+    description = fields.StringField(max_length=10240)
+    context = fields.StringField(max_length=10240)
+    object_refs = fields.ListField()
+
+    meta = {
+        'collection': 'stix_groupings',
+    }
+
+    @classmethod
+    def create(cls, object_, stix_file):
+        if object_ is None:
+            return None
+        document = StixGroupings()
+        document = super(StixGroupings, cls).create(document, object_, stix_file)
+        if ('name' in object_):
+            document.name = object_['name']
+        if ('description' in object_):
+            document.description = object_['description']
+        if ('context' in object_):
+            document.context = object_['context']
+        if ('object_refs' in object_):
+            document.object_refs = Stix2Base.get_lists_or_string(object_['object_refs'])
+        document.save()
+        return document
+
+
+class StixInfrastructures(Stix2Base):
+    name = fields.StringField(max_length=1024)
+    description = fields.StringField(max_length=10240)
+    infrastructure_types = fields.ListField()
+    aliases = fields.ListField()
+    kill_chain_phases = fields.ListField()
+    first_seen = fields.DateTimeField()
+    last_seen = fields.DateTimeField()
+
+    meta = {
+        'collection': 'stix_infrastructures',
+    }
+
+    @classmethod
+    def create(cls, object_, stix_file):
+        if object_ is None:
+            return None
+        document = StixInfrastructures()
+        document = super(StixInfrastructures, cls).create(document, object_, stix_file)
+        if ('name' in object_):
+            document.name = object_['name']
+        if ('description' in object_):
+            document.description = object_['description']
+        if ('infrastructure_types' in object_):
+            document.infrastructure_types = Stix2Base.get_lists_or_string(object_['infrastructure_types'])
+        if ('aliases' in object_):
+            document.aliases = Stix2Base.get_lists_or_string(object_['aliases'])
+        if ('kill_chain_phases' in object_):
+            document.kill_chain_phases = Stix2Base.get_lists_or_string(object_['kill_chain_phases'])
+        if ('first_seen' in object_):
+            document.first_seen = object_['first_seen']
+        if ('last_seen' in object_):
+            document.last_seen = object_['last_seen']
+        if ('context' in object_):
+            document.context = object_['context']
+        if ('object_refs' in object_):
+            document.object_refs = Stix2Base.get_lists_or_string(object_['object_refs'])
+        document.save()
+        return document
+
+
+class StixMalwareAnalyses(Stix2Base):
+    product = fields.StringField(max_length=1024)
+    version = fields.StringField(max_length=10240)
+    host_vm_ref = fields.StringField(max_length=10240)
+    installed_software_refs = fields.ListField()
+    configuration_version = fields.StringField(max_length=10240)
+    modules = fields.ListField()
+    analysis_engine_version = fields.StringField(max_length=10240)
+    analysis_definition_version = fields.StringField(max_length=10240)
+    submitted = fields.DateTimeField()
+    analysis_started = fields.DateTimeField()
+    analysis_ended = fields.DateTimeField()
+    result_name = fields.StringField(max_length=10240)
+    result = fields.StringField(max_length=10240)
+    analysis_sco_refs = fields.ListField()
+    sample_ref = fields.StringField(max_length=10240)
+
+    meta = {
+        'collection': 'stix_malware_analyses',
+    }
+
+    @classmethod
+    def create(cls, object_, stix_file):
+        if object_ is None:
+            return None
+        document = StixMalwareAnalyses()
+        document = super(StixMalwareAnalyses, cls).create(document, object_, stix_file)
+        if ('product' in object_):
+            document.product = object_['product']
+        if ('version' in object_):
+            document.version = object_['version']
+        if ('host_vm_ref' in object_):
+            document.host_vm_ref = object_['host_vm_ref']
+        if ('installed_software_refs' in object_):
+            document.installed_software_refs = Stix2Base.get_lists_or_string(object_['installed_software_refs'])
+        if ('configuration_version' in object_):
+            document.configuration_version = object_['configuration_version']
+        if ('modules' in object_):
+            document.modules = Stix2Base.get_lists_or_string(object_['modules'])
+        if ('analysis_engine_version' in object_):
+            document.analysis_engine_version = object_['analysis_engine_version']
+        if ('analysis_definition_version' in object_):
+            document.analysis_definition_version = object_['analysis_definition_version']
+        if ('submitted' in object_):
+            document.submitted = object_['submitted']
+        if ('analysis_started' in object_):
+            document.analysis_started = object_['analysis_started']
+        if ('analysis_ended' in object_):
+            document.analysis_ended = object_['analysis_ended']
+        if ('result_name' in object_):
+            document.result_name = object_['result_name']
+        if ('result' in object_):
+            document.result = object_['result']
+        if ('analysis_sco_refs' in object_):
+            document.analysis_sco_refs = Stix2Base.get_lists_or_string(object_['analysis_sco_refs'])
+        if ('sample_ref' in object_):
+            document.sample_ref = object_['sample_ref']
         document.save()
         return document
 
@@ -1336,6 +1553,33 @@ class StixOthers(Stix2Base):
         return document
 
 
+'''
+class StixScos(Stix2Base):
+    meta = {
+        'collection': 'stix_scos'
+    }
+
+    @classmethod
+    def create(cls, object_, stix_file):
+        if object_ is None:
+            return None
+        document = StixScos()
+        document = super(StixScos, cls).create(document, object_, stix_file)
+        if ('name' in object_):
+            document.name = object_['name']
+        if ('description' in object_):
+            document.description = object_['description']
+        document.save()
+        if object_['type'] == 'ipv4-addr':
+            ObservableCaches.create_2_x_from_sco(
+                object_, stix_file, object_['id'], 'ipv4', object_['value'])
+        elif object_['type'] == 'domain-name':
+            ObservableCaches.create_2_x_from_sco(
+                object_, stix_file, object_['id'], 'domain-name', object_['value'])
+        return document
+'''
+
+
 class StixIndicators(Document):
     indicator_id = fields.StringField(max_length=100)
     title = fields.StringField(max_length=1024)
@@ -1671,8 +1915,8 @@ class CustomObjectCaches(Document):
         custom_properties = []
         for prop in custom_object.object_:
             for item in custom_properties_list:
-                if '.' in item:
-                    c_prop, c_key = item.split('.')
+                if StixCustomizer.DICT_PROP_DIVINDER in item:
+                    c_prop, c_key = item.split(StixCustomizer.DICT_PROP_DIVINDER)
                     if prop == c_prop:
                         if c_key in custom_object.object_[prop]:
                             v = custom_object.object_[prop][c_key]
@@ -1682,7 +1926,7 @@ class CustomObjectCaches(Document):
                         v = custom_object.object_[prop]
                         match_prop = prop
                         custom_properties.append((prop, v))
-                
+
         for custom_prop in custom_properties:
             match_prop, v = custom_prop
             if (type(v) != str):
@@ -1882,6 +2126,34 @@ class ObservableCaches(Document):
         document.last_observed = observable['last_observed']
         document.save()
         return
+
+
+    @classmethod
+    def create_2_x_from_sco(cls, object_, stix_file, node_id, object_key, type_, value):
+        document = ObservableCaches()
+        object_node_id = '%s_%s' % (node_id, object_key)
+        document.observable_id = node_id
+        document.title = object_node_id
+        document.description = object_node_id
+        document.stix_file = stix_file
+        document.package_name = stix_file.package_name
+        document.package_id = stix_file.package_id
+        document.node_id = object_node_id
+        document.object_ = object_
+        if type_ == 'ipv4':
+            document.ipv4_1_3, document.ipv4_4 = cls.split_ipv4_value(value)
+        if type_ == 'domain_name':
+            rs_system = System.objects.get()
+            tld = TLD(rs_system.public_suffix_list_file_path)
+            document.domain_without_tld, document.domain_tld = tld.split_domain(value)
+            if document.domain_without_tld:
+                document.domain_last = document.domain_without_tld.split('.')[-1]
+        document.type = type_
+        document.value = value
+        #document.number_observed = observable['number_observed']
+        #document.first_observed = observable['first_observed']
+        #document.last_observed = observable['last_observed']
+        document.save()
 
     @classmethod
     def create(cls, observable, stix_file, node_id):

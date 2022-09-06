@@ -177,7 +177,7 @@ $(function() {
     if ('fuzzy_matching' in cp) {
       node.fuzzy_matching = cp['fuzzy_matching']
     }
- 
+
     if(is_dict){
       node.val_type = VAL_TYPE_DICT
     }else {
@@ -210,7 +210,7 @@ $(function() {
       to: prop_id,
       type: EDGE_TYPE_CONTAINS
     }
-    d.label = EDGE_TYPE_CONTAINS 
+    d.label = EDGE_TYPE_CONTAINS
     d.color = EDGE_DEFAULT_COLOR
     d.smooth = false
     d.chosen = false
@@ -775,7 +775,7 @@ $(function() {
     const child_label = child_node.options.label
     if ('child_nodes' in  network.body.nodes[dict_node.id].options) {
       const child_nodes = Object.values(network.body.nodes[dict_node.id].options.child_nodes)
-      if (child_nodes.includes(child_label)) { 
+      if (child_nodes.includes(child_label)) {
         alert('This property has been added')
         clearEdgePopUp()
         return
@@ -896,6 +896,11 @@ $(function() {
       prop.required = node.required
       prop.type = node.val_type
       prop.regexp = node.regexp
+      if (prop.regexp != null) {
+        if (prop.regexp.length == 0) {
+          prop.regexp = null
+        }
+      }
       prop.fuzzy_matching = node.fuzzy_matching
       return prop
     }
@@ -983,7 +988,7 @@ $(function() {
       url: '/configuration/customizer/set_configuration/',
       data:JSON.stringify(ret),
       contentType: 'application/json',
-      dataType: 'json', 
+      dataType: 'json',
       type: 'post',
       cache: false,
       async: false,

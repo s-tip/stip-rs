@@ -121,6 +121,9 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=32, choices=const.ROLE_CHOICES, default="user")
     gv_auth_user = models.ForeignKey(GVAuthUser, on_delete=models.CASCADE, default=1)
     sns_profile = models.ForeignKey(Profile, on_delete=models.CASCADE, default=1)
+    confidence = models.IntegerField(default=50)
+    identity_id = models.CharField(max_length=64, default='', null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
 
     USERNAME_FIELD = 'username'
     ANONYMOUS_USER_ACCOUNT_NAME = 'anonymous'
@@ -190,12 +193,13 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     def get_description(self):
         return self.description
 
-    def notify_liked(self, package_id, feed_user):
+    def notify_liked(self, package_id, feed_user, opinion=None):
         from ctirs.models.sns.activities.models import Notification
         if self != feed_user:
             Notification(notification_type=Notification.LIKED,
                          from_user=self, to_user=feed_user,
-                         package_id=package_id).save()
+                         package_id=package_id,
+                         opinion=opinion).save()
 
     def unotify_liked(self, package_id, feed_user):
         from ctirs.models.sns.activities.models import Notification

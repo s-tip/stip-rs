@@ -12,6 +12,9 @@ from requests.auth import _basic_auth_str
 from stix2 import parse
 from stix2.v21.bundle import Bundle
 from ctirs.core.mongo.documents_taxii21_objects import StixObject
+from logging import getLogger
+
+logger = getLogger('txc2_audit')
 
 
 TAXII_20_ACCEPT = 'application/vnd.oasis.stix+json; version=2.0'
@@ -52,84 +55,157 @@ def _get_taxii_21_post_request_header(taxii_client):
         'Authorization': _get_taxii_2x_authorization(taxii_client),
         'Content-Type': TAXII_21_PUBLICATION_CONTENT_TYPE,
     }
-    
+
 
 def _get_taxii_2x_objects_url(taxii_client):
-    url = '%scollections/%s/objects/' % (
-        taxii_client._api_root,
-        taxii_client._collection)
+    if taxii_client._port == 443:
+        url = 'https://%s%scollections/%s/objects/' % (
+            taxii_client._domain,
+            taxii_client._api_root,
+            taxii_client._collection)
+    else:
+        url = 'https://%s:%d%scollections/%s/objects/' % (
+            taxii_client._domain,
+            taxii_client._port,
+            taxii_client._api_root,
+            taxii_client._collection)
     return url
 
 
-def _get_json_response(taxii_client, protocol_version, next=None):
-    url = _get_taxii_2x_objects_url(taxii_client)
-    url_parts = list(urlparse.urlparse(url))
+def _get_taxii_2x_manifest_url(taxii_client):
+    if taxii_client._port == 443:
+        url = 'https://%s%scollections/%s/manifest/' % (
+            taxii_client._domain,
+            taxii_client._api_root,
+            taxii_client._collection)
+    else:
+        url = 'https://%s:%d%scollections/%s/manifest/' % (
+            taxii_client._domain,
+            taxii_client._port,
+            taxii_client._api_root,
+            taxii_client._collection)
+    return url
+
+
+def _get_taxii_2x_versions_url(taxii_client, object_id):
+    if taxii_client._port == 443:
+        url = 'https://%s%scollections/%s/objects/%s/versions/' % (
+            taxii_client._domain,
+            taxii_client._api_root,
+            taxii_client._collection,
+            object_id)
+    else:
+        url = 'https://%s:%d%scollections/%s/objects/%s/versions/' % (
+            taxii_client._domain,
+            taxii_client._port,
+            taxii_client._api_root,
+            taxii_client._collection,
+            object_id)
+    return url
+
+
+def _get_taxii_2x_object_url(taxii_client, object_id):
+    if taxii_client._port == 443:
+        url = 'https://%s%scollections/%s/objects/%s/' % (
+            taxii_client._domain,
+            taxii_client._api_root,
+            taxii_client._collection,
+            object_id)
+    else:
+        url = 'https://%s:%d%scollections/%s/objects/%s/' % (
+            taxii_client._domain,
+            taxii_client._port,
+            taxii_client._api_root,
+            taxii_client._collection,
+            object_id)
+    return url
+
+
+def _get_taxii_2x_status_url(taxii_client, status_id):
+    if taxii_client._port == 443:
+        url = 'https://%s%sstatus/%s/' % (
+            taxii_client._domain,
+            taxii_client._api_root,
+            status_id)
+    else:
+        url = 'https://%s:%d%sstatus/%s/' % (
+            taxii_client._domain,
+            taxii_client._port,
+            taxii_client._api_root,
+            status_id)
+    return url
+
+
+def _get_query(taxii_client, next=None, filtering_params=None):
     query = {}
 
     if taxii_client._start is not None:
         query['added_after'] = taxii_client._start.strftime('%Y-%m-%dT%H:%M:%S.000Z')
-    if protocol_version == '2.0':
-        headers = _get_taxii_20_get_request_header(taxii_client)
-    elif protocol_version == '2.1':
-        headers = None
-        headers = _get_taxii_21_get_request_header(taxii_client)
+    if taxii_client._protocol_version == '2.1':
         if next is not None:
             query['next'] = next
 
-    cert_file = None
-    key_file = None
-    cert_fd = None
-    key_fd = None
-    if taxii_client._auth_type == clients.HttpClient.AUTH_CERT_BASIC:
-        del(headers['Authorization'])
-        cert_fd, cert_file = tempfile.mkstemp()
-        with open(cert_file, 'w', encoding='utf-8') as fp:
-            fp.write(taxii_client._cert_file)
-        key_fd, key_file = tempfile.mkstemp()
-        with open(key_file, 'w', encoding='utf-8') as fp:
-            fp.write(taxii_client._key_file)
-        cert = (cert_file, key_file)
+    if filtering_params is not None:
+        if 'next' not in query:
+            if 'next' in filtering_params:
+                query['next'] = filtering_params['next']
+        if 'limit' in filtering_params:
+            query['limit'] = filtering_params['limit']
+        if 'match' in filtering_params:
+            match = filtering_params['match']
+            if 'id' in match:
+                query['match[id]'] = match['id']
+            if 'type' in match:
+                query['match[type]'] = match['type']
+            if 'spec_version' in match:
+                query['match[spec_version]'] = match['spec_version']
+            if 'version' in match:
+                query['match[version]'] = match['version']
+    return query
+
+
+def _get_json_response(taxii_client, method='objects', next=None, object_id=None, filtering_params=None):
+    if method == 'objects':
+        url = _get_taxii_2x_objects_url(taxii_client)
+    elif method == 'manifest':
+        url = _get_taxii_2x_manifest_url(taxii_client)
+    elif method == 'versions':
+        url = _get_taxii_2x_versions_url(taxii_client, object_id)
+    elif method == 'get_object':
+        url = _get_taxii_2x_object_url(taxii_client, object_id)
     else:
-        cert = None
+        raise Exception('Method invalid')
+    query = _get_query(taxii_client, next=next, filtering_params=filtering_params)
+    return get_request(taxii_client, url, query)
 
-    try:
-        url_parts[4] = urlencode(query)
-        url = urlparse.urlunparse(url_parts)
-        resp = requests.get(
-            url,
-            headers=headers,
-            verify=False,
-            cert=cert,
-            proxies=taxii_client._proxies
-        )
-    finally:
-        if cert_fd is not None:
-            try:
-                os.close(cert_fd)
-            except Exception:
-                pass
-        if key_fd is not None:
-            try:
-                os.close(key_fd)
-            except Exception:
-                pass
-        if cert_file is not None:
-            try:
-                os.remove(cert_file)
-            except Exception:
-                pass
-        if key_file is not None:
-            try:
-                os.remove(key_file)
-            except Exception:
-                pass
 
-    if resp.status_code >= 300:
-        raise Exception('Invalid http response (%s).' % (resp.status_code))
+def _delete_json_response(taxii_client, object_id=None, filtering_params=None):
+    url = _get_taxii_2x_object_url(taxii_client, object_id)
+    query = _get_query(taxii_client, filtering_params)
+    return delete_request(taxii_client, url, query)
+
+
+def get_request(taxii_client, url, query):
+    if taxii_client._protocol_version == '2.0':
+        headers = _get_taxii_20_get_request_header(taxii_client)
+    elif taxii_client._protocol_version == '2.1':
+        headers = _get_taxii_21_get_request_header(taxii_client)
+
+    resp = _request_to_txs20(taxii_client, headers, url, http_method='GET', query=query, content=None)
     return resp.json()
 
 
-def _get_objects_21(taxii_client, protocol_version, objects, resp_json):
+def delete_request(taxii_client, url, query):
+    if taxii_client._protocol_version == '2.0':
+        headers = _get_taxii_20_get_request_header(taxii_client)
+    elif taxii_client._protocol_version == '2.1':
+        headers = _get_taxii_21_get_request_header(taxii_client)
+
+    resp = _request_to_txs20(taxii_client, headers, url, http_method='DELETE', query=query, content=None)
+    return resp.json()
+
+
+def _get_objects_21(taxii_client, objects, resp_json, filtering_params=None):
     if resp_json is None:
         return objects
     if 'objects' not in resp_json:
@@ -153,21 +229,96 @@ def _get_objects_21(taxii_client, protocol_version, objects, resp_json):
     if resp_json['more'] and 'next' in resp_json:
         next_resp_json = _get_json_response(
             taxii_client,
-            protocol_version,
-            next=resp_json['next'])
+            method='objects',
+            next=resp_json['next'],
+            object_id=None,
+            filtering_params=filtering_params)
         return _get_objects_21(
             taxii_client,
-            protocol_version,
             objects,
-            next_resp_json)
+            next_resp_json,
+            filtering_params)
     return objects
 
 
-def poll_20(taxii_client, protocol_version='2.0'):
+def manifest(taxii_client, filtering_params=None):
     try:
+        js = _get_json_response(
+            taxii_client, method='manifest', next=None, object_id=None,
+            filtering_params=filtering_params)
+        if 'http_status' in js:
+            raise Exception(json.dumps(js, indent=4))
+        if 'objects' not in js:
+            return []
+        return js['objects']
+    except BaseException as e:
+        traceback.print_exc()
+        raise e
+
+
+def versions(taxii_client, object_id, filtering_params=None):
+    try:
+        js = _get_json_response(
+            taxii_client, method='versions', next=None, object_id=object_id,
+            filtering_params=filtering_params)
+        if 'http_status' in js:
+            raise Exception(json.dumps(js, indent=4))
+        if 'versions' not in js:
+            return []
+        return js['versions']
+    except BaseException as e:
+        traceback.print_exc()
+        raise e
+
+
+def status(taxii_client, status_id):
+    try:
+        url = _get_taxii_2x_status_url(taxii_client, status_id)
+        js = get_request(taxii_client, url, {})
+        if 'http_status' in js:
+            raise Exception(json.dumps(js, indent=4))
+        return js
+    except BaseException as e:
+        traceback.print_exc()
+        raise e
+
+
+def get_object(taxii_client, object_id, filtering_params=None):
+    try:
+        js = _get_json_response(
+            taxii_client, method='get_object', next=None, object_id=object_id,
+            filtering_params=filtering_params)
+        if 'http_status' in js:
+            raise Exception(json.dumps(js, indent=4))
+        if 'objects' not in js:
+            return []
+        return js['objects']
+    except BaseException as e:
+        traceback.print_exc()
+        raise e
+
+
+def delete_object(taxii_client, object_id, filtering_params=None):
+    try:
+        js = _delete_json_response(taxii_client, object_id=object_id, filtering_params=filtering_params)
+        if 'http_status' in js:
+            raise Exception(json.dumps(js, indent=4))
+        return
+    except BaseException as e:
+        traceback.print_exc()
+        raise e
+
+
+def poll_20(taxii_client, filtering_params=None):
+    try:
+        protocol_version = taxii_client._protocol_version
         count = 0
         fd = None
-        js = _get_json_response(taxii_client, protocol_version)
+        js = _get_json_response(
+            taxii_client, method='objects', next=None, object_id=None,
+            filtering_params=filtering_params)
+        if 'http_status' in js:
+            raise Exception(json.dumps(js, indent=4))
         if 'objects' not in js:
             return 0
 
@@ -176,7 +327,9 @@ def poll_20(taxii_client, protocol_version='2.0'):
             with open(stix_file_path, 'wb+') as fp:
                 fp.write(json.dumps(js, indent=4).encode('utf-8'))
         elif protocol_version == '2.1':
-            objects = _get_objects_21(taxii_client, protocol_version, [], js)
+            objects = _get_objects_21(
+                taxii_client, [],
+                js, filtering_params=filtering_params)
             if len(objects) == 0:
                 return 0
             bundle = Bundle(objects)
@@ -223,6 +376,17 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
         push_stix['objects'] = org_stix['objects']
         content = json.dumps(push_stix, indent=4)
 
+    resp = _request_to_txs20(taxii_client, headers, url, http_method='POST', query={}, content=content)
+    if resp.status_code != 202:
+        raise Exception('Invalid http response: %s' % (resp.status_code))
+    msg = json.dumps(resp.json(), indent=4)
+    return msg
+ 
+
+def _request_to_txs20(taxii_client, headers, url, http_method='GET', query={}, content=None):
+    resp = None
+    cert_file = None
+    key_file = None
     cert_fd = None
     key_fd = None
     if taxii_client._auth_type == clients.HttpClient.AUTH_CERT_BASIC:
@@ -237,25 +401,49 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
     else:
         cert = None
 
+    logger.info('-----start-----')
+    logger.info('url: %s' % (url))
+    logger.info('method: %s' % (http_method))
+    logger.info('headers: \n%s' % (json.dumps(headers, indent=4)))
+    logger.info('query: \n%s' % (json.dumps(query, indent=4)))
+    logger.info('content: \n%s' % (content))
     try:
-        resp = requests.post(
-            url,
-            headers=headers,
-            data=content,
-            verify=False,
-            cert=cert,
-            proxies=taxii_client._proxies
-        )
-
-        if resp.status_code != 202:
-            raise Exception('Invalid http response: %s' % (resp.status_code))
-        msg = 'An add object status response shows below.'
-        msg += json.dumps(resp.json(), indent=4)
-        return msg
-    except Exception as e:
-        traceback.print_exc()
-        raise e
+        url_parts = list(urlparse.urlparse(url))
+        url_parts[4] = urlencode(query)
+        url = urlparse.urlunparse(url_parts)
+        if http_method == 'GET':
+            resp = requests.get(
+                url,
+                headers=headers,
+                verify=False,
+                cert=cert,
+                proxies=taxii_client._proxies
+            )
+        elif http_method == 'POST':
+            resp = requests.post(
+                url,
+                headers=headers,
+                data=content,
+                verify=False,
+                cert=cert,
+                proxies=taxii_client._proxies
+            )
+        elif http_method == 'DELETE':
+            resp = requests.delete(
+                url,
+                headers=headers,
+                data=content,
+                verify=False,
+                cert=cert,
+                proxies=taxii_client._proxies
+            )
     finally:
+        logger.info('response status: %s' % (resp.status_code))
+        try:
+            logger.info('response json: \n%s' % (json.dumps(resp.json(), indent=4)))
+        except Exception:
+            logger.info('response body (not json format): \n%s' % (resp.text))
+        logger.info('-----end-----')
         if cert_fd is not None:
             try:
                 os.close(cert_fd)
@@ -276,3 +464,4 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
                 os.remove(key_file)
             except Exception:
                 pass
+    return resp

@@ -24,21 +24,26 @@ def get_customizer_configuration(request):
     stix_customizer = StixCustomizer.get_instance()
 
     custom_objects = []
-    for o_ in stix_customizer.conf_json['objects']:
-        if ('class' in o_):
-            del(o_['class'])
-        if 'color' not in o_:
-            o_['color'] = '#D2E5FF'
-        if 'properties' in o_:
-            for prop in o_['properties']:
-                if 'pattern' in prop:
-                    del(prop['pattern'])
-        custom_objects.append(o_)
+    if stix_customizer.conf_json is not None and 'objects' in stix_customizer.conf_json:
+        for o_ in stix_customizer.conf_json['objects']:
+            if ('class' in o_):
+                del(o_['class'])
+            if 'color' not in o_:
+                o_['color'] = '#D2E5FF'
+            if 'properties' in o_:
+                for prop in o_['properties']:
+                    if 'pattern' in prop:
+                        del(prop['pattern'])
+            custom_objects.append(o_)
     matching_customizer = MatchingCustomizer.get_instance()
+
+    matching_json = []
+    if matching_customizer.conf_json is not None and 'objects' in matching_customizer.conf_json:
+        matching_json = matching_customizer.conf_json['matching_patterns']
 
     return JsonResponse({
         'custom_objects': custom_objects,
-        'matching_patterns': matching_customizer.conf_json['matching_patterns']
+        'matching_patterns': matching_json
     })
 
 

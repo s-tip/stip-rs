@@ -11,13 +11,21 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
-import logging
+import json
+from logging import config as logging_config
+from logging import disable, WARNING
 from unipath import Path
 from decouple import Csv, config, UndefinedValueError
 from stip.common.stix_customizer import StixCustomizer
 from stip.common.matching_customizer import MatchingCustomizer
 
-logging.disable(logging.WARNING)
+try:
+    txc2_audit_long_conf_path = config('TXC2_AUDIT_LOG_CONF')
+    with open(txc2_audit_long_conf_path) as fp:
+        log_conf = json.load(fp)
+        logging_config.dictConfig(log_conf)
+except (FileNotFoundError, UndefinedValueError):
+    disable(WARNING)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -114,6 +122,7 @@ DIRS = [
     os.path.join(CTIRS_DIR, 'login/templates'),
     os.path.join(CTIRS_DIR, 'upload/templates'),
     os.path.join(CTIRS_DIR, 'list/templates'),
+    os.path.join(CTIRS_DIR, 'status/templates'),
     os.path.join(CTIRS_DIR, 'poll/templates'),
     os.path.join(CTIRS_DIR, 'profile/templates'),
     os.path.join(CTIRS_DIR, 'configuration/user/templates'),

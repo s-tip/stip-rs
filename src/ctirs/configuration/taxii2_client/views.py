@@ -1,9 +1,13 @@
+import re
+from urllib.parse import urlparse
 from django.shortcuts import render
 from ctirs.core.common import get_text_field_value, get_common_replace_dict
 from ctirs.error.views import error_page, error_page_no_view_permission, error_page_free_format, error_page_inactive
 from django.contrib.auth.decorators import login_required
 from ctirs.models.rs.models import STIPUser
 from ctirs.core.mongo.documents import Taxii2Clients, Communities
+
+API_ROOT_PATTERN = re.compile('(/\S+/)collections/(\S+)\/')
 
 
 def get_taxii2_client_create_display_name(request):
@@ -66,6 +70,14 @@ def get_taxii2_client_create_can_write(request):
     return 'can_write' in request.POST
 
 
+def get_taxii2_client_create_domain(request):
+    return get_text_field_value(request, 'domain', default_value='')
+
+
+def get_taxii2_client_create_port(request):
+    return int(get_text_field_value(request, 'port', default_value='443'))
+
+
 @login_required
 def top(request):
     if not request.user.is_active:
@@ -95,6 +107,10 @@ def create(request):
         collection = get_taxii2_client_create_collection(request)
         if not collection:
             return error_page_free_format(request, 'No Collection.')
+        domain = get_taxii2_client_create_domain(request)
+        port = get_taxii2_client_create_port(request)
+        if not domain:
+            return error_page_free_format(request, 'No TAXII Server Domain.')
         login_id = get_taxii2_client_create_login_id(request)
         login_password = get_taxii2_client_create_login_password(request)
         community_id = get_taxii2_client_create_community_id(request)
@@ -107,8 +123,10 @@ def create(request):
         can_read = get_taxii2_client_create_can_read(request)
         can_write = get_taxii2_client_create_can_write(request)
 
-        Taxii2Clients.create(
+        _ = Taxii2Clients.create(
             setting_name,
+            domain=domain,
+            port=port,
             api_root=api_root,
             collection=collection,
             login_id=login_id,
@@ -150,6 +168,15 @@ def delete(request):
 
 def _get_taxii2_client_common_replace_dict(request):
     replace_dict = get_common_replace_dict(request)
+    for tc in Taxii2Clients.objects.all():
+        if tc.domain is None:
+            o = urlparse(tc.api_root)
+            r = API_ROOT_PATTERN.match(o.path)
+            if r is not None:
+                (tc.api_root, tc.colletion) = r.groups()
+                tc.domain = o.hostname
+                tc.port = o.port
+                tc.save()
     replace_dict['taxii2_clients'] = Taxii2Clients.objects.all()
     replace_dict['protocol_versions'] = Taxii2Clients.get_protocol_versions()
     replace_dict['communities'] = Communities.objects.all()

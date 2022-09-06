@@ -1,3 +1,4 @@
+import ctirs.poll.views as cp
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from ctirs.core.common import get_text_field_value, get_common_replace_dict
@@ -16,6 +17,16 @@ def get_configuartion_taxii2_client_detail_interval_interval(request):
         return 0
     else:
         return int(interval_str)
+
+
+def _get_poll_parameter(request):
+    return cp.get_filtering_params(
+        limit=cp.get_limit(request),
+        next=None,
+        match_id=cp.get_match_id(request),
+        match_spec_version=cp.get_match_spec_version(request),
+        match_type=cp.get_match_type(request),
+        match_version=cp.get_match_version(request))
 
 
 @login_required
@@ -46,6 +57,7 @@ def interval(request, taxii_id):
         client = Client(taxii2_client=taxii_client)
         client.remove_interval_job()
         taxii_client.interval_schedule_job = None
+        taxii_client.filtering_params = _get_poll_parameter(request)
         taxii_client.save()
         if interval != 0:
             schedule_job = taxii_client.add_job(type_=ScheduleJobs.JOB_INTERVAL, seconds=interval)
@@ -76,6 +88,8 @@ def create(request, taxii_id):
         schedule_job = taxii_client.add_job(type_=ScheduleJobs.JOB_CRON, hour=times[0], minute=times[1], second=times[2])
         client = Client(taxii2_client=taxii_client)
         client.add_job(schedule_job)
+        taxii_client.filtering_params = _get_poll_parameter(request)
+        taxii_client.save()
 
         replace_dict = get_common_replace_dict(request)
         replace_dict['client'] = taxii_client

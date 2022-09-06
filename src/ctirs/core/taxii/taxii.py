@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from ctirs.core.mongo.documents import Vias, ScheduleJobs
 from ctirs.core.schedule.schedule import CtirsScheduler
 from ctirs.models.rs.models import System
-from ctirs.core.taxii.taxii20 import poll_20, push_20
+from ctirs.core.taxii.taxii20 import poll_20, push_20, manifest, versions, get_request, get_object, delete_object, status
 from ctirs.core.taxii.taxii11 import poll_11, push_11
 
 
@@ -31,8 +31,11 @@ class Client(object):
         else:
             self._auth_type = clients.HttpClient.AUTH_BASIC
         if taxii2_client:
+            self._domain = taxii.domain
+            self._port = taxii.port
             self._api_root = taxii.api_root
             self._collection = taxii.collection
+            self._filtering_params = taxii.filtering_params
             self._via = Vias.get_via_taxii_poll(taxii2_client=taxii, uploader=taxii.uploader)
         else:
             self._address = taxii.address
@@ -62,6 +65,9 @@ class Client(object):
         self._start = None
         self._end = None
         self._schedule = CtirsScheduler()
+
+    def request_get_taxii_server(self, url):
+        return get_request(self, url, {})
 
     def set_start_time(self, start):
         self._start = start
@@ -122,24 +128,82 @@ class Client(object):
         if self._taxii.last_requested is not None:
             self.set_start_time(self._taxii.last_requested.replace(tzinfo=pytz.utc))
         try:
-            self.poll()
+            self.poll(filtering_params=self._filtering_params)
         except BaseException:
             traceback.print_exc()
 
-    def poll(self):
+    def poll(self, filtering_params=None):
         if not self._can_read:
-            print('This collection is not for polling/consuming.: %s ' % (self._name))
+            print('This collection is not configured for consumption: %s ' % (self._name))
             return 0
         if self._protocol_version == '2.0':
-            return poll_20(self, protocol_version='2.0')
+            return poll_20(self, filtering_params=filtering_params)
         elif self._protocol_version == '2.1':
-            return poll_20(self, protocol_version='2.1')
+            return poll_20(self, filtering_params=filtering_params)
         else:
             return poll_11(self)
 
+    def manifest(self, filtering_params=None):
+        if not self._can_read:
+            print('This collection is not configured for consumption: %s ' % (self._name))
+            return []
+        if self._protocol_version == '2.0':
+            return manifest(self, filtering_params=filtering_params)
+        elif self._protocol_version == '2.1':
+            return manifest(self, filtering_params=filtering_params)
+        else:
+            print('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
+            return []
+
+    def versions(self, object_id, filtering_params=None):
+        if not self._can_read:
+            print('This collection is not configured for consumption: %s ' % (self._name))
+            return []
+        if self._protocol_version == '2.0':
+            return versions(self, object_id, filtering_params=filtering_params)
+        elif self._protocol_version == '2.1':
+            return versions(self, object_id, filtering_params=filtering_params)
+        else:
+            print('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
+            return []
+
+    def status(self, status_id):
+        if self._protocol_version == '2.0':
+            return status(self, status_id)
+        elif self._protocol_version == '2.1':
+            return status(self, status_id)
+        else:
+            print('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
+            return {}
+
+    def get_object(self, object_id, filtering_params=None):
+        if not self._can_read:
+            print('This collection is not configured for consumption: %s ' % (self._name))
+            return []
+        if self._protocol_version == '2.0':
+            return get_object(self, object_id, filtering_params=filtering_params)
+        elif self._protocol_version == '2.1':
+            return get_object(self, object_id, filtering_params=filtering_params)
+        else:
+            print('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
+            return []
+
+    def delete_object(self, object_id, filtering_params=None):
+        if not self._can_read or not self._can_write:
+            print('This collection is not configured for delete: %s ' % (self._name))
+            raise Exception('This collection is not configured for delete: %s ' % (self._name))
+        if self._protocol_version == '2.0':
+            delete_object(self, object_id, filtering_params=filtering_params)
+        elif self._protocol_version == '2.1':
+            delete_object(self, object_id, filtering_params=filtering_params)
+        else:
+            print('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
+            raise Exception('For TAXII 2.0, 2.1 only.: %s ' % (self._name))
+        return
+
     def push(self, stix_file_doc):
         if not self._can_write:
-            msg = 'This collection is not for inbox/publishing: %s ' % (self._name)
+            msg = 'This collection is not configured for publication: %s ' % (self._name)
             print(msg)
             return msg
         if self._protocol_version == '2.0':

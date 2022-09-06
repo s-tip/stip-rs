@@ -1,14 +1,17 @@
-# URLを正規表現で評価し、マッチングした場合の処理箇所を定義
-from django.conf.urls import url, include
+from django.conf.urls import include
+try:
+    from django.conf.urls import url as _url
+except ImportError:
+    from django.urls import re_path as _url
 import ctirs.adapter.otx.urls
 import ctirs.adapter.isight.urls
 import ctirs.adapter.misp.urls
 
 urlpatterns = [
     # adapter/otx
-    url(r'^otx/', include(ctirs.adapter.otx.urls)),
+    _url(r'^otx/', include(ctirs.adapter.otx.urls)),
     # adapter/isight
-    url(r'^isight/', include(ctirs.adapter.isight.urls)),
+    _url(r'^isight/', include(ctirs.adapter.isight.urls)),
     # adapter/misp
-    url(r'^misp/', include(ctirs.adapter.misp.urls)),
+    _url(r'^misp/', include(ctirs.adapter.misp.urls)),
 ]

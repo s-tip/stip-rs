@@ -8,7 +8,10 @@ import json
 import traceback
 from . import rs
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+try:
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _
 from ctirs.models import Group
 from ctirs.models import STIPUser
 from ctirs.models import SNSConfig
@@ -71,6 +74,7 @@ class Feed(models.Model):
     referred_url = models.TextField(max_length=1024, default=None, null=True)
     stix2_package_id = models.CharField(max_length=128, default='', null=True)
     stix_version = models.CharField(max_length=8, default='1.2', null=True)
+    confidence = models.IntegerField(default=50)
     build_cache_flag = False
 
     class Meta:
@@ -786,6 +790,7 @@ class Feed(models.Model):
             query_string=None,
             index=0,
             size=-1,
+            filter=None,
             user_id=None):
 
         if not Feed.build_cache_flag:
@@ -801,6 +806,7 @@ class Feed(models.Model):
                 range_big_datetime=range_big_datetime,
                 query_string=query_string,
                 index=index,
+                filter=filter,
                 size=size)
         else:
             packages_from_rs = rs.get_feeds_from_rs(
@@ -811,6 +817,7 @@ class Feed(models.Model):
                 range_big_datetime=range_big_datetime,
                 query_string=query_string,
                 index=index,
+                filter=filter,
                 size=size)
 
         feeds_ = []
@@ -862,10 +869,11 @@ class Feed(models.Model):
         return None
 
     @staticmethod
-    def get_feeds_after(last_feed_datetime, api_user=None, user_id=None):
+    def get_feeds_after(last_feed_datetime, api_user=None, filter=None, user_id=None):
         feeds_ = Feed.get_feeds(
             last_feed_datetime=last_feed_datetime,
             api_user=api_user,
+            filter=filter,
             user_id=user_id)
         return Feed.get_filter_query_set(None, api_user, feeds_=feeds_)
 

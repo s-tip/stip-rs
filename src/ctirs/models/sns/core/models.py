@@ -1,7 +1,10 @@
 
 from django.db.utils import OperationalError
 from django.db import models
-from django.utils.translation import ugettext_lazy
+try:
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _
 
 
 class Country(models.Model):
@@ -26,7 +29,7 @@ class Country(models.Model):
                 r = []
                 try:
                     for item in Country.objects.all().exclude(region='').order_by('name'):
-                        r.append((item.alpha_2, ugettext_lazy(item.name)))
+                        r.append((item.alpha_2, _(item.name)))
                 except BaseException:
                     pass
                 cls.__country_tuple = tuple(r)
@@ -66,7 +69,7 @@ class Region(models.Model):
     def get_country_code_choices():
         r = []
         for item in Region.get_country_codes():
-            r.append((item, ugettext_lazy(item)))
+            r.append((item, _(item)))
         return tuple(r)
 
     @staticmethod
@@ -88,7 +91,7 @@ class Region(models.Model):
         r = []
         try:
             for item in Region.get_administrative_areas(country_code):
-                r.append((item.code, ugettext_lazy(item.administrative_area)))
+                r.append((item.code, _(item.administrative_area)))
         except BaseException:
             pass
         return tuple(r)

@@ -1,3 +1,4 @@
+import json
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q as QQ
 from django.http import HttpResponseNotAllowed
@@ -5,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from mongoengine.queryset.visitor import Q
 from mongoengine import DoesNotExist
 from ctirs.api import JsonResponse
-from ctirs.core.mongo.documents import Communities, Vias, TaxiiClients, Taxii2Clients
+from ctirs.core.mongo.documents import Communities, Vias, TaxiiClients, Taxii2Clients, Taxii2Statuses
 from ctirs.core.mongo.documents_stix import StixFiles
 from ctirs.core.taxii.taxii import Client
 from ctirs.models.rs.models import STIPUser
@@ -23,7 +24,7 @@ def get_table_info(request):
     sort_dir = request.GET['sSortDir_0']
     order_query = None
     if sort_col == 1:
-        order_query = 'produced'
+        order_query = 'modified'
     elif sort_col == 2:
         order_query = 'package_name'
     elif sort_col == 3:
@@ -57,7 +58,7 @@ def get_table_info(request):
     for d in objects[iDisplayStart:(iDisplayStart + iDisplayLength)]:
         l = []
         l.append('<input type="checkbox" file_id="%s"/ class="delete-checkbox">' % (d.id))
-        l.append(d.produced.strftime('%Y/%m/%d %H:%M:%S'))
+        l.append(d.modified.strftime('%Y/%m/%d %H:%M:%S'))
         l.append(d.package_name)
         l.append(d.package_id)
         l.append(d.version)
@@ -115,6 +116,9 @@ def publish(request):
         return JsonResponse(resp)
     try:
         msg = client.push(stix)
+        if protocol_version.startswith('2.'):
+            status = json.loads(msg)
+            Taxii2Statuses.create(taxii_client, status)
         resp = {'status': 'OK',
                 'message': msg}
     except Exception as e:

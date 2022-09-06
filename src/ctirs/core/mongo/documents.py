@@ -4,6 +4,7 @@ import pytz
 from mongoengine import fields
 from mongoengine.document import Document
 from mongoengine.errors import DoesNotExist
+from django.utils.timezone import make_aware
 from ctirs.models.rs.models import STIPUser, System
 from ctirs import COMMUNITY_ORIGIN_DIR_NAME
 
@@ -587,23 +588,26 @@ class Taxii2Clients(Document):
 
     @classmethod
     def create(
-            cls, name, api_root='', collection='', login_id='', login_password='',
+            cls, name, domain='', port=443, api_root='', collection='', login_id='', login_password='',
             community_id='', ca=False, key_file=None, cert_file=None,
             protocol_version='', push=False, uploader_id=None,
             can_read=False, can_write=False):
-        community = Communities.objects.get(id=community_id)
         try:
             t = Taxii2Clients.objects.get(name=name)
         except DoesNotExist:
             t = Taxii2Clients()
             t.last_requested = None
         t.name = name
+        t.domain = domain
+        t.port = port
         t.api_root = api_root
         t.collection = collection
         t.login_id = login_id
-        if login_password:
+        if len(login_password) != 0:
             t.login_password = login_password
-        t.community = community
+        if len(community_id) != 0:
+            community = Communities.objects.get(id=community_id)
+            t.community = community
         t.is_use_cert = ca
         if ca:
             if key_file:
@@ -619,7 +623,7 @@ class Taxii2Clients(Document):
         t.can_read = can_read
         t.can_write = can_write
         t.save()
-        return
+        return t
 
     @staticmethod
     def get_protocol_versions():
@@ -642,6 +646,8 @@ class Taxii2Clients(Document):
         return CommonTaxiiClient.is_exist_community(self)
 
     name = fields.StringField(max_length=100, unique=True)
+    domain = fields.StringField(max_length=100, required=True)
+    port = fields.IntField(default=443, requred=True)
     api_root = fields.StringField(max_length=100, default='/api1')
     collection = fields.StringField(max_length=100, default='collection')
     login_id = fields.StringField(max_length=100, default='login_id')
@@ -658,6 +664,7 @@ class Taxii2Clients(Document):
     interval_schedule_job = fields.ReferenceField(ScheduleJobs)
     can_read = fields.BooleanField(default=False)
     can_write = fields.BooleanField(default=False)
+    filtering_params = fields.DictField(default={})
 
 
 class CommonTaxiiClient(object):
@@ -707,6 +714,22 @@ class CommonTaxiiClient(object):
     def uploader_name(taxii_client):
         return STIPUser.objects.get(id=taxii_client.uploader).username
 
+
+class Taxii2Statuses(Document):
+    taxii2client = fields.ReferenceField(Taxii2Clients, required=True)
+    published = fields.DateTimeField(default=datetime.datetime.now())
+    status_id = fields.StringField(max_length=128)
+    status = fields.DictField()
+
+    @classmethod
+    def create(cls, taxii2client, status):
+        doc = Taxii2Statuses()
+        doc.taxii2client = taxii2client
+        doc.published = make_aware(datetime.datetime.now())
+        doc.status_id = status['id']
+        doc.status = status
+        doc.save()
+ 
 
 class Vias(Document):
     VIA_CHOICES = (
