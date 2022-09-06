@@ -379,7 +379,7 @@ def create_note(request):
         )
         bundle = Bundle(identity, note_o, allow_custom=True)
         _regist_bundle(bundle, ctirs_auth_user)
- 
+
         resp = get_normal_response_json()
         return JsonResponse(resp, status=201, safe=False)
     except Exception as e:
@@ -440,7 +440,7 @@ def modify(request):
     try:
         if request.method != 'POST':
             return HttpResponseNotAllowed(['POST'])
-        
+
         stix2 = json.loads(request.body)
 
         ctirs_auth_user = authentication(request)

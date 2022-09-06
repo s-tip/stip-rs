@@ -1926,7 +1926,7 @@ class CustomObjectCaches(Document):
                         v = custom_object.object_[prop]
                         match_prop = prop
                         custom_properties.append((prop, v))
-                
+
         for custom_prop in custom_properties:
             match_prop, v = custom_prop
             if (type(v) != str):
@@ -2154,7 +2154,7 @@ class ObservableCaches(Document):
         #document.first_observed = observable['first_observed']
         #document.last_observed = observable['last_observed']
         document.save()
- 
+
     @classmethod
     def create(cls, observable, stix_file, node_id):
         if observable is None:
