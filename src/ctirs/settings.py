@@ -71,6 +71,10 @@ try:
 except UndefinedValueError:
     cookie_domain_name = None
 
+try:
+    CSRF_TRUSTED_ORIGINS = json.loads(config('CSRF_TRUSTED_ORIGINS_RS'))
+except Exception:
+    CSRF_TRUSTED_ORIGINS = []
 
 stix_customizer = StixCustomizer.get_instance()
 try:
