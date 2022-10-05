@@ -99,12 +99,12 @@
     </td>
     <td>
         <div class="form-group">
-            <button {% ifequal job.status 'stop' %}{% else %}disabled{% endifequal %} class="btn btn-default adapter-misp-start-button btn-sm" type="button" job_id="{{job.id}}">Start</button>
+            <button {% if job.status == 'stop' %}{% else %}disabled{% endif %} class="btn btn-default adapter-misp-start-button btn-sm" type="button" job_id="{{job.id}}">Start</button>
         </div><!-- <div class="form-group"> -->
     </td>
     <td>
         <div class="form-group">
-            <button {% ifequal job.status 'stop' %}disabled{% else %}{% endifequal %} class="btn btn-default adapter-misp-stop-button btn-sm" type="button" job_id="{{job.id}}">Stop</button>
+            <button {% if job.status == 'stop' %}disabled{% else %}{% endif %} class="btn btn-default adapter-misp-stop-button btn-sm" type="button" job_id="{{job.id}}">Stop</button>
         </div><!-- <div class="form-group"> -->
     </td>
     </tr>
