@@ -99,12 +99,12 @@
     </td>
     <td>
         <div class="form-group">
-            <button {% ifequal job.status 'stop' %}{% else %}disabled{% endifequal %} class="btn btn-default configuration-taxii-client-start-button btn-sm" type="button" taxii_client_id="{{ client.id }}"  job_id="{{job.id}}">Start</button>
+            <button {% if job.status == 'stop' %}{% else %}disabled{% endif %} class="btn btn-default configuration-taxii-client-start-button btn-sm" type="button" taxii_client_id="{{ client.id }}"  job_id="{{job.id}}">Start</button>
         </div><!-- <div class="form-group"> -->
     </td>
     <td>
         <div class="form-group">
-            <button {% ifequal job.status 'stop' %}disabled{% else %}{% endifequal %} class="btn btn-default configuration-taxii-client-stop-button btn-sm" type="button" taxii_client_id="{{ client.id }}" job_id="{{job.id}}">Stop</button>
+            <button {% if job.status == 'stop' %}disabled{% else %}{% endif %} class="btn btn-default configuration-taxii-client-stop-button btn-sm" type="button" taxii_client_id="{{ client.id }}" job_id="{{job.id}}">Stop</button>
         </div><!-- <div class="form-group"> -->
     </td>
     </tr>
