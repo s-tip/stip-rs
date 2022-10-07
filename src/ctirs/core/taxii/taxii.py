@@ -42,6 +42,7 @@ class Client(object):
             self._port = taxii.port
             self._path = taxii.path
             self._collection_name = taxii.collection
+            self._filtering_params = None
             self._via = Vias.get_via_taxii_poll(taxii_client=taxii, uploader=taxii.uploader)
             self._client = clients.HttpClient()
 
