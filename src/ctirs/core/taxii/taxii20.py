@@ -150,7 +150,8 @@ def _get_query(taxii_client, next=None, filtering_params=None):
             if 'next' in filtering_params:
                 query['next'] = filtering_params['next']
         if 'limit' in filtering_params:
-            query['limit'] = filtering_params['limit']
+            if filtering_params['limit']:
+                query['limit'] = filtering_params['limit']
         if 'match' in filtering_params:
             match = filtering_params['match']
             if 'id' in match:
@@ -381,7 +382,7 @@ def push_20(taxii_client, stix_file_doc, protocol_version='2.0'):
         raise Exception('Invalid http response: %s' % (resp.status_code))
     msg = json.dumps(resp.json(), indent=4)
     return msg
- 
+
 
 def _request_to_txs20(taxii_client, headers, url, http_method='GET', query={}, content=None):
     resp = None
@@ -392,6 +393,7 @@ def _request_to_txs20(taxii_client, headers, url, http_method='GET', query={}, c
     if taxii_client._auth_type == clients.HttpClient.AUTH_CERT_BASIC:
         del(headers['Authorization'])
         cert_fd, cert_file = tempfile.mkstemp()
+        key_fd, key_file = tempfile.mkstemp()
         with open(cert_file, 'w', encoding='utf-8') as fp:
             fp.write(taxii_client._cert_file)
         key_fd, key_file = tempfile.mkstemp()

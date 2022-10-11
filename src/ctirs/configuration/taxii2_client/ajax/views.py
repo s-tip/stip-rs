@@ -38,6 +38,10 @@ def _get_collection_url(domain, port, api_root, collection):
     return '%s%s/' % (base, collection)
 
 
+def _get_taxii2_client_create_ca(request):
+    return 'ca' in request.GET
+
+
 def _taxii_request(request, end_point):
     if request.method != 'GET':
         return HttpResponseNotAllowed(['GET'])
@@ -52,7 +56,7 @@ def _taxii_request(request, end_point):
         port = tc2.get_taxii2_client_create_port(request)
         login_id = tc2.get_taxii2_client_create_login_id(request)
         login_password = tc2.get_taxii2_client_create_login_password(request)
-        ca = tc2.get_taxii2_client_create_ca(request)
+        ca = _get_taxii2_client_create_ca(request)
         certificate = tc2.get_taxii2_client_create_certificate(request)
         private_key = tc2.get_taxii2_client_create_private_key(request)
         protocol_version = tc2.get_taxii2_client_create_protocol_version(request)
@@ -65,12 +69,12 @@ def _taxii_request(request, end_point):
                 if len(certificate) == 0:
                     certificate = tc_work.cert_file
                 if len(private_key) == 0:
-                    certificate = tc_work.key_file
+                    private_key = tc_work.key_file
                 setting_name = str(uuid.uuid4())
             except Taxii2Clients.DoesNotExist:
                 pass
         setting_name = str(uuid.uuid4())
- 
+
         tc = Taxii2Clients.create(
             name=setting_name,
             login_id=login_id,
@@ -109,7 +113,7 @@ def _taxii_request(request, end_point):
 @login_required
 def get_discovery(request):
     return _taxii_request(request, end_point='discovery')
- 
+
 
 @login_required
 def get_collections(request):
