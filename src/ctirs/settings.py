@@ -207,6 +207,7 @@ STATICFILES_DIRS = (
 
 SESSION_COOKIE_NAME = 'stip'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+CSRF_COOKIE_HTTPONLY = True
 
 # HTTP 上で動作させるかどうかのフラグ
 ENV_DEV_OVER_HTTP_KEY = 'DEV_OVER_HTTP'
