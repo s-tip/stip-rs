@@ -18,9 +18,9 @@ def change_api_key(request):
     try:
         user = request.user
         # apikey変更
-        user.change_api_key()
+        api_key = user.change_api_key()
         r = {'status': 'OK',
-             'api_key': user.api_key}
+             'api_key': api_key}
     except Exception as e:
         import traceback
         traceback.print_exc()

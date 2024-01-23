@@ -6,6 +6,7 @@ import pytz
 from django.db import models
 from django.db.models.signals import pre_save
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.hashers import PBKDF2PasswordHasher
 from ctirs.models.gv.authentication.models import GVAuthUser
 from ctirs.models.sns.authentication.models import Profile
 from ctirs.models.sns.core.models import Region
@@ -80,13 +81,39 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.name
 
+    @staticmethod
+    def make_hashed_password(password):
+        ph = PBKDF2PasswordHasher()
+        return ph.encode(password, salt=ph.salt())
+
+    @staticmethod
+    def verify_hashed_password(password, hashed_password):
+        ph = PBKDF2PasswordHasher()
+        return ph.verify(password, hashed_password)
+
     @classmethod
     def make_api_key(self):
         return hmac.new(uuid.uuid4().bytes, digestmod=hashlib.sha1).hexdigest()
 
-    def change_api_key(self):
-        self.api_key = self.make_api_key()
+    def save_hashed_api_key(self, api_key):
+        hashed_api_key = STIPUser.make_hashed_password(api_key)
+        self.hashed_api_key = hashed_api_key
+        self.api_key = ''
         self.save()
+
+    def verify_api_key(self, api_key):
+        if len(self.api_key):
+            self.hashed_api_key = STIPUser.make_hashed_password(self.api_key)
+            self.api_key = ''
+            self.save()
+        if len(self.hashed_api_key) == 0:
+            return None
+        return STIPUser.verify_hashed_password(api_key, self.hashed_api_key)
+
+    def change_api_key(self):
+        api_key = self.make_api_key()
+        self.save_hashed_api_key(api_key)
+        return api_key
 
     def create_gv_auth_user(self):
         self.gv_auth_user = GVAuthUser.objects.create_user()
@@ -98,6 +125,7 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     api_key = models.CharField(max_length=128, default='')
+    hashed_api_key = models.CharField(max_length=1024, default='')
     timezone = models.CharField(max_length=128, default='UTC')
     is_modified_password = models.BooleanField(default=False)
     is_buildin = models.BooleanField(default=False)

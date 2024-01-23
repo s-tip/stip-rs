@@ -86,11 +86,15 @@
                 API KEY
             </div>
             <div class="col-xs-6">
-                <input id="api-key" type="text" name="api_key" class="form-control" value="{{user.api_key}}" readonly="readonly"/>
+                {% if user.hashed_api_key %}
+                <input id="api-key" type="text" name="api_key" class="form-control" value="You have already gereated api_key. If you forget, regenerate api_key" readonly="readonly"/>
+                {% else %}
+                <input id="api-key" type="text" name="api_key" class="form-control" value="" readonly="readonly"/>
+                {% endif %}
             </div>
         </div> <!-- <div class="row">-->
         <div class="row">
-            <button type="button" id="change-api-key-submit" class="btn btn-default">Change API KEY</button>
+            <button type="button" id="change-api-key-submit" class="btn btn-default">Get API KEY</button>
         </div> <!-- <div class="row">-->
     </div><!-- <div class="form-group"> -->
 </div> <!--  <div class="container"> -->
