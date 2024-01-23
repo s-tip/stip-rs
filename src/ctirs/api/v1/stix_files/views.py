@@ -1,4 +1,5 @@
 import pytz
+import traceback
 import datetime
 from mongoengine.errors import DoesNotExist, ValidationError
 from django.http import HttpResponseNotAllowed
@@ -90,7 +91,6 @@ def upload_stix_file(request):
         upload_common(request, via)
         return api_root.get_put_normal_status()
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return api_root.error(e)
 

@@ -13,6 +13,12 @@ from ctirs.models.rs.models import STIPUser
 from ctirs.core.adapter.misp.upload.control import MispUploadAdapterControl
 
 
+def get_common_error_dict():
+    return {
+        'status': 'NG',
+        'message': 'A system error has occurred. Please check the system log.'}
+
+
 @login_required
 def get_table_info(request):
     iDisplayLength = int(request.GET['iDisplayLength'])
@@ -121,11 +127,9 @@ def publish(request):
             Taxii2Statuses.create(taxii_client, status)
         resp = {'status': 'OK',
                 'message': msg}
-    except Exception as e:
-        resp = {'status': 'NG',
-                'message': str(e)}
+    except Exception:
+        resp = get_common_error_dict()
     return JsonResponse(resp)
-
 
 @login_required
 @csrf_exempt
@@ -138,7 +142,6 @@ def misp_import(request):
         control.upload_misp(package_id)
         resp = {'status': 'OK',
                 'message': 'Success'}
-    except Exception as e:
-        resp = {'status': 'NG',
-                'message': str(e)}
+    except Exception:
+        resp = get_common_error_dict()
     return JsonResponse(resp)

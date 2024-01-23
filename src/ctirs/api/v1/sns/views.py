@@ -3,6 +3,7 @@ import datetime
 import re
 import string
 import json
+import traceback
 from mongoengine.errors import DoesNotExist
 from mongoengine.queryset.visitor import Q
 from django.http import HttpResponseNotAllowed
@@ -26,7 +27,7 @@ STIP_SNS_TOOL_NAME_VALUE = 'S-TIP'
 STIP_SNS_TOOL_VENDOR_VALUE = 'Fujitsu'
 STIP_SNS_USER_NAME_PREFIX = 'User Name: '
 SUGGEST_LIMIT = 5
-SUGGEST_MIN_LENGTH = 2 
+SUGGEST_MIN_LENGTH = 2
 
 
 def get_datetime_from_str(s, default=None):
@@ -301,7 +302,6 @@ def feeds(request):
         r['feeds'] = feeds_list
         return JsonResponse(r, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -324,7 +324,6 @@ def attaches(request):
         except DoesNotExist:
             return HttpResponseNotFound()
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -345,7 +344,6 @@ def related_packages(request):
             related_packages_list.append(get_return_dictionary_from_stix_file_document(stix_file))
         return JsonResponse(related_packages_list, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -389,7 +387,6 @@ def content(request):
                 doc['version'] = '1.2'
         return JsonResponse(doc, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -415,7 +412,6 @@ def comments(request):
             comments_list.append(get_return_dictionary_from_stix_file_document(stix_file))
         return JsonResponse(comments_list, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -453,7 +449,6 @@ def likers(request):
                 likers.append(liker)
         return JsonResponse(likers, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -479,7 +474,6 @@ def share_misp(request):
         r['url'] = url
         return JsonResponse(r, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -542,7 +536,6 @@ def query(request):
         r['feeds'] = feeds_list
         return JsonResponse(r, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -619,6 +612,5 @@ def tags(request):
             suggest_list.append(tag.tag)
         return JsonResponse(suggest_list, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)

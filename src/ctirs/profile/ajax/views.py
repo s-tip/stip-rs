@@ -1,3 +1,4 @@
+import traceback
 from django.http.response import JsonResponse
 from django.contrib.auth.decorators import login_required
 
@@ -21,10 +22,9 @@ def change_api_key(request):
         api_key = user.change_api_key()
         r = {'status': 'OK',
              'api_key': api_key}
-    except Exception as e:
-        import traceback
+    except Exception:
         traceback.print_exc()
         r = {'status': 'NG',
-             'message': str(e)}
+             'message': 'A system error has occurred. Please check the system log.'}
     finally:
         return JsonResponse(r, safe=False)
