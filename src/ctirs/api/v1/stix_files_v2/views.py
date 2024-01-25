@@ -121,6 +121,7 @@ def language_contents(request, object_ref):
         else:
             return HttpResponseNotAllowed(['GET', 'POST'])
     except Exception as e:
+        traceback.print_exc()
         return error(e)
 
 
@@ -242,7 +243,6 @@ def object_main(request, object_id):
             return _delete_object_main(request, object_id)
         return HttpResponseNotAllowed(['GET', 'DELETE'])
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -269,7 +269,6 @@ def _delete_object_main(request, object_id):
         resp['data'] = {'remove_package_id': doc.package_id}
         return JsonResponse(resp, status=200, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -321,7 +320,6 @@ def search_bundle(request):
         resp['data'] = d
         return JsonResponse(resp, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -351,7 +349,6 @@ def create_opinion(request):
         resp = get_normal_response_json()
         return JsonResponse(resp, status=201, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -383,7 +380,6 @@ def create_note(request):
         resp = get_normal_response_json()
         return JsonResponse(resp, status=201, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -429,7 +425,6 @@ def revoke(request):
         resp = get_normal_response_json()
         return JsonResponse(resp, status=201, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -469,7 +464,6 @@ def modify(request):
         resp = get_normal_response_json()
         return JsonResponse(resp, status=201, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -503,7 +497,6 @@ def get_latest_object(request, object_id):
         resp['data'] = d
         return JsonResponse(resp, status=201, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)
 
@@ -527,6 +520,5 @@ def get_stix2_content(request, object_id, version):
         resp['data'] = d
         return JsonResponse(resp, safe=False)
     except Exception as e:
-        import traceback
         traceback.print_exc()
         return error(e)

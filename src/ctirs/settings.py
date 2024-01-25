@@ -18,6 +18,7 @@ from unipath import Path
 from decouple import Csv, config, UndefinedValueError
 from stip.common.stix_customizer import StixCustomizer
 from stip.common.matching_customizer import MatchingCustomizer
+from stip.common.session_config import SessionConfig
 
 try:
     txc2_audit_long_conf_path = config('TXC2_AUDIT_LOG_CONF')
@@ -208,6 +209,8 @@ STATICFILES_DIRS = (
 SESSION_COOKIE_NAME = 'stip'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 CSRF_COOKIE_HTTPONLY = True
+
+SESSION_COOKIE_AGE = SessionConfig.get_session_cokkie_age()
 
 # HTTP 上で動作させるかどうかのフラグ
 ENV_DEV_OVER_HTTP_KEY = 'DEV_OVER_HTTP'

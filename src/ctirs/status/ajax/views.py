@@ -30,8 +30,8 @@ def check(request):
         js = cl.status(status_id)
         r = {'status': 'OK',
              'data': js}
-    except Exception as e:
+    except Exception:
         r = {'status': 'NG',
-             'message': str(e)}
+             'message': 'A system error has occurred. Please check the system log.'}
     finally:
         return JsonResponse(r, safe=False)

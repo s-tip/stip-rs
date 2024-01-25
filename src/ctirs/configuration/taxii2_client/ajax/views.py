@@ -101,9 +101,9 @@ def _taxii_request(request, end_point):
         resp = {'status': 'OK',
                 'data': txs_resp}
         return JsonResponse(resp)
-    except Exception as e:
+    except Exception:
         resp = {'status': 'NG',
-                'message': str(e)}
+                'message': 'A system error has occurred. Please check the system log.'}
     finally:
         if tc is not None:
             tc.delete()

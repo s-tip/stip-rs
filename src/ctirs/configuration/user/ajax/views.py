@@ -33,6 +33,12 @@ def check_ajax_request(request):
     return None
 
 
+def get_common_error_dict():
+    return {
+        'status': 'NG',
+        'message': 'A system error has occurred. Please check the system log.'}
+
+
 @login_required
 @csrf_protect
 def change_auth(request):
@@ -48,9 +54,8 @@ def change_auth(request):
         u.save()
         r = {'status': 'OK',
              'message': 'Success'}
-    except Exception as e:
-        r = {'status': 'NG',
-             'message': str(e)}
+    except Exception:
+        r = get_common_error_dict()
     finally:
         return JsonResponse(r, safe=False)
 
@@ -69,9 +74,8 @@ def change_active(request):
         u.save()
         r = {'status': 'OK',
              'message': 'Success'}
-    except Exception as e:
-        r = {'status': 'NG',
-             'message': str(e)}
+    except Exception:
+        r = get_common_error_dict()
     finally:
         return JsonResponse(r, safe=False)
 
@@ -89,8 +93,7 @@ def unset_mfa(request):
         u.save()
         r = {'status': 'OK',
              'message': 'Success'}
-    except Exception as e:
-        r = {'status': 'NG',
-             'message': str(e)}
+    except Exception:
+        r = get_common_error_dict()
     finally:
         return JsonResponse(r, safe=False)

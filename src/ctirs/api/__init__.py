@@ -50,13 +50,10 @@ class JsonResponse(HttpResponse):
         super(JsonResponse, self).__init__(content=data, **kwargs)
 
 
-def error(e):
+def error(e=None):
     d = {}
     d['return_code'] = '1'
-    if isinstance(e, Exception):
-        d['userMessage'] = str(e)
-    else:
-        d['userMessage'] = 'No error message'
+    d['userMessage'] = 'A system error has occurred. Please check the system log.'
     return JsonResponse(d, status=500, safe=False)
 
 

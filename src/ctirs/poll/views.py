@@ -16,6 +16,12 @@ from ctirs.core.stix.regist import regist
 DEFAULT_LIMIT_NUM = 10
 
 
+def get_common_error_dict():
+    return {
+        'status': 'NG',
+        'message': 'A system error has occurred. Please check the system log.'}
+
+
 def get_start_start(request):
     return get_text_field_value(request, 'poll_start', default_value=None)
 
@@ -237,13 +243,10 @@ def _version_get(request, taxii_id, object_id, version):
             'data': object_
         }
         return JsonResponse(d, safe=True)
-    except Exception as e:
-        d = {
-            'status': 'NG',
-            'message': str(e),
-        }
+    except Exception:
+        d = get_common_error_dict()
         return JsonResponse(d, safe=True)
- 
+
 
 def _version_delete(request, taxii_id, object_id, version):
     try:
@@ -278,7 +281,7 @@ def _version_delete(request, taxii_id, object_id, version):
         d = {
             'status': 'NG',
             'message': str(e),
-        }
+        } 
         return JsonResponse(d, safe=True)
 
 
@@ -308,7 +311,7 @@ def get_filtering_params(**kwargs):
         match['version'] = kwargs['match_version']
     filtering_params['match'] = match
     return filtering_params
- 
+
 
 def _manifest(request, replace_dict, cl, filtering_params):
     try:
@@ -331,11 +334,8 @@ def register_object(request):
             'message': 'Success'
         }
         return JsonResponse(d, safe=True)
-    except Exception as e:
-        d = {
-            'status': 'NG',
-            'message': str(e),
-        }
+    except Exception:
+        d = get_common_error_dict()
         return JsonResponse(d, safe=True)
 
 

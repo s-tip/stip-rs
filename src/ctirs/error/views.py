@@ -16,9 +16,9 @@ def get_error_msg():
 
 # エラーページレンダリング
 def error_page(request):
-    # error情報取得
-    err_msg = get_error_msg()
-    return error_page_free_format(request, err_msg)
+    out_error_msg = get_error_msg()
+    print(out_error_msg)
+    return error_page_free_format(request, 'A system error has occurred. Please check the system log.')
 
 
 # エラーページレンダリング/許可されていないページのアクセス
