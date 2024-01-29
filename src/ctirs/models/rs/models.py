@@ -95,25 +95,19 @@ class STIPUser(AbstractBaseUser, PermissionsMixin):
     def make_api_key(self):
         return hmac.new(uuid.uuid4().bytes, digestmod=hashlib.sha1).hexdigest()
 
-    def save_hashed_api_key(self, api_key):
-        hashed_api_key = STIPUser.make_hashed_password(api_key)
-        self.hashed_api_key = hashed_api_key
-        self.api_key = ''
-        self.save()
-
     def verify_api_key(self, api_key):
         if len(self.api_key):
             self.hashed_api_key = STIPUser.make_hashed_password(self.api_key)
-            self.api_key = ''
             self.save()
         if len(self.hashed_api_key) == 0:
             return None
         return STIPUser.verify_hashed_password(api_key, self.hashed_api_key)
 
     def change_api_key(self):
-        api_key = self.make_api_key()
-        self.save_hashed_api_key(api_key)
-        return api_key
+        self.api_key = self.make_api_key()
+        self.hashed_api_key = STIPUser.make_hashed_password(self.api_key)
+        self.save()
+        return self.api_key
 
     def create_gv_auth_user(self):
         self.gv_auth_user = GVAuthUser.objects.create_user()

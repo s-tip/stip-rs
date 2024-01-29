@@ -51,6 +51,8 @@ def get_matching_from_rs(api_user, id_):
 # CTIM-RSのwebapi用のhttp header
 def _get_ctirs_api_http_headers(api_user):
     # username,api_key は api_userごとの値を使用する
+    if len(api_user.api_key) == 0:
+        api_user.change_api_key()
     return {
         'apikey': api_user.api_key,
         'username': api_user.username.encode(),
